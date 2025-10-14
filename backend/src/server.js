@@ -9,8 +9,10 @@ const startServer = async () => {
   try {
     // Sync database
     await syncDatabase();
+    console.log('✅ Database synchronized'); // ✅ BARU
     
     // Start MQTT client
+    console.log('🚀 Starting MQTT client...'); // ✅ BARU
     mqttClient.connect();
     
     // Start server
@@ -18,6 +20,7 @@ const startServer = async () => {
       console.log(`🚀 HY.YUME Monitor Server running on port ${PORT}`);
       console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
       console.log(`🔗 MQTT Broker: ${process.env.MQTT_BROKER_URL}`);
+      console.log(`📡 Subscribed to: hyyume/sensor/data`); // ✅ BARU
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);

@@ -1,8 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const mqttClient = require('./config/mqtt');
-const { saveSensorData } = require('./controllers/dataController');
+const mqttClient = require('./config/mqtt'); // ✅ Tetap import MQTT client
 require('dotenv').config();
 
 const app = express();
@@ -21,24 +20,25 @@ app.get('/api/health', (req, res) => {
   res.json({
     success: true,
     message: 'HY.YUME Monitor API is running',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    mqttStatus: mqttClient.isConnected ? 'connected' : 'disconnected' // ✅ Info status MQTT
   });
 });
 
-// MQTT Message Handler
-mqttClient.onMessage(async (topic, message) => {
-  try {
-    if (topic === 'hyyume/sensor/data') {
-      const sensorData = JSON.parse(message.toString());
-      console.log('📡 MQTT Data received:', sensorData);
-      
-      await saveSensorData(sensorData);
-      console.log('✅ Data diterima dan disimpan');
-    }
-  } catch (error) {
-    console.error('❌ Error processing MQTT message:', error);
-  }
-});
+// ❌ HAPUS BAGIAN INI (sudah dipindah ke mqtt.js):
+// mqttClient.onMessage(async (topic, message) => {
+//   try {
+//     if (topic === 'hyyume/sensor/data') {
+//       const sensorData = JSON.parse(message.toString());
+//       console.log('📡 MQTT Data received:', sensorData);
+//       
+//       await saveSensorData(sensorData);
+//       console.log('✅ Data diterima dan disimpan');
+//     }
+//   } catch (error) {
+//     console.error('❌ Error processing MQTT message:', error);
+//   }
+// });
 
 // Error handling middleware
 app.use((err, req, res, next) => {

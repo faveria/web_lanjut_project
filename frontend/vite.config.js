@@ -13,9 +13,10 @@ export default defineConfig({
     port: 3001,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'https://api.hyyyume.my.id',
         changeOrigin: true,
       },
     },
   },
 })
+
