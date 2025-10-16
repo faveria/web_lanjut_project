@@ -35,9 +35,11 @@ const Header = ({ sidebarOpen, setSidebarOpen, mobileSidebarOpen, setMobileSideb
             <Menu className="w-4 h-4" />
           </Button>
           
-          <div className="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">H</span>
-          </div>
+          <img 
+            src="/favicon.png" 
+            alt="HY.YUME Logo" 
+            className="w-10 h-10 object-contain"
+          />
           <div>
             <h1 className="text-lg sm:text-xl font-semibold text-gray-900">HY.YUME Monitor</h1>
             <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">Smart Hydroponic IoT System</p>

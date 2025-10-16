@@ -116,14 +116,14 @@ const Login = () => {
           className="text-center mb-8"
         >
           <div className="flex items-center justify-center space-x-3 mb-4">
-            <motion.div
+            <motion.img
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 15 }}
-              className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg"
-            >
-              <span className="text-white font-bold text-xl">H</span>
-            </motion.div>
+              src="/favicon.png"
+              alt="HY.YUME Logo"
+              className="w-12 h-12 object-contain"
+            />
             <div>
               <h1 className="text-2xl font-bold text-gray-900">HY.YUME</h1>
               <p className="text-primary-600 font-semibold">Monitor</p>
