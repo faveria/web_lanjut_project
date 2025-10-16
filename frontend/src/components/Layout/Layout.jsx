@@ -28,31 +28,31 @@ const Layout = ({ children }) => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col h-screen">
       <Header 
         sidebarOpen={sidebarOpen} 
         setSidebarOpen={setSidebarOpen} 
         mobileSidebarOpen={mobileSidebarOpen}
         setMobileSidebarOpen={setMobileSidebarOpen}
       />
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-hidden">
         {/* Desktop Sidebar - hidden on mobile unless explicitly opened */}
-        <div className={`${sidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 hidden lg:block overflow-hidden h-full`}>
-          <Sidebar currentPath={location.pathname} onNavigate={navigate} />
+        <div className={`${sidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 ease-in-out hidden lg:block overflow-hidden flex-shrink-0 h-full`}>
+          <div className="h-full flex-1">
+            <Sidebar currentPath={location.pathname} onNavigate={navigate} />
+          </div>
         </div>
         
         {/* Mobile Sidebar - overlay style */}
-        {mobileSidebarOpen && (
-          <div className="fixed inset-0 z-40 lg:hidden">
-            <div 
-              className="fixed inset-0 bg-black bg-opacity-50" 
-              onClick={() => setMobileSidebarOpen(false)}
-            ></div>
-            <div className="relative z-50 w-64 h-full bg-white max-w-[80%]">
-              <Sidebar currentPath={location.pathname} onNavigate={navigate} />
-            </div>
+        <div className={`fixed inset-0 z-40 lg:hidden ${mobileSidebarOpen ? 'block' : 'hidden'}`}>
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300" 
+            onClick={() => setMobileSidebarOpen(false)}
+          ></div>
+          <div className={`relative z-50 w-64 h-full bg-white max-w-[80%] transition-transform duration-300 ease-in-out ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <Sidebar currentPath={location.pathname} onNavigate={navigate} />
           </div>
-        )}
+        </div>
         
         {/* Main Content */}
         <main className="flex-1 w-full overflow-auto p-4 sm:p-6">
