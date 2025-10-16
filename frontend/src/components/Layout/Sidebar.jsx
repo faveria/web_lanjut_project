@@ -35,7 +35,7 @@ const Sidebar = ({ currentPath, onNavigate }) => {
     <motion.div
       initial={{ x: -50, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      className="w-full bg-white border-r border-gray-200 h-full flex flex-col"
+      className="w-full bg-white border-r border-gray-200 h-full flex flex-col min-h-0"
     >
       <div>
         <button 

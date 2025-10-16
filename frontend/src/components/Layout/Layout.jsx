@@ -28,16 +28,16 @@ const Layout = ({ children }) => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header 
         sidebarOpen={sidebarOpen} 
         setSidebarOpen={setSidebarOpen} 
         mobileSidebarOpen={mobileSidebarOpen}
         setMobileSidebarOpen={setMobileSidebarOpen}
       />
-      <div className="flex lg:space-x-0">
+      <div className="flex flex-1">
         {/* Desktop Sidebar - hidden on mobile unless explicitly opened */}
-        <div className={`${sidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 hidden lg:block overflow-hidden`}>
+        <div className={`${sidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 hidden lg:block overflow-hidden h-full`}>
           <Sidebar currentPath={location.pathname} onNavigate={navigate} />
         </div>
         
@@ -55,7 +55,7 @@ const Layout = ({ children }) => {
         )}
         
         {/* Main Content */}
-        <main className="flex-1 w-full min-h-screen sm:min-h-[calc(100vh-80px)] overflow-auto p-4 sm:p-6">
+        <main className="flex-1 w-full overflow-auto p-4 sm:p-6">
           {children}
         </main>
       </div>
