@@ -31,16 +31,6 @@ const Header = () => {
           </div>
           
           <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm" className="flex items-center space-x-2">
-              <User className="w-4 h-4" />
-              <span>Profile</span>
-            </Button>
-            
-            <Button variant="outline" size="sm" className="flex items-center space-x-2">
-              <Settings className="w-4 h-4" />
-              <span>Settings</span>
-            </Button>
-            
             <Button 
               variant="outline" 
               size="sm" 

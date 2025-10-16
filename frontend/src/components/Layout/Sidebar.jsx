@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, User, Settings, Droplets } from 'lucide-react';
+import { LayoutDashboard, User, Settings, Droplets, LogOut } from 'lucide-react';
 import { cn } from '../../utils/cn';
+import { useAuth } from '../../context/AuthContext';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -10,6 +11,8 @@ const menuItems = [
 ];
 
 const Sidebar = ({ currentPath, onNavigate }) => {
+  const { logout } = useAuth();
+
   return (
     <motion.div
       initial={{ x: -50, opacity: 0 }}
@@ -53,6 +56,19 @@ const Sidebar = ({ currentPath, onNavigate }) => {
           );
         })}
       </nav>
+
+      <div className="px-4 mt-4">
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          onClick={logout}
+          className="w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-all duration-200 text-red-600 hover:bg-red-50 border border-red-200"
+        >
+          <LogOut className="w-5 h-5" />
+          <span className="font-medium">Logout</span>
+        </motion.button>
+      </div>
 
       <div className="absolute bottom-6 left-6 right-6">
         <div className="bg-primary-50 rounded-lg p-4 border border-primary-200">
