@@ -23,21 +23,25 @@ const ChartBox = ({ data, title, dataKey, color = '#00A884' }) => {
     >
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-700">{title}</CardTitle>
+          <CardTitle className="text-lg font-semibold text-gray-700 dark:text-gray-200">{title}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                <CartesianGrid strokeDasharray="3 3" className="opacity-30 dark:stroke-gray-600" />
                 <XAxis 
                   dataKey="time" 
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: 'currentColor' }}
                   interval="preserveStartEnd"
+                  tickMargin={10}
+                  stroke="currentColor"
                 />
                 <YAxis 
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: 'currentColor' }}
                   width={40}
+                  tickMargin={10}
+                  stroke="currentColor"
                 />
                 <Tooltip 
                   labelFormatter={(label, payload) => {
@@ -51,8 +55,10 @@ const ChartBox = ({ data, title, dataKey, color = '#00A884' }) => {
                     backgroundColor: 'white', 
                     border: '1px solid #e5e7eb',
                     borderRadius: '8px',
-                    fontSize: '12px'
+                    fontSize: '12px',
+                    color: 'inherit'
                   }}
+                  wrapperStyle={{ outline: 'none' }}
                 />
                 <Line 
                   type="monotone" 

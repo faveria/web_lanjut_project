@@ -32,8 +32,8 @@ const Settings = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">Customize your monitoring experience</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
+        <p className="text-gray-600 mt-1 dark:text-gray-300">Customize your monitoring experience</p>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -51,13 +51,13 @@ const Settings = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                <label className="text-sm font-medium text-gray-700 mb-2 block dark:text-gray-300">
                   Refresh Interval
                 </label>
                 <select
                   value={pollingInterval}
                   onChange={handlePollingIntervalChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                 >
                   {intervals.map(interval => (
                     <option key={interval.value} value={interval.value}>
@@ -65,7 +65,7 @@ const Settings = () => {
                     </option>
                   ))}
                 </select>
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-gray-500 mt-2 dark:text-gray-400">
                   How often the dashboard updates with new sensor data
                 </p>
               </div>
@@ -88,23 +88,23 @@ const Settings = () => {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">Email Alerts</p>
-                  <p className="text-sm text-gray-500">Receive email notifications for system alerts</p>
+                  <p className="font-medium text-gray-900 dark:text-white">Email Alerts</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Receive email notifications for system alerts</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" className="sr-only peer" defaultChecked />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500 dark:bg-gray-700 dark:peer-checked:bg-primary-600"></div>
                 </label>
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">Push Notifications</p>
-                  <p className="text-sm text-gray-500">Browser notifications for critical alerts</p>
+                  <p className="font-medium text-gray-900 dark:text-white">Push Notifications</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Browser notifications for critical alerts</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" className="sr-only peer" defaultChecked />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500 dark:bg-gray-700 dark:peer-checked:bg-primary-600"></div>
                 </label>
               </div>
             </CardContent>
@@ -129,23 +129,23 @@ const Settings = () => {
                   onClick={() => setTheme('light')}
                   className={`p-4 border-2 rounded-lg text-center transition-all ${
                     theme === 'light' 
-                      ? 'border-primary-500 bg-primary-50' 
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30 dark:border-primary-400' 
+                      : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600'
                   }`}
                 >
-                  <Sun className="w-6 h-6 mx-auto mb-2" />
-                  <span className="font-medium">Light</span>
+                  <Sun className="w-6 h-6 mx-auto mb-2 dark:text-white" />
+                  <span className={`font-medium ${theme === 'light' ? 'dark:text-white' : 'dark:text-gray-300'}`}>Light</span>
                 </button>
                 <button
                   onClick={() => setTheme('dark')}
                   className={`p-4 border-2 rounded-lg text-center transition-all ${
                     theme === 'dark' 
-                      ? 'border-primary-500 bg-primary-50' 
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30 dark:border-primary-400' 
+                      : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600'
                   }`}
                 >
-                  <Moon className="w-6 h-6 mx-auto mb-2" />
-                  <span className="font-medium">Dark</span>
+                  <Moon className="w-6 h-6 mx-auto mb-2 dark:text-white" />
+                  <span className={`font-medium ${theme === 'dark' ? 'dark:text-white' : 'dark:text-gray-300'}`}>Dark</span>
                 </button>
               </div>
             </CardContent>
@@ -162,21 +162,21 @@ const Settings = () => {
               <CardTitle>System Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                <span className="text-gray-600">API Version</span>
-                <span className="font-medium">v1.0.0</span>
+              <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-gray-600 dark:text-gray-400">API Version</span>
+                <span className="font-medium dark:text-white">v1.0.0</span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                <span className="text-gray-600">Frontend Version</span>
-                <span className="font-medium">v1.0.0</span>
+              <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-gray-600 dark:text-gray-400">Frontend Version</span>
+                <span className="font-medium dark:text-white">v1.0.0</span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                <span className="text-gray-600">Last Updated</span>
-                <span className="font-medium">{new Date().toLocaleDateString()}</span>
+              <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-gray-600 dark:text-gray-400">Last Updated</span>
+                <span className="font-medium dark:text-white">{new Date().toLocaleDateString()}</span>
               </div>
               <div className="flex justify-between items-center py-2">
-                <span className="text-gray-600">Status</span>
-                <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Operational</span>
+                <span className="text-gray-600 dark:text-gray-400">Status</span>
+                <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full dark:bg-green-900/30 dark:text-green-400">Operational</span>
               </div>
             </CardContent>
           </Card>

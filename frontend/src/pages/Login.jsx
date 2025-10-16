@@ -92,7 +92,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Back to Home */}
         <motion.div
@@ -125,12 +125,12 @@ const Login = () => {
               className="w-12 h-12 object-contain"
             />
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">HY.YUME</h1>
-              <p className="text-primary-600 font-semibold">Monitor</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">HY.YUME</h1>
+              <p className="text-primary-600 font-semibold dark:text-primary-400">Monitor</p>
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-          <p className="text-gray-600">Sign in to your hydroponic monitoring dashboard</p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2 dark:text-white">Welcome Back</h2>
+          <p className="text-gray-600 dark:text-gray-300">Sign in to your hydroponic monitoring dashboard</p>
         </motion.div>
 
         {/* Login Card */}
@@ -139,9 +139,9 @@ const Login = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="w-full shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+          <Card className="w-full shadow-xl border-0 bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 dark:text-white">
             <CardHeader className="text-center space-y-2 pb-4">
-              <CardTitle className="text-xl font-semibold text-gray-900">
+              <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
                 Sign In to Your Account
               </CardTitle>
             </CardHeader>
@@ -150,7 +150,7 @@ const Login = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Email Field */}
                 <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium text-gray-700">
+                  <label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Email Address
                   </label>
                   <div className="relative">
@@ -162,7 +162,7 @@ const Login = () => {
                       placeholder="Enter your email"
                       value={formData.email}
                       onChange={handleChange}
-                      className="pl-10 pr-4 py-3 border-gray-300 focus:border-primary-500 focus:ring-primary-500"
+                      className="pl-10 pr-4 py-3 border-gray-300 focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                       required
                       disabled={loading}
                     />
@@ -172,7 +172,7 @@ const Login = () => {
                 {/* Password Field */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label htmlFor="password" className="text-sm font-medium text-gray-700">
+                    <label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       Password
                     </label>
                     <Link 
@@ -191,7 +191,7 @@ const Login = () => {
                       placeholder="Enter your password"
                       value={formData.password}
                       onChange={handleChange}
-                      className="pl-10 pr-10 py-3 border-gray-300 focus:border-primary-500 focus:ring-primary-500"
+                      className="pl-10 pr-10 py-3 border-gray-300 focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                       required
                       disabled={loading}
                     />
@@ -215,9 +215,9 @@ const Login = () => {
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
-                    className="p-3 bg-red-50 border border-red-200 rounded-lg"
+                    className="p-3 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800"
                   >
-                    <p className="text-red-700 text-sm text-center">{error}</p>
+                    <p className="text-red-700 text-sm text-center dark:text-red-300">{error}</p>
                   </motion.div>
                 )}
 
@@ -243,27 +243,27 @@ const Login = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 py-3 font-medium"
+                  className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 py-3 font-medium dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                   onClick={handleDemoLogin}
                   disabled={loading}
                 >
                   Try Demo Account
                 </Button>
-                <p className="text-xs text-gray-500 text-center mt-2">
+                <p className="text-xs text-gray-500 text-center mt-2 dark:text-gray-400">
                   Experience the dashboard with sample data
                 </p>
               </div>
 
               {/* Divider */}
               <div className="relative flex items-center py-4">
-                <div className="flex-grow border-t border-gray-300"></div>
-                <span className="flex-shrink mx-4 text-gray-500 text-sm">or</span>
-                <div className="flex-grow border-t border-gray-300"></div>
+                <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+                <span className="flex-shrink mx-4 text-gray-500 text-sm dark:text-gray-400">or</span>
+                <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
               </div>
 
               {/* Register Link */}
               <div className="text-center">
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   Don't have an account?{' '}
                   <Link 
                     to="/register" 
@@ -284,23 +284,23 @@ const Login = () => {
           transition={{ delay: 0.3 }}
           className="mt-8 grid grid-cols-3 gap-4 text-center"
         >
-          <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-            <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+          <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2 dark:bg-green-900/20">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             </div>
-            <p className="text-xs text-gray-600">Real-time Data</p>
+            <p className="text-xs text-gray-600 dark:text-gray-300">Real-time Data</p>
           </div>
-          <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-            <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+          <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2 dark:bg-blue-900/20">
               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
             </div>
-            <p className="text-xs text-gray-600">Live Charts</p>
+            <p className="text-xs text-gray-600 dark:text-gray-300">Live Charts</p>
           </div>
-          <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-            <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+          <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2 dark:bg-purple-900/20">
               <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
             </div>
-            <p className="text-xs text-gray-600">Smart Alerts</p>
+            <p className="text-xs text-gray-600 dark:text-gray-300">Smart Alerts</p>
           </div>
         </motion.div>
 
@@ -311,7 +311,7 @@ const Login = () => {
           transition={{ delay: 0.4 }}
           className="mt-8 text-center"
         >
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             © 2024 HY.YUME Monitor. Secure hydroponic monitoring system.
           </p>
         </motion.div>

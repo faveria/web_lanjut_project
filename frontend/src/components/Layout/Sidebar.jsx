@@ -35,11 +35,11 @@ const Sidebar = ({ currentPath, onNavigate }) => {
     <motion.div
       initial={{ x: -50, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      className="w-full bg-white border-r border-gray-200 h-full flex flex-col min-h-0"
+      className="w-full bg-white border-r border-gray-200 h-full flex flex-col min-h-0 dark:bg-gray-800 dark:border-gray-700"
     >
       <div>
         <button 
-          className="lg:hidden p-2 text-gray-500 hover:text-gray-700"
+          className="lg:hidden p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           onClick={() => {
             const event = new CustomEvent('closeMobileSidebar');
             window.dispatchEvent(event);
@@ -65,8 +65,8 @@ const Sidebar = ({ currentPath, onNavigate }) => {
                 'w-full flex items-center space-x-3 px-3 py-3 text-left rounded-lg transition-all duration-200',
                 'mb-1',
                 isActive
-                  ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-500'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-500 dark:bg-primary-900/30 dark:text-primary-300 dark:border-primary-400'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700/50 dark:hover:text-white'
               )}
             >
               <Icon className={cn(
@@ -85,17 +85,17 @@ const Sidebar = ({ currentPath, onNavigate }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           onClick={logout}
-          className="w-full flex items-center space-x-3 px-3 py-3 text-left rounded-lg transition-all duration-200 text-red-600 hover:bg-red-50 border border-red-200"
+          className="w-full flex items-center space-x-3 px-3 py-3 text-left rounded-lg transition-all duration-200 text-red-600 hover:bg-red-50 border border-red-200 dark:text-red-400 dark:hover:bg-red-900/30 dark:border-red-800/50"
         >
           <LogOut className="w-5 h-5" />
           <span className="font-medium">Logout</span>
         </motion.button>
       </div>
 
-      <div className="px-4 py-4 border-t border-gray-200">
-        <div className="bg-primary-50 rounded-lg p-3 border border-primary-200">
-          <p className="text-xs sm:text-sm text-primary-700 font-medium">System Status</p>
-          <p className="text-xs text-primary-600 mt-1">All sensors operational</p>
+      <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="bg-primary-50 rounded-lg p-3 border border-primary-200 dark:bg-gray-700/50 dark:border-gray-600">
+          <p className="text-xs sm:text-sm text-primary-700 font-medium dark:text-primary-300">System Status</p>
+          <p className="text-xs text-primary-600 mt-1 dark:text-gray-300">All sensors operational</p>
         </div>
       </div>
     </motion.div>

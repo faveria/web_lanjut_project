@@ -13,8 +13,8 @@ const Profile = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
-        <p className="text-gray-600 mt-1">Manage your account information</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Profile</h1>
+        <p className="text-gray-600 mt-1 dark:text-gray-300">Manage your account information</p>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -26,33 +26,33 @@ const Profile = () => {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Account Information</CardTitle>
+              <CardTitle className="dark:text-white">Account Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                <div className="w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center">
+              <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg dark:bg-gray-700/50">
+                <div className="w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center dark:bg-primary-600">
                   <User className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Account Type</p>
-                  <p className="font-semibold text-gray-900">Standard User</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Account Type</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">Standard User</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Email Address</label>
-                  <div className="flex items-center space-x-3 p-3 bg-white border border-gray-300 rounded-lg">
-                    <Mail className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-900">{user?.email}</span>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Email Address</label>
+                  <div className="flex items-center space-x-3 p-3 bg-white border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600">
+                    <Mail className="w-4 h-4 text-gray-400 dark:text-gray-300" />
+                    <span className="text-gray-900 dark:text-white">{user?.email}</span>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Member Since</label>
-                  <div className="flex items-center space-x-3 p-3 bg-white border border-gray-300 rounded-lg">
-                    <Calendar className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-900">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Member Since</label>
+                  <div className="flex items-center space-x-3 p-3 bg-white border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600">
+                    <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-300" />
+                    <span className="text-gray-900 dark:text-white">
                       {new Date().toLocaleDateString('en-US', { 
                         year: 'numeric', 
                         month: 'long', 
@@ -64,9 +64,9 @@ const Profile = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">User ID</label>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <code className="text-sm text-gray-600">{user?.id}</code>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">User ID</label>
+                <div className="p-3 bg-gray-50 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:border">
+                  <code className="text-sm text-gray-600 dark:text-gray-300">{user?.id}</code>
                 </div>
               </div>
             </CardContent>
@@ -81,21 +81,21 @@ const Profile = () => {
         >
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">System Access</CardTitle>
+              <CardTitle className="text-lg dark:text-white">System Access</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Dashboard Access</span>
-                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Active</span>
+                  <span className="text-gray-600 dark:text-gray-300">Dashboard Access</span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full dark:bg-green-900/30 dark:text-green-400">Active</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Real-time Data</span>
-                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Enabled</span>
+                  <span className="text-gray-600 dark:text-gray-300">Real-time Data</span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full dark:bg-green-900/30 dark:text-green-400">Enabled</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">API Access</span>
-                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Enabled</span>
+                  <span className="text-gray-600 dark:text-gray-300">API Access</span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full dark:bg-green-900/30 dark:text-green-400">Enabled</span>
                 </div>
               </div>
             </CardContent>
@@ -103,17 +103,17 @@ const Profile = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Quick Actions</CardTitle>
+              <CardTitle className="text-lg dark:text-white">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors dark:border-gray-700 dark:hover:bg-gray-700/50">
                   Change Password
                 </button>
-                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors dark:border-gray-700 dark:hover:bg-gray-700/50">
                   Notification Settings
                 </button>
-                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors dark:border-gray-700 dark:hover:bg-gray-700/50">
                   Export Data
                 </button>
               </div>

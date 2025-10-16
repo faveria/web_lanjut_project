@@ -46,33 +46,33 @@ const SensorCard = ({ type, value, loading }) => {
       <Card className="h-full transition-all duration-300 hover:shadow-md">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-semibold text-gray-700">
+            <CardTitle className="text-lg font-semibold text-gray-700 dark:text-gray-200">
               {label}
             </CardTitle>
-            <Icon className={cn('w-6 h-6', statusColor)} />
+            <Icon className={cn('w-6 h-6', statusColor, 'dark:text-white')} />
           </div>
         </CardHeader>
         <CardContent>
           {loading ? (
             <div className="space-y-2">
-              <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
-              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-8 bg-gray-200 rounded animate-pulse dark:bg-gray-700"></div>
+              <div className="h-4 bg-gray-200 rounded animate-pulse dark:bg-gray-700"></div>
             </div>
           ) : (
             <div className="space-y-2">
               <div className="flex items-baseline space-x-2">
-                <span className="text-3xl font-bold text-gray-900">
+                <span className="text-3xl font-bold text-gray-900 dark:text-white">
                   {value || '--'}
                 </span>
-                <span className="text-sm text-gray-500">{unit}</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">{unit}</span>
               </div>
               <div className={cn(
                 'text-sm font-medium px-2 py-1 rounded-full w-fit',
                 statusColor === 'text-red-500' 
-                  ? 'bg-red-100 text-red-700' 
+                  ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' 
                   : statusColor === 'text-green-500'
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-gray-100 text-gray-700'
+                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                  : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
               )}>
                 {statusText}
               </div>
