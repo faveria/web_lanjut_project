@@ -29,18 +29,6 @@ const Header = () => {
             <p className="text-sm font-medium text-gray-900">{user?.email}</p>
             <p className="text-xs text-gray-500">Online</p>
           </div>
-          
-          <div className="flex items-center space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex items-center space-x-2 text-red-600 border-red-200 hover:bg-red-50"
-              onClick={logout}
-            >
-              <LogOut className="w-4 h-4" />
-              <span>Logout</span>
-            </Button>
-          </div>
         </div>
       </div>
     </motion.header>
