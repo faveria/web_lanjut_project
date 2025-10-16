@@ -1,10 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { LogOut, User, Settings } from 'lucide-react';
+import { LogOut, User, Settings, Menu } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useAuth } from '../../context/AuthContext';
 
-const Header = () => {
+const Header = ({ sidebarOpen, setSidebarOpen }) => {
   const { user, logout } = useAuth();
 
   return (
@@ -15,6 +15,14 @@ const Header = () => {
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="p-2"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            <Menu className="w-4 h-4" />
+          </Button>
           <div className="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-lg">H</span>
           </div>
