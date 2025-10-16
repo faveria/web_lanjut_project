@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useSensorData } from '../hooks/useWebSocket';
+import { useTheme } from '../context/ThemeContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -8,8 +9,8 @@ import { RefreshCw, Bell, Moon, Sun } from 'lucide-react';
 
 const Settings = () => {
   const { updatePollingInterval } = useSensorData();
+  const { theme, setTheme } = useTheme();
   const [pollingInterval, setPollingInterval] = useState(3000);
-  const [theme, setTheme] = useState('light');
 
   const handlePollingIntervalChange = (e) => {
     const value = parseInt(e.target.value);

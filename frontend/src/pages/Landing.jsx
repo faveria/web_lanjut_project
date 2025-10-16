@@ -43,9 +43,11 @@ const Landing = () => {
       <nav className="px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-xl">H</span>
-            </div>
+            <img 
+              src="/favicon.png" 
+              alt="HY.YUME Logo" 
+              className="w-10 h-10 object-contain"
+            />
             <span className="text-2xl font-bold text-gray-900">HY.YUME</span>
           </div>
           <div className="flex items-center space-x-4">
@@ -85,11 +87,6 @@ const Landing = () => {
                 <Button size="lg" className="bg-primary-500 hover:bg-primary-600 px-8 py-3 text-lg">
                   Start Monitoring
                   <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </Link>
-              <Link to="/login">
-                <Button variant="outline" size="lg" className="border-primary-200 text-primary-700 hover:bg-primary-50 px-8 py-3 text-lg">
-                  View Demo
                 </Button>
               </Link>
             </div>
@@ -177,9 +174,11 @@ const Landing = () => {
       <footer className="px-6 py-8 bg-gray-900 text-white">
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex items-center justify-center space-x-3 mb-4">
-            <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold">H</span>
-            </div>
+            <img 
+              src="/favicon.png" 
+              alt="HY.YUME Logo" 
+              className="w-8 h-8 object-contain"
+            />
             <span className="text-xl font-bold">HY.YUME Monitor</span>
           </div>
           <p className="text-gray-400">
