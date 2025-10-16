@@ -37,13 +37,7 @@ const Sidebar = ({ currentPath, onNavigate }) => {
       animate={{ x: 0, opacity: 1 }}
       className="w-full bg-white border-r border-gray-200 h-full flex flex-col"
     >
-      <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
-            <Droplets className="w-5 h-5 text-white" />
-          </div>
-          <span className="text-lg font-semibold text-gray-900 hidden lg:block">HY.YUME</span>
-        </div>
+      <div>
         <button 
           className="lg:hidden p-2 text-gray-500 hover:text-gray-700"
           onClick={() => {
