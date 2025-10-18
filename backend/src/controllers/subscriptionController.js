@@ -2,17 +2,13 @@ const Xendit = require('xendit-node');
 const { User } = require('../models');
 require('dotenv').config();
 
-const xendit = new Xendit({
+const xendit = Xendit({
   secretKey: process.env.XENDIT_API_KEY,
   environment: process.env.XENDIT_MODE || 'development',
 });
 
 const { Invoice } = xendit;
 const invoice = new Invoice();
-
-
-
-const invoiceSpecificOptions = xenditInstance.Invoice;
 
 // Define subscription plans
 const subscriptionPlans = {
