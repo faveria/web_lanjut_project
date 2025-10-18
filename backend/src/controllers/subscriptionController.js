@@ -2,7 +2,6 @@ const { Xendit } = require('xendit-node');
 const { User } = require('../models');
 require('dotenv').config();
 
-// Inisialisasi Xendit
 const xendit = new Xendit({
   secretKey: process.env.XENDIT_API_KEY,
   environment: process.env.XENDIT_MODE || 'sandbox', // sandbox / production
@@ -10,32 +9,12 @@ const xendit = new Xendit({
 
 const invoiceClient = xendit.Invoice;
 
-// Define subscription plans
 const subscriptionPlans = {
-  monthly: {
-    id: 'monthly',
-    name: '1 Month Plan',
-    amount: 29000,
-    description: '1 Month Premium Subscription Plan',
-    validityDays: 30,
-  },
-  quarterly: {
-    id: 'quarterly',
-    name: '3 Months Plan',
-    amount: 69000,
-    description: '3 Months Premium Subscription Plan',
-    validityDays: 90,
-  },
-  annual: {
-    id: 'annual',
-    name: '1 Year Plan',
-    amount: 259000,
-    description: '1 Year Premium Subscription Plan',
-    validityDays: 365,
-  },
+  monthly: { id: 'monthly', name: '1 Month Plan', amount: 29000, description: '1 Month Premium Subscription Plan', validityDays: 30 },
+  quarterly: { id: 'quarterly', name: '3 Months Plan', amount: 69000, description: '3 Months Premium Subscription Plan', validityDays: 90 },
+  annual: { id: 'annual', name: '1 Year Plan', amount: 259000, description: '1 Year Premium Subscription Plan', validityDays: 365 },
 };
 
-// Create invoice
 const createInvoice = async (req, res) => {
   try {
     const { planId } = req.body;
@@ -47,17 +26,19 @@ const createInvoice = async (req, res) => {
 
     const plan = subscriptionPlans[planId];
 
-    // Membuat invoice via Xendit v7
-    const createdInvoice = await invoiceClient.createInvoice({
+    // Pastikan field wajib sesuai Xendit v7
+    const payload = {
       externalID: `invoice_${user.id}_${Date.now()}`,
       amount: plan.amount,
       payerEmail: user.email,
       description: plan.description,
       successRedirectURL: 'https://your-domain.com/payment-success',
       failureRedirectURL: 'https://your-domain.com/payment-failed',
-    });
+    };
 
-    console.log('Invoice response:', createdInvoice);
+    console.log('Payload for Xendit invoice:', payload);
+
+    const createdInvoice = await invoiceClient.createInvoice(payload);
 
     res.status(200).json({
       success: true,
@@ -79,32 +60,23 @@ const createInvoice = async (req, res) => {
   }
 };
 
-// Webhook payment
 const handlePaymentWebhook = async (req, res) => {
   try {
     const { event_type, data } = req.body;
 
     if (event_type === 'invoice.paid') {
       const invoice = data;
-      const userId = invoice.externalID.split('_')[1]; // Ambil user ID
+      const userId = invoice.externalID.split('_')[1];
 
       const user = await User.findByPk(userId);
-      if (!user) {
-        console.error('User not found for invoice:', invoice.id);
-        return res.status(404).json({ success: false, message: 'User not found' });
-      }
+      if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
-      // Ambil plan ID dari externalID
       const planInfo = invoice.externalID.split('_')[0];
       const planId = planInfo === 'invoice' ? 'monthly' : planInfo;
 
-      // Hitung tanggal berakhir subscription
       const startDate = new Date();
       const endDate = new Date(startDate);
-
-      if (subscriptionPlans[planId]) {
-        endDate.setDate(startDate.getDate() + subscriptionPlans[planId].validityDays);
-      }
+      if (subscriptionPlans[planId]) endDate.setDate(startDate.getDate() + subscriptionPlans[planId].validityDays);
 
       await user.update({
         subscriptionType: planId,
@@ -122,7 +94,6 @@ const handlePaymentWebhook = async (req, res) => {
   }
 };
 
-// Get subscription status
 const getSubscriptionStatus = async (req, res) => {
   try {
     const { user } = req;
@@ -132,9 +103,7 @@ const getSubscriptionStatus = async (req, res) => {
       subscriptionStartDate: user.subscriptionStartDate,
       subscriptionEndDate: user.subscriptionEndDate,
       isExpired: user.subscriptionEndDate ? new Date() > new Date(user.subscriptionEndDate) : true,
-      daysRemaining: user.subscriptionEndDate
-        ? Math.ceil((new Date(user.subscriptionEndDate) - new Date()) / (1000 * 60 * 60 * 24))
-        : 0,
+      daysRemaining: user.subscriptionEndDate ? Math.ceil((new Date(user.subscriptionEndDate) - new Date()) / (1000 * 60 * 60 * 24)) : 0,
     };
 
     res.status(200).json({ success: true, data: subscriptionInfo });
@@ -144,8 +113,4 @@ const getSubscriptionStatus = async (req, res) => {
   }
 };
 
-module.exports = {
-  createInvoice,
-  handlePaymentWebhook,
-  getSubscriptionStatus,
-};
+module.exports = { createInvoice, handlePaymentWebhook, getSubscriptionStatus };
