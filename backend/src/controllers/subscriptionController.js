@@ -2,7 +2,7 @@ const { Xendit } = require('xendit-node');
 const { User } = require('../models');
 require('dotenv').config();
 
-const xendit = Xendit({
+const xendit = new Xendit({
   secretKey: process.env.XENDIT_API_KEY,
   environment: process.env.XENDIT_MODE || 'development',
 });
