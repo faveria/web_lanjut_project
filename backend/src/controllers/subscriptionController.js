@@ -1,10 +1,16 @@
-const { Xendit } = require('xendit-node');
+const Xendit = require('xendit-node');
 const { User } = require('../models');
 require('dotenv').config();
 
-const xenditInstance = new Xendit({
-  apiKey: process.env.XENDIT_API_KEY,
+const xendit = new Xendit({
+  secretKey: process.env.XENDIT_API_KEY,
+  environment: process.env.XENDIT_MODE || 'development',
 });
+
+const { Invoice } = xendit;
+const invoice = new Invoice();
+
+
 
 const invoiceSpecificOptions = xenditInstance.Invoice;
 
@@ -49,13 +55,15 @@ const createInvoice = async (req, res) => {
     const plan = subscriptionPlans[planId];
 
     // Create the invoice using Xendit
-    const createdInvoice = await invoiceSpecificOptions.createInvoice({
-      externalID: `invoice_${user.id}_${Date.now()}`,
-      amount: plan.amount,
-      description: plan.description,
-      payerEmail: user.email,
-      shouldSendEmail: false, // We'll handle email notifications ourselves
-    });
+    const createdInvoice = await invoice.create({
+  externalId: `invoice_${user.id}_${Date.now()}`,
+  amount: plan.amount,
+  description: plan.description,
+  payerEmail: user.email,
+  successRedirectUrl: 'https://your-domain.com/payment-success',
+  failureRedirectUrl: 'https://your-domain.com/payment-failed',
+});
+
 
     res.status(200).json({
       success: true,
