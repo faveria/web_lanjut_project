@@ -25,7 +25,7 @@ const EmailVerification = () => {
 
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/auth/verify-email?token=${token}&email=${email}`
+          `https://api.hyyyume.my.id/api/auth/verify-email?token=${token}&email=${email}`
         );
 
         if (response.data.success) {

@@ -42,7 +42,7 @@ const Subscription = () => {
       // This assumes you have the API endpoint ready
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:5000/api/subscription/create-invoice',
+        'https://api.hyyyume.my.id/api/subscription/create-invoice',
         { planId },
         {
           headers: {

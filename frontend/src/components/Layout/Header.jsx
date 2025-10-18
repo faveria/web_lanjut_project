@@ -16,7 +16,7 @@ const Header = ({ sidebarOpen, setSidebarOpen, mobileSidebarOpen, setMobileSideb
         const token = localStorage.getItem('token');
         if (token && user) {
           const response = await axios.get(
-            'http://localhost:5000/api/subscription/status',
+            'https://api.hyyyume.my.id/api/subscription/status',
             {
               headers: {
                 'Authorization': `Bearer ${token}`,

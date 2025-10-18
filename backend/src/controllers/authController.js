@@ -51,7 +51,7 @@ const register = async (req, res) => {
     });
 
     // Send verification email
-    const verificationUrl = `http://localhost:5173/verify-email?token=${verificationToken}&email=${email}`;
+    const verificationUrl = `https://hyyyume.my.id/verify-email?token=${verificationToken}&email=${email}`;
     
     const mailOptions = {
       from: process.env.EMAIL_USER,
