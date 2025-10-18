@@ -1,4 +1,4 @@
-const {Xendit} = require('xendit-node');
+const { Xendit } = require('xendit-node');
 const { User } = require('../models');
 require('dotenv').config();
 
