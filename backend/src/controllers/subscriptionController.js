@@ -2,13 +2,14 @@ const { Xendit } = require('xendit-node');
 const { User } = require('../models');
 require('dotenv').config();
 
+// Instansiasi Xendit
 const xendit = new Xendit({
   secretKey: process.env.XENDIT_API_KEY,
-  environment: process.env.XENDIT_MODE || 'development',
+  environment: process.env.XENDIT_MODE || 'sandbox', // 'production' jika live
 });
 
-const { Invoice } = xendit;
-const invoice = new Invoice();
+// Ambil service Invoice dari instance Xendit
+const invoice = xendit.Invoice;
 
 // Define subscription plans
 const subscriptionPlans = {
@@ -35,12 +36,12 @@ const subscriptionPlans = {
   }
 };
 
+// Create Invoice
 const createInvoice = async (req, res) => {
   try {
     const { planId } = req.body;
     const { user } = req;
 
-    // Validate plan ID
     if (!subscriptionPlans[planId]) {
       return res.status(400).json({
         success: false,
@@ -50,25 +51,24 @@ const createInvoice = async (req, res) => {
 
     const plan = subscriptionPlans[planId];
 
-    // Create the invoice using Xendit
-    const createdInvoice = await invoice.create({
-  externalId: `invoice_${user.id}_${Date.now()}`,
-  amount: plan.amount,
-  description: plan.description,
-  payerEmail: user.email,
-  successRedirectUrl: 'https://your-domain.com/payment-success',
-  failureRedirectUrl: 'https://your-domain.com/payment-failed',
-});
-
+    // Versi terbaru: gunakan createInvoice, jangan pakai `new Invoice()`
+    const createdInvoice = await invoice.createInvoice({
+      externalID: `invoice_${user.id}_${Date.now()}`,
+      amount: plan.amount,
+      description: plan.description,
+      payerEmail: user.email,
+      successRedirectURL: 'https://your-domain.com/payment-success',
+      failureRedirectURL: 'https://your-domain.com/payment-failed',
+    });
 
     res.status(200).json({
       success: true,
       message: 'Invoice created successfully',
       data: {
-        invoiceUrl: createdInvoice.invoiceUrl,
+        invoiceUrl: createdInvoice.invoice_url,
         invoiceId: createdInvoice.id,
         amount: createdInvoice.amount,
-        expiryDate: createdInvoice.expiryDate
+        expiryDate: createdInvoice.expiry_date
       }
     });
 
@@ -82,35 +82,31 @@ const createInvoice = async (req, res) => {
   }
 };
 
-// Webhook endpoint to handle Xendit payment notifications
+// Webhook endpoint
 const handlePaymentWebhook = async (req, res) => {
   try {
     const { event_type, data } = req.body;
 
     if (event_type === 'invoice.paid') {
-      const invoice = data;
-      const userId = invoice.external_id.split('_')[1]; // Extract user ID from external_id
+      const invoiceData = data;
+      const userId = invoiceData.external_id.split('_')[1]; // ambil user ID
 
-      // Find the user
       const user = await User.findByPk(userId);
       if (!user) {
-        console.error('User not found for invoice:', invoice.id);
+        console.error('User not found for invoice:', invoiceData.id);
         return res.status(404).json({ success: false, message: 'User not found' });
       }
 
-      // Parse plan info from external_id
-      const planInfo = invoice.external_id.split('_')[0]; // This should contain the plan type
-      const planId = planInfo === 'invoice' ? 'monthly' : planInfo; // Default to monthly if not specified
+      const planInfo = invoiceData.external_id.split('_')[0];
+      const planId = planInfo === 'invoice' ? 'monthly' : planInfo;
 
-      // Calculate subscription end date based on plan
       const startDate = new Date();
       const endDate = new Date(startDate);
-      
+
       if (subscriptionPlans[planId]) {
         endDate.setDate(startDate.getDate() + subscriptionPlans[planId].validityDays);
       }
 
-      // Update user subscription
       await user.update({
         subscriptionType: planId,
         subscriptionStartDate: startDate,
@@ -127,7 +123,7 @@ const handlePaymentWebhook = async (req, res) => {
   }
 };
 
-// Get subscription status for current user
+// Get subscription status
 const getSubscriptionStatus = async (req, res) => {
   try {
     const { user } = req;
