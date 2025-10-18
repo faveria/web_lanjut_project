@@ -1,13 +1,12 @@
-const Xendit = require('xendit-node');
+const { Invoice } = require('xendit-node'); // import Invoice langsung
 const { User } = require('../models');
 require('dotenv').config();
 
-const x = new Xendit({
+// Buat instance Invoice
+const invoice = new Invoice({
   secretKey: process.env.XENDIT_API_KEY,
-  environment: process.env.XENDIT_MODE || 'sandbox', // 'sandbox' atau 'production'
+  // environment: process.env.XENDIT_MODE || 'sandbox', // opsional
 });
-
-const { Invoice } = x;
 
 // Define subscription plans
 const subscriptionPlans = {
@@ -50,7 +49,7 @@ const createInvoice = async (req, res) => {
     const plan = subscriptionPlans[planId];
 
     // Buat invoice
-    const createdInvoice = await Invoice.createInvoice({
+    const createdInvoice = await invoice.createInvoice({
       externalID: `invoice_${user.id}_${Date.now()}`,
       amount: plan.amount,
       description: plan.description,
