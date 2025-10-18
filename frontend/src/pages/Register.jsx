@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import AuthForm from '../components/Auth/AuthForm';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -89,7 +88,7 @@ const Register = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Back to Home */}
         <motion.div
@@ -99,7 +98,7 @@ const Register = () => {
         >
           <Link 
             to="/" 
-            className="inline-flex items-center space-x-2 text-primary-600 hover:text-primary-700 transition-colors group"
+            className="inline-flex items-center space-x-2 text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             <span className="font-medium">Back to Home</span>
@@ -117,17 +116,21 @@ const Register = () => {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 15 }}
-              className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg"
+              className="flex items-center space-x-3"
             >
-              <span className="text-white font-bold text-xl">H</span>
+              <img
+                src="/favicon.png"
+                alt="HY.YUME Logo"
+                className="w-12 h-12 object-contain"
+              />
             </motion.div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">HY.YUME</h1>
-              <p className="text-primary-600 font-semibold">Monitor</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">HY.YUME</h1>
+              <p className="text-primary-600 dark:text-primary-400 font-semibold">Monitor</p>
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
-          <p className="text-gray-600">Join our smart hydroponic monitoring system</p>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Create Account</h2>
+          <p className="text-gray-600 dark:text-gray-300">Join our smart hydroponic monitoring system</p>
         </motion.div>
 
         {/* Register Card */}
@@ -136,9 +139,9 @@ const Register = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="w-full shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+          <Card className="w-full shadow-xl border-0 bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 dark:border dark:border-gray-700">
             <CardHeader className="text-center space-y-2 pb-4">
-              <CardTitle className="text-xl font-semibold text-gray-900">
+              <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
                 Start Your Journey
               </CardTitle>
             </CardHeader>
@@ -147,7 +150,7 @@ const Register = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Email Field */}
                 <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium text-gray-700">
+                  <label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Email Address
                   </label>
                   <div className="relative">
@@ -159,7 +162,7 @@ const Register = () => {
                       placeholder="Enter your email"
                       value={formData.email}
                       onChange={handleChange}
-                      className="pl-10 pr-4 py-3 border-gray-300 focus:border-primary-500 focus:ring-primary-500"
+                      className="pl-10 pr-4 py-3 border-gray-300 focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       required
                       disabled={loading}
                     />
@@ -168,7 +171,7 @@ const Register = () => {
 
                 {/* Password Field */}
                 <div className="space-y-2">
-                  <label htmlFor="password" className="text-sm font-medium text-gray-700">
+                  <label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Password
                   </label>
                   <div className="relative">
@@ -180,7 +183,7 @@ const Register = () => {
                       placeholder="Create a password"
                       value={formData.password}
                       onChange={handleChange}
-                      className="pl-10 pr-10 py-3 border-gray-300 focus:border-primary-500 focus:ring-primary-500"
+                      className="pl-10 pr-10 py-3 border-gray-300 focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       required
                       disabled={loading}
                     />
@@ -201,7 +204,7 @@ const Register = () => {
 
                 {/* Confirm Password Field */}
                 <div className="space-y-2">
-                  <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+                  <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Confirm Password
                   </label>
                   <div className="relative">
@@ -213,7 +216,7 @@ const Register = () => {
                       placeholder="Confirm your password"
                       value={formData.confirmPassword}
                       onChange={handleChange}
-                      className="pl-10 pr-10 py-3 border-gray-300 focus:border-primary-500 focus:ring-primary-500"
+                      className="pl-10 pr-10 py-3 border-gray-300 focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       required
                       disabled={loading}
                     />
@@ -237,9 +240,9 @@ const Register = () => {
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
-                    className="space-y-2 p-3 bg-gray-50 rounded-lg border border-gray-200"
+                    className="space-y-2 p-3 bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600"
                   >
-                    <p className="text-sm font-medium text-gray-700 mb-2">Password Requirements:</p>
+                    <p className="text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">Password Requirements:</p>
                     {passwordRequirements.map((req) => (
                       <div key={req.id} className="flex items-center space-x-2">
                         {req.met ? (
@@ -247,7 +250,7 @@ const Register = () => {
                         ) : (
                           <XCircle className="w-4 h-4 text-gray-400" />
                         )}
-                        <span className={`text-sm ${req.met ? 'text-green-600' : 'text-gray-500'}`}>
+                        <span className={`text-sm ${req.met ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
                           {req.text}
                         </span>
                       </div>
@@ -260,9 +263,9 @@ const Register = () => {
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
-                    className="p-3 bg-red-50 border border-red-200 rounded-lg"
+                    className="p-3 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800"
                   >
-                    <p className="text-red-700 text-sm text-center">{error}</p>
+                    <p className="text-red-700 text-sm text-center dark:text-red-300">{error}</p>
                   </motion.div>
                 )}
 
@@ -285,13 +288,13 @@ const Register = () => {
 
               {/* Terms and Conditions */}
               <div className="text-center">
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   By creating an account, you agree to our{' '}
-                  <Link to="/terms" className="text-primary-600 hover:text-primary-700">
+                  <Link to="/terms" className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
                     Terms of Service
                   </Link>{' '}
                   and{' '}
-                  <Link to="/privacy" className="text-primary-600 hover:text-primary-700">
+                  <Link to="/privacy" className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
                     Privacy Policy
                   </Link>
                 </p>
@@ -299,18 +302,18 @@ const Register = () => {
 
               {/* Divider */}
               <div className="relative flex items-center py-4">
-                <div className="flex-grow border-t border-gray-300"></div>
-                <span className="flex-shrink mx-4 text-gray-500 text-sm">or</span>
-                <div className="flex-grow border-t border-gray-300"></div>
+                <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+                <span className="flex-shrink mx-4 text-gray-500 text-sm dark:text-gray-400">or</span>
+                <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
               </div>
 
               {/* Login Link */}
               <div className="text-center">
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   Already have an account?{' '}
                   <Link 
                     to="/login" 
-                    className="text-primary-600 hover:text-primary-700 font-semibold transition-colors"
+                    className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-semibold transition-colors"
                   >
                     Sign in here
                   </Link>
@@ -327,7 +330,7 @@ const Register = () => {
           transition={{ delay: 0.3 }}
           className="mt-8 space-y-4"
         >
-          <h3 className="text-lg font-semibold text-gray-900 text-center">Why Join HY.YUME?</h3>
+          <h3 className="text-lg font-semibold text-gray-900 text-center dark:text-white">Why Join HY.YUME?</h3>
           <div className="grid grid-cols-1 gap-3">
             {[
               { icon: '📊', text: 'Real-time sensor monitoring' },
@@ -340,10 +343,10 @@ const Register = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 + index * 0.1 }}
-                className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 shadow-sm"
+                className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700"
               >
                 <span className="text-xl">{benefit.icon}</span>
-                <span className="text-sm text-gray-700">{benefit.text}</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">{benefit.text}</span>
               </motion.div>
             ))}
           </div>
@@ -356,7 +359,7 @@ const Register = () => {
           transition={{ delay: 0.4 }}
           className="mt-8 text-center"
         >
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             © 2024 HY.YUME Monitor. Secure hydroponic monitoring system.
           </p>
         </motion.div>

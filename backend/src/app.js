@@ -14,6 +14,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/data', require('./routes/dataRoutes'));
+app.use('/api/subscription', require('./routes/subscriptionRoutes'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

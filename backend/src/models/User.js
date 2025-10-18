@@ -22,6 +22,26 @@ const User = sequelize.define('User', {
     validate: {
       len: [6, 100]
     }
+  },
+  subscriptionType: {
+    type: DataTypes.ENUM('free', 'monthly', 'quarterly', 'annual'),
+    defaultValue: 'free'
+  },
+  subscriptionStartDate: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  subscriptionEndDate: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  isEmailVerified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  emailVerificationToken: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 }, {
   tableName: 'users',

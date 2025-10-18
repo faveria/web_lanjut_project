@@ -17,7 +17,9 @@
     "jsonwebtoken": "^9.0.2",
     "mqtt": "^4.3.7",
     "mysql2": "^3.6.0",
-    "sequelize": "^6.32.1"
+    "nodemailer": "^7.0.9",
+    "sequelize": "^6.32.1",
+    "xendit-node": "^7.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

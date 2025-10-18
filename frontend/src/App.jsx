@@ -9,6 +9,8 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
+import Subscription from './pages/Subscription';
+import EmailVerification from './pages/EmailVerification';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -63,6 +65,14 @@ function App() {
                   </PublicRoute>
                 } 
               />
+              <Route 
+                path="/verify-email" 
+                element={
+                  <PublicRoute>
+                    <EmailVerification />
+                  </PublicRoute>
+                } 
+              />
 
               {/* Protected Routes */}
               <Route 
@@ -91,6 +101,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <Settings />
+                    </Layout>
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/subscription" 
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Subscription />
                     </Layout>
                   </ProtectedRoute>
                 } 
