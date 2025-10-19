@@ -50,13 +50,16 @@ const createInvoice = async (req, res) => {
 
     // Buat invoice
     const createdInvoice = await invoice.createInvoice({
-      externalID: `invoice_${user.id}_${Date.now()}`,
-      amount: plan.amount,
-      description: plan.description,
-      payerEmail: user.email,
-      successRedirectURL: 'https://hyyyume.my.id/payment-success',
-      failureRedirectURL: 'https://hyyyume.my.id/payment-failed',
-    });
+  data: {
+    externalId: `invoice_${user.id}_${Date.now()}`,
+    amount: plan.amount,
+    description: plan.description,
+    payerEmail: user.email,
+    successRedirectUrl: 'https://hyyyume.my.id/payment-success',
+    failureRedirectUrl: 'https://hyyyume.my.id/payment-failed',
+  },
+});
+
 
     res.status(200).json({
       success: true,
