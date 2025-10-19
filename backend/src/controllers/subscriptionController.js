@@ -55,8 +55,8 @@ const createInvoice = async (req, res) => {
     amount: plan.amount,
     description: plan.description,
     payerEmail: user.email,
-    successRedirectUrl: process.env.SUCCESS_REDIRECT_URL || 'http://localhost:3001/payment-success',
-    failureRedirectUrl: process.env.FAILURE_REDIRECT_URL || 'http://localhost:3001/payment-failed',
+    successRedirectUrl: process.env.SUCCESS_REDIRECT_URL || 'http://hyyyume.my.id/payment-success',
+    failureRedirectUrl: process.env.FAILURE_REDIRECT_URL || 'http://hyyyume.my.id/payment-failed',
   },
 });
 
