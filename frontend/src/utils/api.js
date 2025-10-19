@@ -52,4 +52,8 @@ export const subscriptionAPI = {
   getStatus: () => api.get('/subscription/status'),
 };
 
+export const pumpAPI = {
+  controlPump: (status) => api.post('/data/control-pump', { status }),
+};
+
 export default api;

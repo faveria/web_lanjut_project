@@ -3,6 +3,7 @@ export const SENSOR_THRESHOLDS = {
   suhu_udara: { min: 20, max: 30 },
   kelembapan: { min: 40, max: 80 },
   tds: { min: 500, max: 1500 },
+  ph: { min: 5.5, max: 7.5 },
 };
 
 export const SENSOR_UNITS = {
@@ -10,6 +11,8 @@ export const SENSOR_UNITS = {
   suhu_udara: '°C',
   kelembapan: '%',
   tds: 'ppm',
+  ph: '',
+  pompa: '',
 };
 
 export const SENSOR_LABELS = {
@@ -17,4 +20,6 @@ export const SENSOR_LABELS = {
   suhu_udara: 'Air Temperature',
   kelembapan: 'Humidity',
   tds: 'TDS',
+  ph: 'pH Level',
+  pompa: 'Pump Status',
 };

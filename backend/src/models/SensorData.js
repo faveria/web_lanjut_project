@@ -23,6 +23,14 @@ const SensorData = sequelize.define('SensorData', {
     type: DataTypes.FLOAT,
     allowNull: false
   },
+  ph: {
+    type: DataTypes.FLOAT,
+    allowNull: true  // pH can be null if sensor is not available
+  },
+  pompa: {
+    type: DataTypes.STRING,  // ON/OFF status
+    allowNull: true
+  },
   created_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW

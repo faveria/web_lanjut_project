@@ -1,4 +1,5 @@
 const { SensorData } = require('../models');
+const mqttClient = require('../config/mqtt'); // Import MQTT client for pump control
 
 const getLatestData = async (req, res) => {
   try {
@@ -19,6 +20,45 @@ const getLatestData = async (req, res) => {
     });
   } catch (error) {
     console.error('Get latest data error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+// Control pump via MQTT
+const controlPump = async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    if (!status || !['ON', 'OFF'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Status must be either "ON" or "OFF"'
+      });
+    }
+
+    // Publish pump command to MQTT topic
+    if (mqttClient.client && mqttClient.isConnected) {
+      const topic = 'hyyume/sensor/pump';
+      mqttClient.client.publish(topic, status);
+      
+      console.log(`Pump command sent: ${status} to topic: ${topic}`);
+      
+      res.json({
+        success: true,
+        message: `Pump command sent: ${status}`
+      });
+    } else {
+      console.error('MQTT client not connected');
+      res.status(503).json({
+        success: false,
+        message: 'MQTT client not connected'
+      });
+    }
+  } catch (error) {
+    console.error('Control pump error:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error'
@@ -49,13 +89,15 @@ const getHistory = async (req, res) => {
 // Fungsi untuk menangani data MQTT
 const saveSensorData = async (sensorData) => {
   try {
-    const { suhu_air, suhu_udara, kelembapan, tds } = sensorData;
+    const { suhu_air, suhu_udara, kelembapan, tds, ph, pompa } = sensorData;
     
     const newData = await SensorData.create({
       suhu_air,
       suhu_udara,
       kelembapan,
       tds,
+      ph: ph || null,
+      pompa: pompa || null,
       created_at: new Date()
     });
 
@@ -70,5 +112,6 @@ const saveSensorData = async (sensorData) => {
 module.exports = {
   getLatestData,
   getHistory,
-  saveSensorData
+  saveSensorData,
+  controlPump
 };

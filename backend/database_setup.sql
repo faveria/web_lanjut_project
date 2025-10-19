@@ -21,6 +21,8 @@ CREATE TABLE sensor_data (
     suhu_udara FLOAT NOT NULL,
     kelembapan FLOAT NOT NULL,
     tds FLOAT NOT NULL,
+    ph FLOAT NULL,
+    pompa VARCHAR(10) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 */

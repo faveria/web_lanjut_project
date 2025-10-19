@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Thermometer, Droplets, Gauge, Wind } from 'lucide-react';
+import { Thermometer, Droplets, Gauge, Wind, TestTube, ToggleLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { SENSOR_THRESHOLDS, SENSOR_UNITS, SENSOR_LABELS } from '../../utils/constants';
 import { cn } from '../../utils/cn';
@@ -10,9 +10,16 @@ const iconMap = {
   suhu_udara: Wind,
   kelembapan: Droplets,
   tds: Gauge,
+  ph: TestTube,
+  pompa: ToggleLeft,
 };
 
 const getStatusColor = (type, value) => {
+  // Special handling for pompa (pump) which is ON/OFF
+  if (type === 'pompa') {
+    return value === 'ON' ? 'text-green-500' : 'text-gray-500';
+  }
+  
   const threshold = SENSOR_THRESHOLDS[type];
   if (!threshold) return 'text-gray-600';
   
@@ -23,6 +30,11 @@ const getStatusColor = (type, value) => {
 };
 
 const getStatusText = (type, value) => {
+  // Special handling for pompa (pump) which is ON/OFF
+  if (type === 'pompa') {
+    return value === 'ON' ? 'Active' : 'Inactive';
+  }
+  
   const threshold = SENSOR_THRESHOLDS[type];
   if (!threshold) return 'Normal';
   
