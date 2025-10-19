@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, AlertCircle, RotateCcw } from 'lucide-react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import api from '../utils/api';
 
 const EmailVerification = () => {
   const [searchParams] = useSearchParams();
@@ -24,8 +24,8 @@ const EmailVerification = () => {
       }
 
       try {
-        const response = await axios.get(
-          `https://api.hyyyume.my.id/api/auth/verify-email?token=${token}&email=${email}`
+        const response = await api.get(
+          `/api/auth/verify-email?token=${token}&email=${email}`
         );
 
         if (response.data.success) {

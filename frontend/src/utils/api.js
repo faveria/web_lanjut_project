@@ -47,4 +47,9 @@ export const dataAPI = {
   getHistory: () => api.get('/data/history'),
 };
 
+export const subscriptionAPI = {
+  createInvoice: (planId) => api.post('/subscription/create-invoice', { planId }),
+  getStatus: () => api.get('/subscription/status'),
+};
+
 export default api;

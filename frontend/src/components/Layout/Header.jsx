@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { LogOut, User, Settings, Menu, X, CreditCard } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useAuth } from '../../context/AuthContext';
-import axios from 'axios';
+import { subscriptionAPI } from '../../utils/api';
 
 const Header = ({ sidebarOpen, setSidebarOpen, mobileSidebarOpen, setMobileSidebarOpen }) => {
   const { user, logout } = useAuth();
@@ -15,14 +15,7 @@ const Header = ({ sidebarOpen, setSidebarOpen, mobileSidebarOpen, setMobileSideb
       try {
         const token = localStorage.getItem('token');
         if (token && user) {
-          const response = await axios.get(
-            'https://api.hyyyume.my.id/api/subscription/status',
-            {
-              headers: {
-                'Authorization': `Bearer ${token}`,
-              }
-            }
-          );
+          const response = await subscriptionAPI.getStatus();
           
           if (response.data.success) {
             setSubscriptionInfo(response.data.data);

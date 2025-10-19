@@ -51,12 +51,12 @@ const createInvoice = async (req, res) => {
     // Buat invoice
     const createdInvoice = await invoice.createInvoice({
   data: {
-    externalId: `invoice_${user.id}_${Date.now()}`,
+    externalId: `${planId}_${user.id}_${Date.now()}`,
     amount: plan.amount,
     description: plan.description,
     payerEmail: user.email,
-    successRedirectUrl: 'https://hyyyume.my.id/payment-success',
-    failureRedirectUrl: 'https://hyyyume.my.id/payment-failed',
+    successRedirectUrl: process.env.SUCCESS_REDIRECT_URL || 'http://localhost:3001/payment-success',
+    failureRedirectUrl: process.env.FAILURE_REDIRECT_URL || 'http://localhost:3001/payment-failed',
   },
 });
 
@@ -98,8 +98,7 @@ const handlePaymentWebhook = async (req, res) => {
       }
 
       // Parse plan info
-      const planInfo = invoiceData.external_id.split('_')[0];
-      const planId = planInfo === 'invoice' ? 'monthly' : planInfo;
+      const planId = invoiceData.external_id.split('_')[0];
 
       const startDate = new Date();
       const endDate = new Date(startDate);

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CreditCard, Check, RotateCcw } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import axios from 'axios';
+import { subscriptionAPI } from '../utils/api';
 
 const Subscription = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -41,16 +41,7 @@ const Subscription = () => {
     try {
       // This assumes you have the API endpoint ready
       const token = localStorage.getItem('token');
-      const response = await axios.post(
-        'https://api.hyyyume.my.id/api/subscription/create-invoice',
-        { planId },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
+      const response = await subscriptionAPI.createInvoice(planId);
       
       if (response.data.success) {
         setPaymentUrl(response.data.data.invoiceUrl);

@@ -11,6 +11,8 @@ import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import Subscription from './pages/Subscription';
 import EmailVerification from './pages/EmailVerification';
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentFailed from './pages/PaymentFailed';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -111,6 +113,28 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <Subscription />
+                    </Layout>
+                  </ProtectedRoute>
+                } 
+              />
+              
+              <Route 
+                path="/payment-success" 
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <PaymentSuccess />
+                    </Layout>
+                  </ProtectedRoute>
+                } 
+              />
+              
+              <Route 
+                path="/payment-failed" 
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <PaymentFailed />
                     </Layout>
                   </ProtectedRoute>
                 } 
