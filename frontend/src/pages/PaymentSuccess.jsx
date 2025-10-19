@@ -3,14 +3,26 @@ import { motion } from 'framer-motion';
 import { CheckCircle, Home, RefreshCw } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { subscriptionAPI } from '../utils/api';
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Auto-refresh subscription status or redirect after a few seconds
+    // Refresh subscription status immediately
+    const refreshSubscription = async () => {
+      try {
+        await subscriptionAPI.getStatus();
+        console.log('Subscription status refreshed');
+      } catch (error) {
+        console.error('Error refreshing subscription status:', error);
+      }
+    };
+
+    refreshSubscription();
+
+    // Optionally redirect to subscription page after a few seconds
     const timer = setTimeout(() => {
-      // Optionally redirect to subscription page to update status
       navigate('/subscription');
     }, 5000);
 

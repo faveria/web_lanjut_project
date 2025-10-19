@@ -47,6 +47,9 @@ const Subscription = () => {
         setPaymentUrl(response.data.data.invoiceUrl);
         // Open the payment page in a new tab
         window.open(response.data.data.invoiceUrl, '_blank');
+        
+        // Show user a message to indicate where to return after payment
+        alert('You will be redirected to the payment page. Please complete your payment and return to the dashboard to see your subscription status.');
       } else {
         alert('Error creating invoice: ' + response.data.message);
       }
