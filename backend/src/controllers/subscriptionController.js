@@ -50,7 +50,7 @@ const createInvoice = async (req, res) => {
 
     // Buat invoice
     const createdInvoice = await invoice.createInvoice({
-  data: {
+    data: {
     externalId: `${planId}_${user.id}_${Date.now()}`,
     amount: plan.amount,
     description: plan.description,
