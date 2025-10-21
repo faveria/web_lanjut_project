@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Droplets } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import SensorCard from '../components/Dashboard/SensorCard';
 import ChartBox from '../components/Dashboard/ChartBox';
 import StatusAlert from '../components/Dashboard/StatusAlert';
-import PumpControl from '../components/Dashboard/PumpControl';
 import { useSensorData } from '../hooks/useWebSocket';
 import { usePumpControl } from '../hooks/usePumpControl';
 
@@ -81,7 +80,7 @@ const Dashboard = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6"
+        className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6"
       >
         {sensorTypes.map((type, index) => (
           <motion.div
@@ -97,31 +96,84 @@ const Dashboard = () => {
             />
           </motion.div>
         ))}
-        {/* Pump Status Card */}
+        
+        {/* Pump Status & Control Card */}
         <motion.div
           key="pompa"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: sensorTypes.length * 0.1 }}
+          transition={{ delay: 0.1 }}
+          whileHover={{ scale: 1.02 }}
         >
           <Card className="h-full transition-all duration-300 hover:shadow-md">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-0 md:pb-1 lg:pb-1">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-semibold text-gray-700 dark:text-gray-200">
-                  Pump Status
+                <CardTitle className="text-md mb-2 md:text-lg lg:text-lg font-semibold text-gray-700 dark:text-gray-200">
+                  Pump Control
                 </CardTitle>
-                <div className={`w-6 h-6 rounded-full ${sensorData?.pompa === 'ON' ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                <div className={`w-2 h-2 md:w-6 md:h-6 lg:w-6 lg:h-6 rounded-full ${sensorData?.pompa === 'ON' ? 'bg-green-500' : 'bg-gray-400'}`}></div>
               </div>
+              
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+              {/* Status Display */}
               <div className="space-y-2">
-                <div className="flex items-baseline space-x-2">
-                  <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                    {sensorData?.pompa || '--'}
-                  </span>
+                <div className="flex items-baseline justify-between">
+                  <div>
+                    <span className="text-2xl md:text-3xl lg:text-3xl font-bold text-gray-900 dark:text-white">
+                      {sensorData?.pompa || '--'}
+                    </span>
+                    {/* Status Label - selalu di bawah teks */}
+                    <div className={`hidden sm:hidden md:block text-sm font-medium px-2 py-1 rounded-full mt-1 ${sensorData?.pompa === 'ON' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}>
+                      {sensorData?.pompa === 'ON' ? 'Active' : 'Inactive'}
+                    </div>
+                  </div>
+                  
+                  {/* Toggle untuk desktop */}
+                  <div className="hidden sm:flex flex-col items-center space-y-3 pt-2">
+                    <div 
+                      onClick={() => handlePumpControl(sensorData?.pompa === 'ON' ? 'OFF' : 'ON')}
+                      className={`relative inline-flex items-center h-7 rounded-full w-16 cursor-pointer transition-all duration-300 ${
+                        sensorData?.pompa === 'ON' ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
+                      } ${isControlling ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                      <span 
+                        className={`inline-block w-5 h-5 transform bg-white rounded-full shadow-lg transition-all duration-300 ${
+                          sensorData?.pompa === 'ON' ? 'translate-x-8' : 'translate-x-1'
+                        } ${isControlling ? 'animate-pulse' : ''}`}
+                      />
+                    </div>
+
+
+                    {/* Loading Indicator */}
+                    {isControlling && (
+                      <div className="mt-1 w-full text-[10px] text-gray-500 dark:text-gray-400 flex items-center justify-center">
+                        <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin mr-0.5"></div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className={`text-sm font-medium px-2 py-1 rounded-full w-fit ${sensorData?.pompa === 'ON' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}>
-                  {sensorData?.pompa === 'ON' ? 'Active' : 'Inactive'}
+
+                {/* Toggle untuk mobile (di bawah teks) */}
+                <div className="sm:hidden flex flex-col items-center space-y-3">
+                  <div 
+                    onClick={() => handlePumpControl(sensorData?.pompa === 'ON' ? 'OFF' : 'ON')}
+                    className={`relative inline-flex items-center h-7 rounded-full w-16 cursor-pointer transition-all duration-300 ${
+                      sensorData?.pompa === 'ON' ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
+                    } ${isControlling ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    <span 
+                      className={`inline-block w-5 h-5 transform bg-white rounded-full shadow-lg transition-all duration-300 ${
+                        sensorData?.pompa === 'ON' ? 'translate-x-8' : 'translate-x-1'
+                      } ${isControlling ? 'animate-pulse' : ''}`}
+                    />
+                  </div>
+
+                  {/* Loading Indicator */}
+                  {isControlling && (
+                    <div className="w-full text-[10px] text-gray-500 dark:text-gray-400 flex items-center justify-center">
+                      <div className="w-2 h-2 border border-gray-400 border-t-transparent rounded-full animate-spin mr-0.5"></div>
+                      Loading...
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -129,7 +181,7 @@ const Dashboard = () => {
         </motion.div>
       </motion.div>
 
-      {/* Charts Grid and Pump Control */}
+      {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartBox
           title="Water Temperature Trend"
@@ -160,10 +212,6 @@ const Dashboard = () => {
           dataKey="ph"
           data={history}
           color="#EF4444"
-        />
-        <PumpControl 
-          pumpStatus={sensorData?.pompa} 
-          onPumpControl={handlePumpControl} 
         />
       </div>
 
