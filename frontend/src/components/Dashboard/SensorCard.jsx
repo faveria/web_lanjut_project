@@ -47,8 +47,8 @@ const SensorCard = ({ type, value, loading }) => {
   const Icon = iconMap[type];
   const unit = SENSOR_UNITS[type];
   const label = SENSOR_LABELS[type];
-  const statusColor = value ? getStatusColor(type, value) : 'text-gray-600';
-  const statusText = value ? getStatusText(type, value) : 'No Data';
+  const statusColor = value != null && value !== undefined ? getStatusColor(type, value) : 'text-gray-600';
+  const statusText = value != null && value !== undefined ? getStatusText(type, value) : 'No Data';
 
   return (
     <motion.div
@@ -74,7 +74,7 @@ const SensorCard = ({ type, value, loading }) => {
             <div className="space-y-2">
               <div className="flex items-baseline space-x-2">
                 <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {value || '--'}
+                  {value != null && value !== undefined ? value : '--'}
                 </span>
                 <span className="text-sm text-gray-500 dark:text-gray-400">{unit}</span>
               </div>
