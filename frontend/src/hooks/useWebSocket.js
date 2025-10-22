@@ -7,12 +7,17 @@ export const useSensorData = (pollingInterval = 3000) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const intervalRef = useRef();
+  const hourlyDataRef = useRef([]);
+  const hourlyIntervalRef = useRef();
 
   const fetchLatestData = async () => {
     try {
       const response = await dataAPI.getLatestData();
       setSensorData(response.data.data);
       setError(null);
+      
+      // Record hourly data when we get new sensor data
+      recordHourlyData(response.data.data);
     } catch (err) {
       setError('Failed to fetch sensor data');
       console.error('Error fetching sensor data:', err);
@@ -26,6 +31,51 @@ export const useSensorData = (pollingInterval = 3000) => {
     } catch (err) {
       console.error('Error fetching history:', err);
     }
+  };
+
+  // Function to record data hourly
+  const recordHourlyData = (currentSensorData) => {
+    if (!currentSensorData) return;
+    
+    const currentTime = new Date();
+    // Create timestamp rounded to the hour (e.g., "2023-01-01T10:00:00.000Z")
+    const currentHour = new Date(
+      currentTime.getFullYear(),
+      currentTime.getMonth(),
+      currentTime.getDate(),
+      currentTime.getHours(),
+      0,
+      0,
+      0
+    ).toISOString();
+
+    // Create new hourly record
+    const newHourlyRecord = {
+      ...currentSensorData,
+      created_at: currentHour
+    };
+
+    // Check if we already have data for this exact hour (same date and hour)
+    const existingIndex = hourlyDataRef.current.findIndex(
+      (record) => record.created_at === currentHour
+    );
+
+    if (existingIndex === -1) {
+      // Add new record
+      const updatedData = [...hourlyDataRef.current, newHourlyRecord];
+      
+      // Keep only the last 24 hours of data to prevent memory issues
+      if (updatedData.length > 24) {
+        hourlyDataRef.current = updatedData.slice(-24);
+      } else {
+        hourlyDataRef.current = updatedData;
+      }
+    }
+  };
+
+  // Method to get hourly data
+  const getHourlyData = () => {
+    return hourlyDataRef.current;
   };
 
   useEffect(() => {
@@ -44,6 +94,9 @@ export const useSensorData = (pollingInterval = 3000) => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
+      if (hourlyIntervalRef.current) {
+        clearInterval(hourlyIntervalRef.current);
+      }
     };
   }, [pollingInterval]);
 
@@ -61,5 +114,6 @@ export const useSensorData = (pollingInterval = 3000) => {
     error,
     refetch: fetchLatestData,
     updatePollingInterval,
+    getHourlyData, // Add method to get hourly data
   };
 };

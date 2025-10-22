@@ -12,7 +12,7 @@ import { usePumpControl } from '../hooks/usePumpControl';
 
 const Dashboard = () => {
   const [showAlert, setShowAlert] = useState(true);
-  const { sensorData, history, loading, error, refetch } = useSensorData();
+  const { sensorData, history, loading, error, refetch, getHourlyData } = useSensorData();
   const { controlPump: controlPumpAPI, isControlling, error: pumpError } = usePumpControl();
 
   const sensorTypes = ['suhu_air', 'suhu_udara', 'kelembapan', 'tds', 'ph'];

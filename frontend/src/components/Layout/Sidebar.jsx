@@ -1,12 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, User, Settings, Droplets, LogOut, X, CreditCard } from 'lucide-react';
+import { LayoutDashboard, User, Settings, Droplets, LogOut, X, CreditCard, Activity } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { useAuth } from '../../context/AuthContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+  { icon: Activity, label: 'Daily History', path: '/daily-history' },
   { icon: CreditCard, label: 'Subscription', path: '/subscription' },
   { icon: User, label: 'Profile', path: '/profile' },
   { icon: Settings, label: 'Settings', path: '/settings' },

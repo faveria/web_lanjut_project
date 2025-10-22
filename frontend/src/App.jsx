@@ -7,6 +7,7 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import DailyHistory from './pages/DailyHistory';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import Subscription from './pages/Subscription';
@@ -107,6 +108,17 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
+              <Route 
+                path="/daily-history" 
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <DailyHistory />
+                    </Layout>
+                  </ProtectedRoute>
+                } 
+              />
+              
               <Route 
                 path="/subscription" 
                 element={
