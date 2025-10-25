@@ -68,7 +68,9 @@ import {
   Sparkles as Sparkles2,
   RefreshCw,
   AlertTriangle,
-  X
+  X,
+  Sun as SunIconRegular,
+  Moon as MoonIconRegular
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -714,6 +716,7 @@ const Landing = () => {
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
   const controls = useAnimation();
   const [scrolled, setScrolled] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
   const navRef = useRef(null);
 
   useEffect(() => {
@@ -725,9 +728,23 @@ const Landing = () => {
       }
     };
 
+    // Check initial theme preference
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setDarkMode(prefersDark);
+    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+    // Toggle dark mode class on document element
+    if (!darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
 
   const features = [
     {
@@ -1042,7 +1059,7 @@ const Landing = () => {
 <nav className={`px-6 py-4 fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
   scrolled 
     ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-lg' 
-    : 'bg-transparent'
+    : darkMode ? 'bg-transparent' : 'bg-transparent'
 }`}>
   <div className="max-w-7xl mx-auto flex items-center justify-between">
     <div className="flex items-center space-x-3">
@@ -1051,23 +1068,50 @@ const Landing = () => {
         alt="HY.YUME Logo"
         className="w-10 h-10 object-contain"
       />
-      <span className="text-2xl font-bold text-gray-900 dark:text-white">
+      <span className={`text-2xl font-bold ${
+        scrolled 
+          ? 'text-gray-900 dark:text-white' 
+          : 'text-white'
+      }`}>
         HY.YUME
       </span>
     </div>
 
     <div className="flex items-center space-x-4">
+      <button
+        onClick={toggleDarkMode}
+        className={`p-2 rounded-full ${
+          scrolled 
+            ? 'text-gray-700 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700' 
+            : 'text-white hover:bg-white/20'
+        } transition-colors duration-200`}
+        aria-label="Toggle dark mode"
+      >
+        {darkMode ? (
+          <SunIconRegular className="w-5 h-5" />
+        ) : (
+          <MoonIconRegular className="w-5 h-5" />
+        )}
+      </button>
       <Link to="/login">
         <Button 
           variant="outline"
-          className="border-primary-200 text-primary-700 hover:bg-primary-50 dark:border-primary-700 dark:text-primary-300 dark:hover:bg-primary-900/30"
+          className={`${
+            scrolled 
+              ? 'border-primary-200 text-primary-700 hover:bg-primary-50 dark:border-primary-700 dark:text-primary-300 dark:hover:bg-primary-900/30' 
+              : 'border-white text-white hover:bg-white/10'
+          }`}
         >
           Sign In
         </Button>
       </Link>
 
       <Link to="/register">
-        <Button className="bg-gradient-to-r from-primary-500 to-blue-500 hover:from-primary-600 hover:to-blue-600 dark:from-primary-600 dark:to-blue-600 dark:hover:from-primary-700 dark:hover:to-blue-700">
+        <Button className={`${
+          scrolled 
+            ? 'bg-gradient-to-r from-primary-500 to-blue-500 hover:from-primary-600 hover:to-blue-600 dark:from-primary-600 dark:to-blue-600 dark:hover:from-primary-700 dark:hover:to-blue-700' 
+            : 'bg-white text-primary-600 hover:bg-gray-100'
+        }`}>
           Get Started
         </Button>
       </Link>
@@ -1205,18 +1249,42 @@ const Landing = () => {
                     className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 h-full relative overflow-hidden"
                   >
                     {/* Animated background element */}
-                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-gradient-to-r from-primary-500/10 to-blue-500/10 rounded-full blur-xl"></div>
+                    <div className={`absolute -top-10 -right-10 w-24 h-24 ${
+                      index === 0 ? 'bg-gradient-to-r from-green-400/20 to-blue-500/20' :
+                      index === 1 ? 'bg-gradient-to-r from-yellow-400/20 to-orange-500/20' :
+                      index === 2 ? 'bg-gradient-to-r from-blue-400/20 to-indigo-500/20' :
+                      'bg-gradient-to-r from-emerald-400/20 to-teal-500/20'
+                    } rounded-full blur-xl`}></div>
                     
                     <div className="relative z-10 flex items-start space-x-4">
-                      <motion.div 
-                        className="flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center text-white flex-shrink-0"
-                        whileHover={{ scale: 1.1, rotate: 5 }}
-                        style={{
-                          background: 'linear-gradient(135deg, #0088cc 0%, #4361ee 100%)'
-                        }}
-                      >
-                        <Icon className="w-6 h-6" />
-                      </motion.div>
+                      <div className="flex-shrink-0 relative">
+                        {/* Background circle with gradient */}
+                        <div className={`w-16 h-16 rounded-2xl ${
+                          index === 0 ? 'bg-gradient-to-br from-green-400 to-blue-500' :
+                          index === 1 ? 'bg-gradient-to-br from-yellow-400 to-orange-500' :
+                          index === 2 ? 'bg-gradient-to-br from-blue-400 to-indigo-500' :
+                          'bg-gradient-to-br from-emerald-400 to-teal-500'
+                        } flex items-center justify-center shadow-lg`}>
+                          <motion.div
+                            className="w-10 h-10 flex items-center justify-center text-white"
+                            whileHover={{ scale: 1.1, rotate: 10 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 10 }}
+                          >
+                            <Icon className="w-6 h-6" />
+                          </motion.div>
+                        </div>
+                        {/* Glowing effect */}
+                        <motion.div 
+                          className={`absolute -inset-2 rounded-2xl bg-current opacity-20 ${
+                            index === 0 ? 'text-green-400' :
+                            index === 1 ? 'text-yellow-400' :
+                            index === 2 ? 'text-blue-400' :
+                            'text-emerald-400'
+                          } blur-lg`}
+                          whileHover={{ opacity: 0.4 }}
+                          transition={{ duration: 0.3 }}
+                        ></motion.div>
+                      </div>
                       <div>
                         <motion.h3 
                           className="text-xl font-semibold text-gray-900 dark:text-white mb-2"
@@ -1235,7 +1303,12 @@ const Landing = () => {
                         
                         {/* Animated hover effect line */}
                         <motion.div 
-                          className="h-0.5 bg-gradient-to-r from-primary-500 to-blue-500 mt-4"
+                          className={`h-0.5 mt-4 ${
+                            index === 0 ? 'bg-gradient-to-r from-green-400 to-blue-500' :
+                            index === 1 ? 'bg-gradient-to-r from-yellow-400 to-orange-500' :
+                            index === 2 ? 'bg-gradient-to-r from-blue-400 to-indigo-500' :
+                            'bg-gradient-to-r from-emerald-400 to-teal-500'
+                          }`}
                           initial={{ width: 0 }}
                           whileHover={{ width: '100%' }}
                           transition={{ duration: 0.3 }}
