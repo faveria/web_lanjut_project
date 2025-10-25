@@ -69,6 +69,7 @@ import {
   AlertTriangle,
   X
 } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Animated counter component for stats
 const AnimatedCounter = ({ value, suffix = '', duration = 2 }) => {
@@ -458,12 +459,7 @@ const InteractiveDashboard = () => {
     };
 
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6"
-      >
+      <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6">
         <div className="flex items-center mb-4">
           <div className={`w-10 h-10 bg-gradient-to-br ${getGradient(title)} rounded-lg flex items-center justify-center mr-3`}>
             {getIcon(title)}
@@ -471,18 +467,53 @@ const InteractiveDashboard = () => {
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
         </div>
         <div className="h-64">
-          {/* This would be a real chart in the actual implementation */}
-          <div className="h-full flex items-center justify-center">
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-500 to-blue-500 rounded-full mb-4">
-                {getIcon(title)}
-              </div>
-              <p className="text-gray-600 dark:text-gray-300">Live Trending Chart</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Showing real-time data</p>
-            </div>
-          </div>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData} animationDuration={0}>
+              <CartesianGrid strokeDasharray="3 3" className="opacity-30 dark:stroke-gray-600" />
+              <XAxis 
+                dataKey="time" 
+                tick={{ fontSize: 12, fill: 'currentColor' }}
+                interval="preserveStartEnd"
+                tickMargin={10}
+                stroke="currentColor"
+              />
+              <YAxis 
+                tick={{ fontSize: 12, fill: 'currentColor' }}
+                width={40}
+                tickMargin={10}
+                stroke="currentColor"
+              />
+              <Tooltip 
+                labelFormatter={(label, payload) => {
+                  if (payload && payload[0]) {
+                    return `Time: ${payload[0].payload.fullTime}`;
+                  }
+                  return `Time: ${label}`;
+                }}
+                formatter={(value) => [`${value}`, title]}
+                contentStyle={{ 
+                  backgroundColor: 'white', 
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                  color: 'inherit',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                }}
+                wrapperStyle={{ outline: 'none' }}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="value" 
+                stroke={getColor(title)}
+                strokeWidth={2}
+                dot={{ fill: getColor(title), strokeWidth: 2, r: 4, animationDuration: 0 }}
+                activeDot={{ r: 6, fill: getColor(title), animationDuration: 0 }}
+                animationDuration={0}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
-      </motion.div>
+      </div>
     );
   };
 
@@ -575,35 +606,6 @@ const InteractiveDashboard = () => {
 
   return (
     <div className="space-y-6 w-full">
-      <SummaryCard />
-
-      {/* Status Alert */}
-      {showAlert && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-2xl p-4 flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mr-4">
-                <AlertTriangle className="w-6 h-6 text-yellow-500" />
-              </div>
-              <div>
-                <h3 className="font-bold text-gray-900 dark:text-white">System Alert</h3>
-                <p className="text-gray-600 dark:text-gray-300">pH level approaching upper threshold</p>
-              </div>
-            </div>
-            <button 
-              onClick={() => setShowAlert(false)}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </motion.div>
-      )}
-
       {/* Sensor Grid */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -620,12 +622,7 @@ const InteractiveDashboard = () => {
       </motion.div>
 
       {/* Charts Grid */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.0 }}
-        className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6"
-      >
+      <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6">
         <div className="flex items-center mb-4">
           <Activity className="w-5 h-5 text-primary-500 mr-2" />
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">Last 10 Hours Trend</h2>
@@ -636,33 +633,64 @@ const InteractiveDashboard = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ChartBox
-            title="Water Temperature Trend"
-            dataKey="suhu_air"
-            data={historyData.suhu_air}
-          />
-          <ChartBox
-            title="Air Temperature Trend"
-            dataKey="suhu_udara"
-            data={historyData.suhu_udara}
-          />
-          <ChartBox
-            title="Humidity Trend"
-            dataKey="kelembapan"
-            data={historyData.kelembapan}
-          />
-          <ChartBox
-            title="TDS Trend"
-            dataKey="tds"
-            data={historyData.tds}
-          />
-          <ChartBox
-            title="pH Level Trend"
-            dataKey="ph"
-            data={historyData.ph}
-          />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1 }}
+          >
+            <ChartBox
+              title="Water Temperature Trend"
+              dataKey="suhu_air"
+              data={historyData.suhu_air}
+            />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2 }}
+          >
+            <ChartBox
+              title="Air Temperature Trend"
+              dataKey="suhu_udara"
+              data={historyData.suhu_udara}
+            />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.3 }}
+          >
+            <ChartBox
+              title="Humidity Trend"
+              dataKey="kelembapan"
+              data={historyData.kelembapan}
+            />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.4 }}
+          >
+            <ChartBox
+              title="TDS Trend"
+              dataKey="tds"
+              data={historyData.tds}
+            />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.5 }}
+            className="lg:col-span-2"
+          >
+            <ChartBox
+              title="pH Level Trend"
+              dataKey="ph"
+              data={historyData.ph}
+            />
+          </motion.div>
         </div>
-      </motion.div>
+      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
