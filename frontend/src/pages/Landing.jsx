@@ -339,7 +339,7 @@ const InteractiveDashboard = () => {
       <motion.div
         whileHover={{ y: -5 }}
         whileTap={{ scale: 0.98 }}
-        className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6 h-full flex flex-col"
+        className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 p-6 h-full flex flex-col"
       >
         <div className="flex items-center justify-between mb-4 flex-shrink-0">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">{label}</h3>
@@ -459,7 +459,7 @@ const InteractiveDashboard = () => {
     };
 
     return (
-      <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6">
+      <div className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 p-6">
         <div className="flex items-center mb-4">
           <div className={`w-10 h-10 bg-gradient-to-br ${getGradient(title)} rounded-lg flex items-center justify-center mr-3`}>
             {getIcon(title)}
@@ -523,7 +523,7 @@ const InteractiveDashboard = () => {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6"
+        className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 p-6"
       >
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
@@ -558,7 +558,7 @@ const InteractiveDashboard = () => {
     return (
       <motion.div
         whileHover={{ y: -5 }}
-        className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6 h-full"
+        className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 p-6 h-full"
       >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
@@ -622,7 +622,7 @@ const InteractiveDashboard = () => {
       </motion.div>
 
       {/* Charts Grid */}
-      <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6">
+      <div className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 p-6">
         <div className="flex items-center mb-4">
           <Activity className="w-5 h-5 text-primary-500 mr-2" />
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">Last 10 Hours Trend</h2>
@@ -692,24 +692,7 @@ const InteractiveDashboard = () => {
         </div>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.5 }}
-      >
-        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Last Updated</h3>
-              <p className="text-gray-600 dark:text-gray-300">Just now</p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-600 dark:text-gray-300">Live</span>
-            </div>
-          </div>
-        </div>
-      </motion.div>
+
     </div>
   );
 };
@@ -994,12 +977,12 @@ const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-primary-50 to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-green-900/20 overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-primary-50/30 to-green-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-green-900/20 overflow-x-hidden">
       {/* Animated particles background */}
       <AnimatedParticles />
       
       {/* Navigation */}
-      <nav className="px-6 py-4 fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+      <nav className="px-6 py-4 fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-sm dark:shadow-none">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <img 
@@ -1028,9 +1011,9 @@ const Landing = () => {
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-300/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-300/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-green-200/5 to-blue-200/5 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-green-200/30 to-blue-200/30 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-blue-200/30 to-purple-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-green-200/10 via-primary-200/10 to-blue-200/10 rounded-full blur-3xl"></div>
         </div>
         
         <div className="relative z-10 px-6 py-20 max-w-7xl mx-auto text-center">
@@ -1121,11 +1104,11 @@ const Landing = () => {
               return (
                 <InteractiveCard
                   key={feature.title}
-                  className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-gray-100 dark:bg-gray-800/70 dark:border-gray-700"
+                  className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 hover:shadow-2xl transition-all duration-300"
                 >
                   <div className="flex items-center justify-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-blue-500 rounded-xl flex items-center justify-center dark:bg-gradient-to-br dark:from-primary-600 dark:to-blue-600">
-                      <Icon className="w-6 h-6 text-white" />
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-blue-500 rounded-xl flex items-center justify-center text-white">
+                      <Icon className="w-6 h-6" />
                     </div>
                     <h3 className="text-xl font-semibold text-gray-900 dark:text-white text-center">
                       {feature.title}
@@ -1155,7 +1138,7 @@ const Landing = () => {
 
 
       {/* Powerful Dashboard Experience Section */}
-      <section className="px-6 py-20 bg-gradient-to-br from-slate-50 via-primary-50 to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-green-900/20">
+      <section className="px-6 py-20 bg-gradient-to-br from-slate-50/50 via-primary-50/30 to-green-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-green-900/20">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -1181,7 +1164,7 @@ const Landing = () => {
       </section>
 
       {/* Enhanced Benefits Section */}
-      <section className="px-6 py-20 bg-gradient-to-br from-white to-primary-50 dark:from-gray-800 dark:to-gray-900">
+      <section className="px-6 py-20 bg-gradient-to-br from-white/50 to-primary-50/30 dark:from-gray-800 dark:to-gray-900">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -1204,7 +1187,7 @@ const Landing = () => {
               return (
                 <InteractiveCard
                   key={benefit.title}
-                  className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden"
+                  className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 overflow-hidden hover:shadow-2xl transition-all duration-300"
                 >
                   <div className="relative">
                     <div className={`absolute -top-4 -right-4 w-16 h-16 rounded-full bg-gradient-to-r ${benefit.gradient} opacity-20 blur-md`}></div>
@@ -1230,7 +1213,7 @@ const Landing = () => {
 
 
       {/* How It Works Section */}
-      <section className="px-6 py-20 bg-white dark:bg-gray-800">
+      <section className="px-6 py-20 bg-gradient-to-br from-slate-50/50 to-white/50 dark:from-gray-800 dark:to-gray-900">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -1240,7 +1223,7 @@ const Landing = () => {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 dark:text-white">
-              How It <span className="text-primary-600">Works</span>
+              How It <span className="text-primary-600 dark:text-primary-400">Works</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
               Simple 4-step process to transform your hydroponic operation
@@ -1249,7 +1232,7 @@ const Landing = () => {
 
           <div className="relative">
             {/* Timeline line */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-primary-500 to-blue-500 hidden md:block"></div>
+            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-primary-500 to-blue-500 hidden md:block dark:bg-gradient-to-b dark:from-primary-600 dark:to-blue-600"></div>
             
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {howItWorksSteps.map((step, index) => {
@@ -1265,7 +1248,7 @@ const Landing = () => {
                     className={`text-center group ${index % 2 === 0 ? 'md:pr-16' : 'md:pl-16 md:mt-20'}`}
                   >
                     <div className="relative mb-6">
-                      <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mx-auto group-hover:bg-primary-200 transition-colors">
+                      <div className="w-16 h-16 bg-gradient-to-br from-primary-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 rounded-full flex items-center justify-center mx-auto group-hover:bg-primary-100 dark:group-hover:bg-gray-600 transition-colors">
                         <div className="w-12 h-12 bg-gradient-to-r from-primary-500 to-blue-500 rounded-full flex items-center justify-center">
                           <Icon className="w-6 h-6 text-white" />
                         </div>
@@ -1289,7 +1272,7 @@ const Landing = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="px-6 py-20 bg-gradient-to-br from-primary-50 to-blue-50 dark:from-gray-800 dark:to-gray-900">
+      <section className="px-6 py-20 bg-gradient-to-br from-primary-50/40 to-blue-50/40 dark:from-gray-800 dark:to-gray-900">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -1328,7 +1311,7 @@ const Landing = () => {
               return (
                 <InteractiveCard
                   key={benefit.title}
-                  className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 relative overflow-hidden"
+                  className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 relative overflow-hidden hover:shadow-2xl transition-all duration-300"
                 >
                   <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-blue-500 rounded-xl flex items-center justify-center mb-6">
                     <Icon className="w-6 h-6 text-white" />
@@ -1348,7 +1331,7 @@ const Landing = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="px-6 py-20 bg-white dark:bg-gray-800">
+      <section className="px-6 py-20 bg-gradient-to-br from-slate-50/50 to-white/50 dark:from-gray-800 dark:to-gray-900">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -1358,7 +1341,7 @@ const Landing = () => {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 dark:text-white">
-              What Our <span className="text-primary-600">Customers</span> Say
+              What Our <span className="text-primary-600 dark:text-primary-400">Customers</span> Say
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
               Real results from satisfied hydroponic farmers
@@ -1369,7 +1352,7 @@ const Landing = () => {
             {testimonials.map((testimonial, index) => (
               <InteractiveCard
                 key={testimonial.name}
-                className="bg-gradient-to-br from-primary-50 to-white dark:from-gray-800 dark:to-gray-900 p-8 rounded-2xl shadow-xl border border-primary-100 dark:border-gray-700 relative overflow-hidden"
+                className="bg-gradient-to-br from-primary-50 to-white/80 dark:from-gray-800 dark:to-gray-900 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 relative overflow-hidden hover:shadow-2xl transition-all duration-300"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-r from-primary-500/5 to-blue-500/5 rounded-full -translate-y-16 translate-x-16"></div>
                 <div className="relative z-10">
@@ -1400,7 +1383,7 @@ const Landing = () => {
             {additionalTestimonials.map((testimonial, index) => (
               <InteractiveCard
                 key={testimonial.name}
-                className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700"
+                className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 hover:shadow-2xl transition-all duration-300"
               >
                 <div className="flex mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
@@ -1430,7 +1413,7 @@ const Landing = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="px-6 py-20 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
+      <section className="px-6 py-20 bg-gradient-to-br from-gray-50/50 to-white/50 dark:from-gray-800 dark:to-gray-900">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -1447,7 +1430,7 @@ const Landing = () => {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {pricingPlans.map((plan, index) => (
               <InteractiveCard
                 key={plan.name}
@@ -1464,7 +1447,7 @@ const Landing = () => {
                     </span>
                   </div>
                 )}
-                <div className="p-8">
+                <div className={`p-8 ${plan.popular ? 'pt-12' : ''}`}>  {/* Add extra top padding when 'Most Popular' badge is present */}
                   <h3 className="text-2xl font-bold text-gray-900 mb-4 dark:text-white">
                     {plan.name}
                   </h3>
@@ -1503,7 +1486,7 @@ const Landing = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="px-6 py-20 bg-white dark:bg-gray-800">
+      <section className="px-6 py-20 bg-gradient-to-br from-slate-50/50 to-white/50 dark:from-gray-800 dark:to-gray-900">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -1513,7 +1496,7 @@ const Landing = () => {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 dark:text-white">
-              Frequently <span className="text-primary-600">Asked</span> Questions
+              Frequently <span className="text-primary-600 dark:text-primary-400">Asked</span> Questions
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
               Everything you need to know about HY.YUME
