@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Droplets, Thermometer, Droplets as DropletsIcon, Gauge, Activity } from 'lucide-react';
 
 const DailyHistory = () => {
   const navigate = useNavigate();
@@ -74,11 +74,11 @@ const DailyHistory = () => {
 
   // Chart data for each sensor type
   const chartConfig = [
-    { dataKey: "suhu_air", title: "Water Temperature Trend", color: "#00A884" },
-    { dataKey: "suhu_udara", title: "Air Temperature Trend", color: "#3B82F6" },
-    { dataKey: "kelembapan", title: "Humidity Trend", color: "#8B5CF6" },
-    { dataKey: "tds", title: "TDS Trend", color: "#F59E0B" },
-    { dataKey: "ph", title: "pH Level Trend", color: "#EF4444" },
+    { dataKey: "suhu_air", title: "Water Temperature Trend", color: "#00A884", icon: DropletsIcon },
+    { dataKey: "suhu_udara", title: "Air Temperature Trend", color: "#3B82F6", icon: Thermometer },
+    { dataKey: "kelembapan", title: "Humidity Trend", color: "#8B5CF6", icon: Droplets },
+    { dataKey: "tds", title: "TDS Trend", color: "#F59E0B", icon: Gauge },
+    { dataKey: "ph", title: "pH Level Trend", color: "#EF4444", icon: Activity },
   ];
 
   const formatDataForChart = (data, dataKey) => {
@@ -91,97 +91,118 @@ const DailyHistory = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700"
+        >
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Loading historical data...</p>
+        </motion.div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6 p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <button 
-            onClick={() => navigate('/dashboard')}
-            className="flex items-center text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-          >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Dashboard
-          </button>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Daily History</h1>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6"
+      >
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex items-center space-x-4">
+            <button 
+              onClick={() => navigate('/dashboard')}
+              className="flex items-center text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Back to Dashboard
+            </button>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Daily History</h1>
+              <p className="text-gray-600 dark:text-gray-400">Historical trends for your hydroponic system</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-3">
+            <label htmlFor="date-picker" className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
+              Select Date:
+            </label>
+            <input
+              id="date-picker"
+              type="date"
+              value={selectedDate}
+              onChange={handleDateChange}
+              className="border border-primary-200 rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500"
+            />
+          </div>
         </div>
-        
-        <div className="flex items-center space-x-2">
-          <label htmlFor="date-picker" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Select Date:
-          </label>
-          <input
-            id="date-picker"
-            type="date"
-            value={selectedDate}
-            onChange={handleDateChange}
-            className="border border-gray-300 rounded-md px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          />
-        </div>
-      </div>
+      </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {chartConfig.map((config, index) => (
-          <motion.div
-            key={config.dataKey}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold text-gray-700 dark:text-gray-200">
-                  {config.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={formatDataForChart(dailyData, config.dataKey)}>
-                      <CartesianGrid strokeDasharray="3 3" className="opacity-30 dark:stroke-gray-600" />
-                      <XAxis 
-                        dataKey="time" 
-                        tick={{ fontSize: 12, fill: 'currentColor' }}
-                        interval="preserveStartEnd"
-                        tickMargin={10}
-                        stroke="currentColor"
-                      />
-                      <YAxis 
-                        tick={{ fontSize: 12, fill: 'currentColor' }}
-                        width={40}
-                        tickMargin={10}
-                        stroke="currentColor"
-                      />
-                      <Tooltip 
-                        formatter={(value) => [value, config.title]}
-                        contentStyle={{ 
-                          backgroundColor: 'white', 
-                          border: '1px solid #e5e7eb',
-                          borderRadius: '8px',
-                          fontSize: '12px',
-                          color: 'inherit'
-                        }}
-                        wrapperStyle={{ outline: 'none' }}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="value" 
-                        stroke={config.color}
-                        strokeWidth={2}
-                        dot={{ fill: config.color, strokeWidth: 2, r: 4 }}
-                        activeDot={{ r: 6, fill: config.color }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
+        {chartConfig.map((config, index) => {
+          const Icon = config.icon;
+          return (
+            <motion.div
+              key={config.dataKey}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6"
+            >
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-blue-500 rounded-lg flex items-center justify-center mr-3">
+                  <Icon className="w-5 h-5 text-white" />
                 </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {config.title}
+                </h3>
+              </div>
+              
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={formatDataForChart(dailyData, config.dataKey)}>
+                    <CartesianGrid strokeDasharray="3 3" className="opacity-30 dark:stroke-gray-600" />
+                    <XAxis 
+                      dataKey="time" 
+                      tick={{ fontSize: 12, fill: 'currentColor' }}
+                      interval="preserveStartEnd"
+                      tickMargin={10}
+                      stroke="currentColor"
+                    />
+                    <YAxis 
+                      tick={{ fontSize: 12, fill: 'currentColor' }}
+                      width={40}
+                      tickMargin={10}
+                      stroke="currentColor"
+                    />
+                    <Tooltip 
+                      formatter={(value) => [value, config.title]}
+                      contentStyle={{ 
+                        backgroundColor: 'white', 
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                        color: 'inherit',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                      }}
+                      wrapperStyle={{ outline: 'none' }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke={config.color}
+                      strokeWidth={2}
+                      dot={{ fill: config.color, strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6, fill: config.color }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );

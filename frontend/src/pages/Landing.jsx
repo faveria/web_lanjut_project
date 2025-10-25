@@ -696,7 +696,7 @@ const Landing = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="mt-20 grid md:grid-cols-2 lg:grid-cols-4 gap-8"
+            className="mt-28 grid md:grid-cols-2 lg:grid-cols-4 gap-8"
           >
             {features.map((feature, index) => {
               const Icon = feature.icon;

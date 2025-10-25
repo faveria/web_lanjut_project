@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Thermometer, Droplets, Gauge, Wind, TestTube, ToggleLeft } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { SENSOR_THRESHOLDS, SENSOR_UNITS, SENSOR_LABELS } from '../../utils/constants';
 import { cn } from '../../utils/cn';
 
@@ -52,46 +51,50 @@ const SensorCard = ({ type, value, loading }) => {
 
   return (
     <motion.div
-      whileHover={{ scale: 1.02 }}
+      whileHover={{ y: -5 }}
       whileTap={{ scale: 0.98 }}
+      className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6 h-full"
     >
-      <Card className="h-full transition-all duration-300 hover:shadow-md">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-semibold text-gray-700 dark:text-gray-200">
-              {label}
-            </CardTitle>
-            <Icon className={cn('w-6 h-6', statusColor, 'dark:text-white')} />
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{label}</h3>
+        <div className={cn(
+          "w-10 h-10 rounded-lg flex items-center justify-center",
+          type === 'suhu_air' ? "bg-gradient-to-br from-red-500 to-red-600" :
+          type === 'suhu_udara' ? "bg-gradient-to-br from-orange-500 to-orange-600" :
+          type === 'kelembapan' ? "bg-gradient-to-br from-blue-500 to-blue-600" :
+          type === 'tds' ? "bg-gradient-to-br from-green-500 to-green-600" :
+          type === 'ph' ? "bg-gradient-to-br from-purple-500 to-purple-600" :
+          "bg-gradient-to-br from-gray-500 to-gray-600"
+        )}>
+          <Icon className="w-5 h-5 text-white" />
+        </div>
+      </div>
+      
+      {loading ? (
+        <div className="space-y-2">
+          <div className="h-8 bg-gray-200 rounded-lg animate-pulse dark:bg-gray-700"></div>
+          <div className="h-4 bg-gray-200 rounded animate-pulse dark:bg-gray-700 w-16"></div>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <div className="flex items-baseline space-x-2">
+            <span className="text-3xl font-bold text-gray-900 dark:text-white">
+              {value != null && value !== undefined ? value : '--'}
+            </span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">{unit}</span>
           </div>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="space-y-2">
-              <div className="h-8 bg-gray-200 rounded animate-pulse dark:bg-gray-700"></div>
-              <div className="h-4 bg-gray-200 rounded animate-pulse dark:bg-gray-700"></div>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <div className="flex items-baseline space-x-2">
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {value != null && value !== undefined ? value : '--'}
-                </span>
-                <span className="text-sm text-gray-500 dark:text-gray-400">{unit}</span>
-              </div>
-              <div className={cn(
-                'text-sm font-medium px-2 py-1 rounded-full w-fit',
-                statusColor === 'text-red-500' 
-                  ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' 
-                  : statusColor === 'text-green-500'
-                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                  : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
-              )}>
-                {statusText}
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          <div className={cn(
+            'text-sm font-medium px-3 py-1 rounded-full inline-block mt-2',
+            statusColor === 'text-red-500' 
+              ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' 
+              : statusColor === 'text-green-500'
+              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+              : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+          )}>
+            {statusText}
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };

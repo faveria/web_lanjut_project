@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, X } from 'lucide-react';
+import { AlertTriangle, X, ShieldAlert } from 'lucide-react';
 import { SENSOR_THRESHOLDS } from '../../utils/constants';
 
 const StatusAlert = ({ sensorData, onClose }) => {
@@ -35,25 +35,27 @@ const StatusAlert = ({ sensorData, onClose }) => {
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -50 }}
-        className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 dark:bg-red-900/20 dark:border-red-800/50"
+        className="bg-gradient-to-r from-red-100 to-orange-100 border-l-4 border-l-red-500 rounded-2xl p-6 mb-6 dark:from-red-900/30 dark:to-orange-900/30 backdrop-blur-sm shadow-xl"
       >
         <div className="flex items-start justify-between">
-          <div className="flex items-start space-x-3">
-            <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0 dark:text-red-400" />
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+              <ShieldAlert className="w-6 h-6 text-white" />
+            </div>
             <div>
-              <h4 className="text-sm font-semibold text-red-800 dark:text-red-200">System Alert</h4>
-              <ul className="mt-1 text-sm text-red-700 list-disc list-inside space-y-1 dark:text-red-300">
+              <h4 className="text-lg font-bold text-red-800 dark:text-red-200">System Alert</h4>
+              <ul className="mt-2 text-red-700 list-disc list-inside space-y-1 dark:text-red-300">
                 {alerts.map((alert, index) => (
-                  <li key={index}>{alert}</li>
+                  <li key={index} className="text-gray-700 dark:text-gray-300 font-medium">{alert}</li>
                 ))}
               </ul>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-red-400 hover:text-red-600 transition-colors dark:text-red-300 dark:hover:text-red-100"
+            className="w-8 h-8 rounded-lg bg-white/50 hover:bg-white/80 transition-colors flex items-center justify-center dark:bg-gray-800/50 dark:hover:bg-gray-700/50"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
       </motion.div>
