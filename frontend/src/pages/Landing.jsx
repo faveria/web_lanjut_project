@@ -1055,7 +1055,7 @@ const Landing = () => {
         />
       </div>
       
-     {/* Navigation */}
+    {/* Navigation */}
 <nav className={`px-6 py-4 fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
   scrolled 
     ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-lg' 
@@ -1068,11 +1068,8 @@ const Landing = () => {
         alt="HY.YUME Logo"
         className="w-10 h-10 object-contain"
       />
-      <span className={`text-2xl font-bold ${
-        scrolled 
-          ? 'text-gray-900 dark:text-white' 
-          : 'text-white'
-      }`}>
+      {/* DIUBAH: Dihapus kondisi scrolled, style teks sekarang permanen */}
+      <span className={`text-2xl font-bold text-gray-900 dark:text-white`}>
         HY.YUME
       </span>
     </div>
@@ -1080,11 +1077,8 @@ const Landing = () => {
     <div className="flex items-center space-x-4">
       <button
         onClick={toggleDarkMode}
-        className={`p-2 rounded-full ${
-          scrolled 
-            ? 'text-gray-700 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700' 
-            : 'text-white hover:bg-white/20'
-        } transition-colors duration-200`}
+        // DIUBAH: Dihapus kondisi scrolled, style tombol sekarang permanen
+        className={`p-2 rounded-full text-gray-700 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors duration-200`}
         aria-label="Toggle dark mode"
       >
         {darkMode ? (
@@ -1096,22 +1090,18 @@ const Landing = () => {
       <Link to="/login">
         <Button 
           variant="outline"
-          className={`${
-            scrolled 
-              ? 'border-primary-200 text-primary-700 hover:bg-primary-50 dark:border-primary-700 dark:text-primary-300 dark:hover:bg-primary-900/30' 
-              : 'border-white text-white hover:bg-white/10'
-          }`}
+          // DIUBAH: Dihapus kondisi scrolled, style tombol sekarang permanen
+          className={`border-primary-200 text-primary-700 hover:bg-primary-50 dark:border-primary-700 dark:text-primary-300 dark:hover:bg-primary-900/30`}
         >
           Sign In
         </Button>
       </Link>
 
       <Link to="/register">
-        <Button className={`${
-          scrolled 
-            ? 'bg-gradient-to-r from-primary-500 to-blue-500 hover:from-primary-600 hover:to-blue-600 dark:from-primary-600 dark:to-blue-600 dark:hover:from-primary-700 dark:hover:to-blue-700' 
-            : 'bg-white text-primary-600 hover:bg-gray-100'
-        }`}>
+        <Button 
+          // DIUBAH: Dihapus kondisi scrolled, style tombol sekarang permanen
+          className={`bg-gradient-to-r from-primary-500 to-blue-500 hover:from-primary-600 hover:to-blue-600 dark:from-primary-600 dark:to-blue-600 dark:hover:from-primary-700 dark:hover:to-blue-700`}
+        >
           Get Started
         </Button>
       </Link>
