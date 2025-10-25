@@ -64,7 +64,10 @@ import {
   Gamepad2,
   Gamepad,
   Sparkle,
-  Sparkles as Sparkles2
+  Sparkles as Sparkles2,
+  RefreshCw,
+  AlertTriangle,
+  X
 } from 'lucide-react';
 
 // Animated counter component for stats
@@ -187,125 +190,512 @@ const InteractiveCard = ({ children, className = "" }) => {
   );
 };
 
-// Interactive dashboard visualization
+// Enhanced dashboard demo visualization for landing page
 const InteractiveDashboard = () => {
   const [sensorData, setSensorData] = useState({
-    ph: 6.8,
-    temp: 24.5,
+    suhu_air: 24.5,
+    suhu_udara: 23.2,
+    kelembapan: 65,
     tds: 560,
-    humidity: 65,
-    light: 12
+    ph: 6.8,
+    pompa: 'ON'
   });
+
+  // Mock historical data for charts
+  const [historyData, setHistoryData] = useState({
+    suhu_air: [
+      { created_at: '2024-01-01T10:00:00Z', suhu_air: 23.1 },
+      { created_at: '2024-01-01T11:00:00Z', suhu_air: 23.5 },
+      { created_at: '2024-01-01T12:00:00Z', suhu_air: 24.0 },
+      { created_at: '2024-01-01T13:00:00Z', suhu_air: 25.2 },
+      { created_at: '2024-01-01T14:00:00Z', suhu_air: 24.8 },
+      { created_at: '2024-01-01T15:00:00Z', suhu_air: 24.5 },
+    ],
+    suhu_udara: [
+      { created_at: '2024-01-01T10:00:00Z', suhu_udara: 22.1 },
+      { created_at: '2024-01-01T11:00:00Z', suhu_udara: 22.5 },
+      { created_at: '2024-01-01T12:00:00Z', suhu_udara: 23.0 },
+      { created_at: '2024-01-01T13:00:00Z', suhu_udara: 24.2 },
+      { created_at: '2024-01-01T14:00:00Z', suhu_udara: 23.8 },
+      { created_at: '2024-01-01T15:00:00Z', suhu_udara: 23.2 },
+    ],
+    kelembapan: [
+      { created_at: '2024-01-01T10:00:00Z', kelembapan: 62 },
+      { created_at: '2024-01-01T11:00:00Z', kelembapan: 63 },
+      { created_at: '2024-01-01T12:00:00Z', kelembapan: 64 },
+      { created_at: '2024-01-01T13:00:00Z', kelembapan: 66 },
+      { created_at: '2024-01-01T14:00:00Z', kelembapan: 65 },
+      { created_at: '2024-01-01T15:00:00Z', kelembapan: 65 },
+    ],
+    tds: [
+      { created_at: '2024-01-01T10:00:00Z', tds: 540 },
+      { created_at: '2024-01-01T11:00:00Z', tds: 545 },
+      { created_at: '2024-01-01T12:00:00Z', tds: 550 },
+      { created_at: '2024-01-01T13:00:00Z', tds: 565 },
+      { created_at: '2024-01-01T14:00:00Z', tds: 562 },
+      { created_at: '2024-01-01T15:00:00Z', tds: 560 },
+    ],
+    ph: [
+      { created_at: '2024-01-01T10:00:00Z', ph: 6.6 },
+      { created_at: '2024-01-01T11:00:00Z', ph: 6.7 },
+      { created_at: '2024-01-01T12:00:00Z', ph: 6.75 },
+      { created_at: '2024-01-01T13:00:00Z', ph: 6.85 },
+      { created_at: '2024-01-01T14:00:00Z', ph: 6.8 },
+      { created_at: '2024-01-01T15:00:00Z', ph: 6.8 },
+    ]
+  });
+
+  const [showAlert, setShowAlert] = useState(true);
 
   // Simulate real-time sensor updates
   useEffect(() => {
     const interval = setInterval(() => {
       setSensorData(prev => ({
-        ph: Math.max(4, Math.min(9, prev.ph + (Math.random() - 0.5) * 0.1)),
-        temp: Math.max(15, Math.min(35, prev.temp + (Math.random() - 0.5) * 0.2)),
+        suhu_air: Math.max(15, Math.min(35, prev.suhu_air + (Math.random() - 0.5) * 0.5)),
+        suhu_udara: Math.max(15, Math.min(35, prev.suhu_udara + (Math.random() - 0.5) * 0.5)),
+        kelembapan: Math.max(30, Math.min(90, prev.kelembapan + (Math.random() - 0.5) * 2)),
         tds: Math.max(400, Math.min(800, prev.tds + (Math.random() - 0.5) * 10)),
-        humidity: Math.max(40, Math.min(90, prev.humidity + (Math.random() - 0.5))),
-        light: Math.max(0, Math.min(24, prev.light + (Math.random() - 0.5) * 0.5))
+        ph: Math.max(4, Math.min(9, prev.ph + (Math.random() - 0.5) * 0.1)),
+        pompa: Math.random() > 0.7 ? (Math.random() > 0.5 ? 'ON' : 'OFF') : prev.pompa
       }));
     }, 2000);
 
     return () => clearInterval(interval);
   }, []);
 
+  // Mock constants for sensor thresholds
+  const SENSOR_THRESHOLDS = {
+    suhu_air: { min: 18, max: 28 },
+    suhu_udara: { min: 18, max: 30 },
+    kelembapan: { min: 50, max: 80 },
+    tds: { min: 400, max: 800 },
+    ph: { min: 5.5, max: 7.5 }
+  };
+
+  const SENSOR_UNITS = {
+    suhu_air: '°C',
+    suhu_udara: '°C',
+    kelembapan: '%',
+    tds: 'ppm',
+    ph: '',
+    pompa: ''
+  };
+
+  const SENSOR_LABELS = {
+    suhu_air: 'Water Temperature',
+    suhu_udara: 'Air Temperature',
+    kelembapan: 'Humidity',
+    tds: 'TDS Level',
+    ph: 'pH Level',
+    pompa: 'Pump Status'
+  };
+
+  const iconMap = {
+    suhu_air: Thermometer,
+    suhu_udara: WindIcon,
+    kelembapan: Droplets,
+    tds: Gauge,
+    ph: Activity,
+    pompa: ToggleLeft,
+  };
+
+  const getStatusColor = (type, value) => {
+    if (type === 'pompa') {
+      return value === 'ON' ? 'text-green-500' : 'text-gray-500';
+    }
+    
+    const threshold = SENSOR_THRESHOLDS[type];
+    if (!threshold) return 'text-gray-600';
+    
+    if (value < threshold.min || value > threshold.max) {
+      return 'text-red-500';
+    }
+    return 'text-green-500';
+  };
+
+  const getStatusText = (type, value) => {
+    if (type === 'pompa') {
+      return value === 'ON' ? 'Active' : 'Inactive';
+    }
+    
+    const threshold = SENSOR_THRESHOLDS[type];
+    if (!threshold) return 'Normal';
+    
+    if (value < threshold.min) return 'Too Low';
+    if (value > threshold.max) return 'Too High';
+    return 'Normal';
+  };
+
+  // SensorCard component for demo
+  const SensorCard = ({ type, value }) => {
+    const Icon = iconMap[type];
+    const unit = SENSOR_UNITS[type];
+    const label = SENSOR_LABELS[type];
+    const statusColor = value != null && value !== undefined ? getStatusColor(type, value) : 'text-gray-600';
+    const statusText = value != null && value !== undefined ? getStatusText(type, value) : 'No Data';
+
+    return (
+      <motion.div
+        whileHover={{ y: -5 }}
+        whileTap={{ scale: 0.98 }}
+        className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6 h-full flex flex-col"
+      >
+        <div className="flex items-center justify-between mb-4 flex-shrink-0">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">{label}</h3>
+          <div className={cn(
+            "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0",
+            type === 'suhu_air' ? "bg-gradient-to-br from-red-500 to-red-600" :
+            type === 'suhu_udara' ? "bg-gradient-to-br from-orange-500 to-orange-600" :
+            type === 'kelembapan' ? "bg-gradient-to-br from-blue-500 to-blue-600" :
+            type === 'tds' ? "bg-gradient-to-br from-green-500 to-green-600" :
+            type === 'ph' ? "bg-gradient-to-br from-purple-500 to-purple-600" :
+            "bg-gradient-to-br from-gray-500 to-gray-600"
+          )}>
+            <Icon className="w-5 h-5 text-white" />
+          </div>
+        </div>
+        
+        <div className="flex-grow flex flex-col justify-between">
+          <div className="space-y-2">
+            <div className="flex items-baseline space-x-2">
+              {value != null && value !== undefined 
+                ? (() => {
+                    let displayValue;
+                    if (type === 'ph') {
+                      displayValue = parseFloat(value.toFixed(1));
+                    } else if (type === 'suhu_air' || type === 'suhu_udara') {
+                      displayValue = parseFloat(value.toFixed(1));
+                    } else {
+                      displayValue = Math.round(value);
+                    }
+                    
+                    // Determine font size based on value length
+                    const valueLength = displayValue.toString().length;
+                    let fontSizeClass;
+                    if (valueLength <= 3) {
+                      fontSizeClass = "text-3xl";
+                    } else if (valueLength === 4) {
+                      fontSizeClass = "text-2xl";
+                    } else {
+                      fontSizeClass = "text-xl";
+                    }
+                    
+                    return (
+                      <>
+                        <span className={`${fontSizeClass} font-bold text-gray-900 dark:text-white break-words max-w-[70%]`}>
+                          {displayValue}
+                        </span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400 flex-shrink-0">{unit}</span>
+                      </>
+                    );
+                  })()
+                : (
+                  <>
+                    <span className="text-3xl font-bold text-gray-900 dark:text-white">--</span>
+                  </>
+                )}
+            </div>
+          </div>
+          
+          <div className={cn(
+            'text-sm font-medium px-3 py-1 rounded-full inline-block mt-2 w-fit',
+            statusColor === 'text-red-500' 
+              ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' 
+              : statusColor === 'text-green-500'
+              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+              : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+          )}>
+            {statusText}
+          </div>
+        </div>
+      </motion.div>
+    );
+  };
+
+  // ChartBox component for demo
+  const ChartBox = ({ data, title, dataKey }) => {
+    const formatTime = (timestamp) => {
+      const date = new Date(timestamp);
+      return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+    };
+
+    const chartData = data?.map(item => ({
+      time: formatTime(item.created_at),
+      value: item[dataKey],
+      fullTime: new Date(item.created_at).toLocaleTimeString(),
+    })) || [];
+
+    // Map titles to icons
+    const getIcon = (title) => {
+      if (title.includes('Water')) return <Droplets className="w-5 h-5 text-white" />;
+      if (title.includes('Air')) return <WindIcon className="w-5 h-5 text-white" />;
+      if (title.includes('Humidity')) return <Droplets className="w-5 h-5 text-white" />;
+      if (title.includes('TDS')) return <Gauge className="w-5 h-5 text-white" />;
+      if (title.includes('pH')) return <Activity className="w-5 h-5 text-white" />;
+      if (title.includes('Temperature')) return <Thermometer className="w-5 h-5 text-white" />;
+      return <Activity className="w-5 h-5 text-white" />;
+    };
+
+    // Map titles to gradient colors
+    const getGradient = (title) => {
+      if (title.includes('Water')) return 'from-blue-500 to-cyan-500';
+      if (title.includes('Air')) return 'from-orange-500 to-yellow-500';
+      if (title.includes('Humidity')) return 'from-blue-400 to-indigo-500';
+      if (title.includes('TDS')) return 'from-green-500 to-emerald-500';
+      if (title.includes('pH')) return 'from-purple-500 to-violet-500';
+      if (title.includes('Temperature')) return 'from-red-500 to-orange-500';
+      return 'from-gray-500 to-gray-600';
+    };
+
+    // Define a color based on the title
+    const getColor = (title) => {
+      if (title.includes('Water')) return '#00A884';
+      if (title.includes('Air')) return '#3B82F6';
+      if (title.includes('Humidity')) return '#8B5CF6';
+      if (title.includes('TDS')) return '#F59E0B';
+      if (title.includes('pH')) return '#EF4444';
+      return '#6B7280';
+    };
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6"
+      >
+        <div className="flex items-center mb-4">
+          <div className={`w-10 h-10 bg-gradient-to-br ${getGradient(title)} rounded-lg flex items-center justify-center mr-3`}>
+            {getIcon(title)}
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
+        </div>
+        <div className="h-64">
+          {/* This would be a real chart in the actual implementation */}
+          <div className="h-full flex items-center justify-center">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-500 to-blue-500 rounded-full mb-4">
+                {getIcon(title)}
+              </div>
+              <p className="text-gray-600 dark:text-gray-300">Live Trending Chart</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Showing real-time data</p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    );
+  };
+
+  // SummaryCard component for demo
+  const SummaryCard = () => {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6"
+      >
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center mb-2">
+              <Activity className="w-6 h-6 text-primary-500 mr-2" />
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+            </div>
+            <p className="text-gray-600 dark:text-gray-300">Real-time hydroponic system monitoring</p>
+          </div>
+          <button
+            className={`px-4 py-2 rounded-lg border flex items-center space-x-2
+              bg-primary-50 border-primary-200 text-primary-700 hover:bg-primary-100
+              dark:bg-gray-700/70 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600`}
+          >
+            <RefreshCw className="w-4 h-4" />
+            <span>Refresh</span>
+          </button>
+        </div>
+      </motion.div>
+    );
+  };
+
+  // PumpControl component for demo
+  const PumpControl = ({ pumpStatus = 'OFF' }) => {
+    const isOn = pumpStatus === 'ON';
+    
+    // Mock function to simulate pump control
+    const togglePump = () => {
+      // In a real implementation, this would call the API
+    };
+    
+    return (
+      <motion.div
+        whileHover={{ y: -5 }}
+        className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6 h-full"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-gray-500 to-gray-700 rounded-lg flex items-center justify-center mr-3">
+              <ToggleLeft className="w-5 h-5 text-white" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Pump Control</h3>
+          </div>
+          <div className={`w-3 h-3 rounded-full ${isOn ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+        </div>
+        
+        {/* Status Display */}
+        <div className="space-y-2">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">
+                {pumpStatus != null && pumpStatus !== undefined ? pumpStatus : '--'}
+              </div>
+              <div className={`text-sm font-medium px-3 py-1 rounded-full inline-block mt-2 ${
+                isOn ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+              }`}>
+                {isOn ? 'Active' : 'Inactive'}
+              </div>
+            </div>
+            
+            <div className="flex flex-col items-center space-y-2 ml-4">
+              <div 
+                onClick={togglePump}
+                className={`relative inline-flex items-center h-7 rounded-full w-16 cursor-pointer transition-all duration-300 ${
+                  isOn ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-gray-300 dark:bg-gray-600'
+                }`}
+              >
+                <span 
+                  className={`inline-block w-5 h-5 transform bg-white rounded-full shadow-lg transition-all duration-300 ${
+                    isOn ? 'translate-x-10' : 'translate-x-1'
+                  }`}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    );
+  };
+
   return (
-    <div className="bg-gray-900 rounded-xl p-4 h-full">
-      <div className="flex items-center justify-between mb-4">
-        <div className="text-white font-semibold">Real-time Sensor Dashboard</div>
-        <div className="flex items-center space-x-2">
-          <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-          <div className="text-xs text-gray-400">Live</div>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <div className="flex items-center">
-            <DropletsIcon className="w-6 h-6 text-blue-400 mr-2" />
-            <div>
-              <div className="text-white font-bold">{sensorData.ph.toFixed(1)}</div>
-              <div className="text-xs text-gray-400">pH Level</div>
+    <div className="space-y-6 w-full">
+      <SummaryCard />
+
+      {/* Status Alert */}
+      {showAlert && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-2xl p-4 flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mr-4">
+                <AlertTriangle className="w-6 h-6 text-yellow-500" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 dark:text-white">System Alert</h3>
+                <p className="text-gray-600 dark:text-gray-300">pH level approaching upper threshold</p>
+              </div>
             </div>
+            <button 
+              onClick={() => setShowAlert(false)}
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <div className="mt-2 h-1.5 bg-gray-700 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-blue-500 rounded-full"
-              style={{ width: `${((sensorData.ph - 4) / 5) * 100}%` }}
-            ></div>
-          </div>
+        </motion.div>
+      )}
+
+      {/* Sensor Grid */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
+        <SensorCard type="suhu_air" value={sensorData.suhu_air} />
+        <SensorCard type="suhu_udara" value={sensorData.suhu_udara} />
+        <SensorCard type="kelembapan" value={sensorData.kelembapan} />
+        <SensorCard type="tds" value={sensorData.tds} />
+        <SensorCard type="ph" value={sensorData.ph} />
+        <PumpControl pumpStatus={sensorData.pompa} />
+      </motion.div>
+
+      {/* Charts Grid */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.0 }}
+        className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6"
+      >
+        <div className="flex items-center mb-4">
+          <Activity className="w-5 h-5 text-primary-500 mr-2" />
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Last 10 Hours Trend</h2>
         </div>
         
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <div className="flex items-center">
-            <ThermometerIcon className="w-6 h-6 text-red-400 mr-2" />
-            <div>
-              <div className="text-white font-bold">{sensorData.temp.toFixed(1)}°C</div>
-              <div className="text-xs text-gray-400">Water Temp</div>
-            </div>
-          </div>
-          <div className="mt-2 h-1.5 bg-gray-700 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-red-500 rounded-full"
-              style={{ width: `${((sensorData.temp - 15) / 20) * 100}%` }}
-            ></div>
-          </div>
+        <div className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+          Showing data from the last 10 hours (6 data points total)
         </div>
         
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <div className="flex items-center">
-            <Gauge className="w-6 h-6 text-green-400 mr-2" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ChartBox
+            title="Water Temperature Trend"
+            dataKey="suhu_air"
+            data={historyData.suhu_air}
+          />
+          <ChartBox
+            title="Air Temperature Trend"
+            dataKey="suhu_udara"
+            data={historyData.suhu_udara}
+          />
+          <ChartBox
+            title="Humidity Trend"
+            dataKey="kelembapan"
+            data={historyData.kelembapan}
+          />
+          <ChartBox
+            title="TDS Trend"
+            dataKey="tds"
+            data={historyData.tds}
+          />
+          <ChartBox
+            title="pH Level Trend"
+            dataKey="ph"
+            data={historyData.ph}
+          />
+        </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.5 }}
+      >
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6">
+          <div className="flex items-center justify-between">
             <div>
-              <div className="text-white font-bold">{sensorData.tds}</div>
-              <div className="text-xs text-gray-400">TDS Level</div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Last Updated</h3>
+              <p className="text-gray-600 dark:text-gray-300">Just now</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-sm text-gray-600 dark:text-gray-300">Live</span>
             </div>
           </div>
-          <div className="mt-2 h-1.5 bg-gray-700 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-green-500 rounded-full"
-              style={{ width: `${(sensorData.tds / 1000) * 100}%` }}
-            ></div>
-          </div>
         </div>
-        
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <div className="flex items-center">
-            <Droplet className="w-6 h-6 text-cyan-400 mr-2" />
-            <div>
-              <div className="text-white font-bold">{sensorData.humidity}%</div>
-              <div className="text-xs text-gray-400">Humidity</div>
-            </div>
-          </div>
-          <div className="mt-2 h-1.5 bg-gray-700 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-cyan-500 rounded-full"
-              style={{ width: `${sensorData.humidity}%` }}
-            ></div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Live chart visualization */}
-      <div className="h-32 bg-gray-800 rounded-lg p-2">
-        <div className="h-full flex items-end justify-between space-x-0.5">
-          {Array.from({ length: 24 }, (_, i) => (
-            <motion.div
-              key={i}
-              className="bg-gradient-to-t from-primary-500 to-blue-500 w-full rounded-t"
-              style={{ height: `${Math.random() * 80 + 20}%` }}
-              initial={{ height: Math.random() * 30 + 10 }}
-              animate={{ height: `${Math.random() * 80 + 20}%` }}
-              transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
-            />
-          ))}
-        </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
+
+// Helper functions for dashboard
+const cn = (...classes) => classes.filter(Boolean).join(' ');
+
+// Additional icon needed for the dashboard (not available in lucide-react)
+const ToggleLeft = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <rect x="2" y="6" width="20" height="12" rx="6"></rect>
+    <circle cx="8" cy="12" r="2"></circle>
+  </svg>
+);
 
 const Landing = () => {
   const { scrollYProgress } = useScroll();
@@ -734,30 +1124,31 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Stats Section with Animated Counters */}
-      <section className="px-6 py-16 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+
+
+      {/* Powerful Dashboard Experience Section */}
+      <section className="px-6 py-20 bg-gradient-to-br from-slate-50 via-primary-50 to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-green-900/20">
         <div className="max-w-7xl mx-auto">
-          <motion.div 
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.5 }}
-            variants={containerVariants}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
           >
-            {stats.map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                variants={itemVariants}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-gradient-to-br from-primary-50 to-white p-6 rounded-2xl shadow-lg border border-primary-100 dark:from-gray-700 dark:to-gray-800 dark:border-gray-600"
-              >
-                <div className="text-4xl font-bold text-primary-600 dark:text-primary-400 mb-2">
-                  <AnimatedCounter value={stat.value} suffix={stat.suffix} />
-                </div>
-                <div className="text-gray-600 dark:text-gray-300">{stat.label}</div>
-              </motion.div>
-            ))}
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 dark:text-white">
+              Powerful <span className="text-primary-600">Dashboard</span> Experience
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
+              Experience real-time monitoring and control with our intuitive dashboard interface
+            </p>
           </motion.div>
+
+          <div className="flex justify-center">
+            <div className="w-full max-w-4xl">
+              <InteractiveDashboard />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -802,63 +1193,6 @@ const Landing = () => {
                     </div>
                   </div>
                 </InteractiveCard>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Interactive Growth Visualization Section */}
-      <section className="px-6 py-20 bg-gradient-to-br from-green-50 to-primary-50 dark:from-green-900/20 dark:to-gray-800">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 dark:text-white">
-              <span className="text-green-600">Growth</span> & <span className="text-primary-600">Efficiency</span> Metrics
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
-              See the real impact of HY.YUME on your hydroponic operations
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {plantGrowthVisualizations.map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <motion.div
-                  key={item.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
-                      <Icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                      {item.value}{item.unit}
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">
-                    {item.description}
-                  </p>
-                  <div className="mt-4 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"
-                      style={{ width: `${item.value}%` }}
-                    ></div>
-                  </div>
-                </motion.div>
               );
             })}
           </div>
