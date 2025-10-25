@@ -22,6 +22,7 @@ import {
   Play,
   Quote,
   ArrowDown,
+  ChevronDown,
   Star,
   Sun,
   Moon,
@@ -712,6 +713,21 @@ const Landing = () => {
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
   const controls = useAnimation();
+  const [scrolled, setScrolled] = useState(false);
+  const navRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const features = [
     {
@@ -847,14 +863,6 @@ const Landing = () => {
     }
   ];
 
-  // Stats data with animated counters
-  const stats = [
-    { value: "99.9", suffix: "%", label: "Uptime" },
-    { value: "24/7", label: "Monitoring" },
-    { value: "50", suffix: "%", label: "Water Saved" },
-    { value: "100", suffix: "%", label: "Secure" }
-  ];
-
   // Enhanced feature benefits with more icons
   const enhancedBenefits = [
     {
@@ -977,38 +985,99 @@ const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-primary-50/30 to-green-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-green-900/20 overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-primary-50/30 to-green-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-green-900/20 overflow-x-hidden relative">
       {/* Animated particles background */}
       <AnimatedParticles />
       
-      {/* Navigation */}
-      <nav className="px-6 py-4 fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-sm dark:shadow-none">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <img 
-              src="/favicon.png" 
-              alt="HY.YUME Logo" 
-              className="w-10 h-10 object-contain"
-            />
-            <span className="text-2xl font-bold text-gray-900 dark:text-white">HY.YUME</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link to="/login">
-              <Button variant="outline" className="border-primary-200 text-primary-700 hover:bg-primary-50 dark:border-primary-700 dark:text-primary-300 dark:hover:bg-primary-900/30">
-                Sign In
-              </Button>
-            </Link>
-            <Link to="/register">
-              <Button className="bg-gradient-to-r from-primary-500 to-blue-500 hover:from-primary-600 hover:to-blue-600 dark:from-primary-600 dark:to-blue-600 dark:hover:from-primary-700 dark:hover:to-blue-700">
-                Get Started
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
+      {/* Floating animated elements throughout the page */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <motion.div
+          className="absolute top-1/4 left-1/4 w-4 h-4 rounded-full bg-green-400/30"
+          animate={{ 
+            y: [-10, 10, -10],
+            x: [-10, 10, -10],
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.6, 0.3]
+          }}
+          transition={{ 
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0
+          }}
+        />
+        <motion.div
+          className="absolute top-3/4 right-1/3 w-6 h-6 rounded-full bg-blue-400/25"
+          animate={{ 
+            y: [10, -10, 10],
+            x: [15, -15, 15],
+            scale: [1, 1.3, 1],
+            opacity: [0.2, 0.5, 0.2]
+          }}
+          transition={{ 
+            duration: 7,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1
+          }}
+        />
+        <motion.div
+          className="absolute top-1/3 right-1/5 w-3 h-3 rounded-full bg-purple-400/35"
+          animate={{ 
+            y: [20, -20, 20],
+            x: [-15, 15, -15],
+            scale: [1, 1.4, 1],
+            opacity: [0.4, 0.7, 0.4]
+          }}
+          transition={{ 
+            duration: 9,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+        />
+      </div>
+      
+     {/* Navigation */}
+<nav className={`px-6 py-4 fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+  scrolled 
+    ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-lg' 
+    : 'bg-transparent'
+}`}>
+  <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <div className="flex items-center space-x-3">
+      <img 
+        src="/favicon.png"
+        alt="HY.YUME Logo"
+        className="w-10 h-10 object-contain"
+      />
+      <span className="text-2xl font-bold text-gray-900 dark:text-white">
+        HY.YUME
+      </span>
+    </div>
+
+    <div className="flex items-center space-x-4">
+      <Link to="/login">
+        <Button 
+          variant="outline"
+          className="border-primary-200 text-primary-700 hover:bg-primary-50 dark:border-primary-700 dark:text-primary-300 dark:hover:bg-primary-900/30"
+        >
+          Sign In
+        </Button>
+      </Link>
+
+      <Link to="/register">
+        <Button className="bg-gradient-to-r from-primary-500 to-blue-500 hover:from-primary-600 hover:to-blue-600 dark:from-primary-600 dark:to-blue-600 dark:hover:from-primary-700 dark:hover:to-blue-700">
+          Get Started
+        </Button>
+      </Link>
+    </div>
+  </div>
+</nav>
+
 
       {/* Hero Section with Enhanced Cinematic Elements */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+      <section className="relative h-screen flex items-center justify-center overflow-hidden pt-20">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-green-200/30 to-blue-200/30 rounded-full blur-3xl animate-pulse"></div>
@@ -1016,7 +1085,7 @@ const Landing = () => {
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-green-200/10 via-primary-200/10 to-blue-200/10 rounded-full blur-3xl"></div>
         </div>
         
-        <div className="relative z-10 px-6 py-20 max-w-7xl mx-auto text-center">
+        <div className="relative z-10 px-6 py-8 max-w-7xl mx-auto text-center flex flex-col justify-center h-full">
           <motion.div
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -1048,6 +1117,20 @@ const Landing = () => {
             <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed dark:text-gray-300">
               Smart Hydroponic IoT System – Monitor, Analyze, and Optimize Your Hydroponic Farm in Real-Time
             </p>
+            <div className="flex flex-wrap justify-center gap-6 mb-8 max-w-4xl mx-auto">
+              <div className="flex items-center text-gray-700 dark:text-gray-300">
+                <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+                <span>Real-time Monitoring</span>
+              </div>
+              <div className="flex items-center text-gray-700 dark:text-gray-300">
+                <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+                <span>Smart Efficiency</span>
+              </div>
+              <div className="flex items-center text-gray-700 dark:text-gray-300">
+                <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+                <span>Remote Access</span>
+              </div>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link to="/register">
                 <Button size="lg" className="bg-gradient-to-r from-primary-500 to-blue-500 hover:from-primary-600 hover:to-blue-600 px-8 py-3 text-lg dark:from-primary-600 dark:to-blue-600 dark:hover:from-primary-700 dark:hover:to-blue-700">
@@ -1070,57 +1153,10 @@ const Landing = () => {
               </motion.div>
             </div>
             
-            {/* Trust indicators */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-              className="mt-12 flex flex-wrap justify-center items-center gap-8"
-            >
-              <div className="flex items-center">
-                <Users className="w-5 h-5 text-green-500 mr-2" />
-                <span className="text-gray-600 dark:text-gray-300">5,000+ Happy Farmers</span>
-              </div>
-              <div className="flex items-center">
-                <Package className="w-5 h-5 text-blue-500 mr-2" />
-                <span className="text-gray-600 dark:text-gray-300">100% Eco-Friendly</span>
-              </div>
-              <div className="flex items-center">
-                <Clock className="w-5 h-5 text-purple-500 mr-2" />
-                <span className="text-gray-600 dark:text-gray-300">24/7 Support</span>
-              </div>
-            </motion.div>
+
           </motion.div>
 
-          {/* Interactive feature cards */}
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="mt-28 grid md:grid-cols-2 lg:grid-cols-4 gap-8"
-          >
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <InteractiveCard
-                  key={feature.title}
-                  className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 hover:shadow-2xl transition-all duration-300"
-                >
-                  <div className="flex items-center justify-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-blue-500 rounded-xl flex items-center justify-center text-white">
-                      <Icon className="w-6 h-6" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white text-center">
-                      {feature.title}
-                    </h3>
-                  </div>
-                  <p className="text-gray-600 leading-relaxed dark:text-gray-300 text-center">
-                    {feature.description}
-                  </p>
-                </InteractiveCard>
-              );
-            })}
-          </motion.div>
+
 
           {/* Scroll indicator */}
           <motion.div
@@ -1135,48 +1171,142 @@ const Landing = () => {
         </div>
       </section>
 
-
-
-      {/* Powerful Dashboard Experience Section */}
-      <section className="px-6 py-20 bg-gradient-to-br from-slate-50/50 via-primary-50/30 to-green-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-green-900/20">
-        <div className="max-w-7xl mx-auto">
+      {/* Features Section */}
+      <section className="px-6 py-12 bg-gradient-to-br from-primary-50/40 via-green-50/50 to-blue-50/40 dark:from-gray-800 dark:via-gray-800/80 dark:to-gray-800 min-h-screen flex items-center">
+        <div className="max-w-7xl mx-auto w-full">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+            className="text-center mb-12"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 dark:text-white">
-              Powerful <span className="text-primary-600">Dashboard</span> Experience
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 dark:text-white">
+              Key <span className="text-primary-600">Features</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
-              Experience real-time monitoring and control with our intuitive dashboard interface
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
+              Essential capabilities for modern hydroponic farming
             </p>
           </motion.div>
 
-          <div className="flex justify-center">
-            <div className="w-full max-w-4xl">
-              <InteractiveDashboard />
-            </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  whileHover={{ y: -10, scale: 1.02 }}
+                >
+                  <InteractiveCard
+                    className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 h-full relative overflow-hidden"
+                  >
+                    {/* Animated background element */}
+                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-gradient-to-r from-primary-500/10 to-blue-500/10 rounded-full blur-xl"></div>
+                    
+                    <div className="relative z-10 flex items-start space-x-4">
+                      <motion.div 
+                        className="flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center text-white flex-shrink-0"
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        style={{
+                          background: 'linear-gradient(135deg, #0088cc 0%, #4361ee 100%)'
+                        }}
+                      >
+                        <Icon className="w-6 h-6" />
+                      </motion.div>
+                      <div>
+                        <motion.h3 
+                          className="text-xl font-semibold text-gray-900 dark:text-white mb-2"
+                          initial={{ opacity: 0.7 }}
+                          whileHover={{ opacity: 1 }}
+                        >
+                          {feature.title}
+                        </motion.h3>
+                        <motion.p 
+                          className="text-gray-600 dark:text-gray-300"
+                          initial={{ opacity: 0.8 }}
+                          whileHover={{ opacity: 1 }}
+                        >
+                          {feature.description}
+                        </motion.p>
+                        
+                        {/* Animated hover effect line */}
+                        <motion.div 
+                          className="h-0.5 bg-gradient-to-r from-primary-500 to-blue-500 mt-4"
+                          initial={{ width: 0 }}
+                          whileHover={{ width: '100%' }}
+                          transition={{ duration: 0.3 }}
+                        ></motion.div>
+                      </div>
+                    </div>
+                  </InteractiveCard>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* Enhanced Benefits Section */}
-      <section className="px-6 py-20 bg-gradient-to-br from-white/50 to-primary-50/30 dark:from-gray-800 dark:to-gray-900">
-        <div className="max-w-7xl mx-auto">
+
+
+      {/* Powerful Dashboard Experience Section */}
+      <section className="px-6 py-12 bg-gradient-to-br from-green-50/30 via-primary-100/40 to-blue-50/40 dark:from-green-900/20 dark:via-gray-800 dark:to-gray-800 min-h-screen flex items-center">
+        <div className="max-w-7xl mx-auto w-full">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+            className="text-center mb-8"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 dark:text-white">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 dark:text-white">
+              Powerful <span className="text-primary-600">Dashboard</span> Experience
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
+              Experience real-time monitoring and control with our intuitive dashboard interface
+            </p>
+          </motion.div>
+
+          {/* Animated floating elements */}
+          <div className="absolute top-20 left-20 w-8 h-8 bg-green-400/20 rounded-full blur-md animate-pulse"></div>
+          <div className="absolute top-1/3 right-40 w-6 h-6 bg-blue-400/20 rounded-full blur-md animate-pulse delay-1000"></div>
+          <div className="absolute bottom-1/4 left-1/3 w-10 h-10 bg-primary-400/20 rounded-full blur-md animate-pulse delay-500"></div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.7 }}
+            whileHover={{ y: -5 }}
+            className="flex justify-center"
+          >
+            <div className="w-full max-w-4xl relative">
+              <div className="absolute -inset-4 bg-gradient-to-r from-primary-500/20 to-blue-500/20 rounded-3xl blur-xl opacity-30"></div>
+              <div className="relative">
+                <InteractiveDashboard />
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Enhanced Benefits Section */}
+      <section className="px-6 py-12 bg-gradient-to-br from-blue-50/40 via-primary-50/40 to-green-50/50 dark:from-gray-800 dark:via-gray-800/80 dark:to-gray-800 min-h-screen flex items-center">
+        <div className="max-w-7xl mx-auto w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-8"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 dark:text-white">
               Advanced <span className="text-primary-600">Features</span> for Modern Growers
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
               Innovative technology to optimize your hydroponic operation
             </p>
           </motion.div>
@@ -1187,7 +1317,7 @@ const Landing = () => {
               return (
                 <InteractiveCard
                   key={benefit.title}
-                  className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 overflow-hidden hover:shadow-2xl transition-all duration-300"
+                  className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm p-4 rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 overflow-hidden hover:shadow-2xl transition-all duration-300"
                 >
                   <div className="relative">
                     <div className={`absolute -top-4 -right-4 w-16 h-16 rounded-full bg-gradient-to-r ${benefit.gradient} opacity-20 blur-md`}></div>
@@ -1213,26 +1343,32 @@ const Landing = () => {
 
 
       {/* How It Works Section */}
-      <section className="px-6 py-20 bg-gradient-to-br from-slate-50/50 to-white/50 dark:from-gray-800 dark:to-gray-900">
-        <div className="max-w-7xl mx-auto">
+      <section className="px-6 py-12 bg-gradient-to-br from-green-50/50 via-primary-50/40 to-slate-50/50 dark:from-gray-800 dark:via-gray-800/80 dark:to-gray-900 min-h-screen flex items-center">
+        <div className="max-w-7xl mx-auto w-full">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+            className="text-center mb-8"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 dark:text-white">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 dark:text-white">
               How It <span className="text-primary-600 dark:text-primary-400">Works</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
               Simple 4-step process to transform your hydroponic operation
             </p>
           </motion.div>
 
           <div className="relative">
-            {/* Timeline line */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-primary-500 to-blue-500 hidden md:block dark:bg-gradient-to-b dark:from-primary-600 dark:to-blue-600"></div>
+            {/* Animated timeline line */}
+            <motion.div 
+              className="absolute left-1/2 transform -translate-x-1/2 w-1 bg-gradient-to-b from-primary-500 to-blue-500 hidden md:block dark:bg-gradient-to-b dark:from-primary-600 dark:to-blue-600"
+              initial={{ height: 0 }}
+              whileInView={{ height: "100%" }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.5, ease: "easeOut" }}
+            ></motion.div>
             
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {howItWorksSteps.map((step, index) => {
@@ -1240,29 +1376,51 @@ const Landing = () => {
                 return (
                   <motion.div
                     key={step.title}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
                     viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    whileHover={{ y: -10 }}
-                    className={`text-center group ${index % 2 === 0 ? 'md:pr-16' : 'md:pl-16 md:mt-20'}`}
+                    transition={{ duration: 0.5, delay: index * 0.15 }}
+                    whileHover={{ y: -15, scale: 1.05 }}
+                    className={`text-center ${index % 2 === 0 ? 'md:pr-10' : 'md:pl-10 md:mt-12'}`}
                   >
                     <div className="relative mb-6">
-                      <div className="w-16 h-16 bg-gradient-to-br from-primary-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 rounded-full flex items-center justify-center mx-auto group-hover:bg-primary-100 dark:group-hover:bg-gray-600 transition-colors">
-                        <div className="w-12 h-12 bg-gradient-to-r from-primary-500 to-blue-500 rounded-full flex items-center justify-center">
+                      <motion.div 
+                        className="w-16 h-16 bg-gradient-to-br from-primary-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 rounded-full flex items-center justify-center mx-auto"
+                        whileHover={{ 
+                          scale: 1.1,
+                          backgroundColor: "rgba(99, 102, 241, 0.1)" 
+                        }}
+                      >
+                        <motion.div 
+                          className="w-12 h-12 bg-gradient-to-r from-primary-500 to-blue-500 rounded-full flex items-center justify-center"
+                          whileHover={{ 
+                            scale: 1.1,
+                            boxShadow: "0 0 20px rgba(99, 102, 241, 0.5)"
+                          }}
+                        >
                           <Icon className="w-6 h-6 text-white" />
-                        </div>
-                      </div>
-                      <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-primary-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        </motion.div>
+                      </motion.div>
+                      <motion.div 
+                        className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-primary-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                        whileHover={{ scale: 1.2, rotate: 10 }}
+                      >
                         {step.step}
-                      </div>
+                      </motion.div>
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-3 dark:text-white">
+                    <motion.h3 
+                      className="text-xl font-semibold text-gray-900 mb-3 dark:text-white"
+                      whileHover={{ color: "#4f46e5" }}
+                    >
                       {step.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300">
+                    </motion.h3>
+                    <motion.p 
+                      className="text-gray-600 dark:text-gray-300"
+                      initial={{ opacity: 0.7 }}
+                      whileHover={{ opacity: 1 }}
+                    >
                       {step.description}
-                    </p>
+                    </motion.p>
                   </motion.div>
                 );
               })}
@@ -1272,19 +1430,19 @@ const Landing = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="px-6 py-20 bg-gradient-to-br from-primary-50/40 to-blue-50/40 dark:from-gray-800 dark:to-gray-900">
-        <div className="max-w-7xl mx-auto">
+      <section className="px-6 py-12 bg-gradient-to-br from-slate-50/50 via-primary-100/40 to-green-50/40 dark:from-gray-900 dark:via-gray-800 dark:to-gray-800/80 min-h-screen flex items-center">
+        <div className="max-w-7xl mx-auto w-full">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+            className="text-center mb-8"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 dark:text-white">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 dark:text-white">
               Why Choose <span className="text-primary-600">HY.YUME</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
               Superior technology and results for your hydroponic operation
             </p>
           </motion.div>
@@ -1294,36 +1452,70 @@ const Landing = () => {
               {
                 title: "Advanced Analytics",
                 description: "Get deep insights from your data to optimize growing conditions and maximize yields.",
-                icon: BarChart3
+                icon: BarChart3,
+                gradient: "from-purple-500 to-pink-500"
               },
               {
                 title: "Remote Control",
                 description: "Control pumps, lights, and other equipment remotely with our intuitive interface.",
-                icon: Globe
+                icon: Globe,
+                gradient: "from-blue-500 to-cyan-500"
               },
               {
                 title: "Smart Alerts",
                 description: "Receive real-time notifications when conditions go out of optimal range.",
-                icon: Shield
+                icon: Shield,
+                gradient: "from-green-500 to-teal-500"
               }
             ].map((benefit, index) => {
               const Icon = benefit.icon;
               return (
-                <InteractiveCard
+                <motion.div
                   key={benefit.title}
-                  className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 relative overflow-hidden hover:shadow-2xl transition-all duration-300"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  whileHover={{ y: -15, scale: 1.03 }}
                 >
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-blue-500 rounded-xl flex items-center justify-center mb-6">
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3 dark:text-white">
-                    {benefit.title}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    {benefit.description}
-                  </p>
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-r from-primary-500/10 to-blue-500/10 rounded-full -translate-y-16 translate-x-16"></div>
-                </InteractiveCard>
+                  <InteractiveCard
+                    className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 relative overflow-hidden"
+                  >
+                    {/* Animated background element */}
+                    <div className={`absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-r ${benefit.gradient} rounded-full blur-xl opacity-20`}></div>
+                    
+                    <motion.div 
+                      className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 ${benefit.gradient} bg-clip-text text-transparent`}
+                      whileHover={{ 
+                        scale: 1.1,
+                        rotate: 5,
+                        textShadow: "0 0 15px rgba(255,255,255,0.5)"
+                      }}
+                      style={{
+                        background: `linear-gradient(135deg, ${index === 0 ? '#a855f7' : index === 1 ? '#3b82f6' : '#10b981'} 0%, ${index === 0 ? '#ec4899' : index === 1 ? '#60a5fa' : '#06b6d4'} 100%)`,
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent'
+                      }}
+                    >
+                      <Icon className="w-7 h-7" />
+                    </motion.div>
+                    
+                    <motion.h3 
+                      className="text-xl font-semibold text-gray-900 mb-3 dark:text-white"
+                      whileHover={{ color: "#4f46e5" }}
+                    >
+                      {benefit.title}
+                    </motion.h3>
+                    
+                    <motion.p 
+                      className="text-gray-600 dark:text-gray-300"
+                      initial={{ opacity: 0.8 }}
+                      whileHover={{ opacity: 1 }}
+                    >
+                      {benefit.description}
+                    </motion.p>
+                  </InteractiveCard>
+                </motion.div>
               );
             })}
           </div>
@@ -1331,227 +1523,394 @@ const Landing = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="px-6 py-20 bg-gradient-to-br from-slate-50/50 to-white/50 dark:from-gray-800 dark:to-gray-900">
-        <div className="max-w-7xl mx-auto">
+      <section className="px-6 py-12 bg-gradient-to-br from-green-50/40 via-primary-50/40 to-slate-100/50 dark:from-gray-800/80 dark:via-gray-800 dark:to-gray-900 min-h-screen flex items-center">
+        <div className="max-w-7xl mx-auto w-full">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+            className="text-center mb-8"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 dark:text-white">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 dark:text-white">
               What Our <span className="text-primary-600 dark:text-primary-400">Customers</span> Say
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
               Real results from satisfied hydroponic farmers
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 mb-12">
             {testimonials.map((testimonial, index) => (
-              <InteractiveCard
+              <motion.div
                 key={testimonial.name}
-                className="bg-gradient-to-br from-primary-50 to-white/80 dark:from-gray-800 dark:to-gray-900 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 relative overflow-hidden hover:shadow-2xl transition-all duration-300"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{ y: -10, scale: 1.02 }}
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-r from-primary-500/5 to-blue-500/5 rounded-full -translate-y-16 translate-x-16"></div>
-                <div className="relative z-10">
-                  <div className="flex mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                  <Quote className="w-8 h-8 text-primary-500 mb-4" />
-                  <p className="text-gray-700 dark:text-gray-300 mb-6 italic">
-                    "{testimonial.content}"
-                  </p>
-                  <div>
-                    <div className="font-semibold text-gray-900 dark:text-white">
-                      {testimonial.name}
+                <InteractiveCard
+                  className="bg-gradient-to-br from-primary-50 to-white/80 dark:from-gray-800 dark:to-gray-900 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 relative overflow-hidden"
+                >
+                  {/* Animated background element */}
+                  <div className="absolute -top-6 -right-6 w-20 h-20 bg-gradient-to-r from-yellow-400/30 to-green-400/30 rounded-full blur-xl"></div>
+                  
+                  <div className="relative z-10">
+                    <div className="flex mb-4">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: i * 0.1 }}
+                        >
+                          <Star className="w-5 h-5 text-yellow-400 fill-current" />
+                        </motion.div>
+                      ))}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {testimonial.role}
+                    <motion.div
+                      animate={{ 
+                        rotate: [0, -5, 0, 5, 0],
+                      }}
+                      transition={{ 
+                        duration: 4,
+                        repeat: Infinity,
+                        repeatType: "reverse"
+                      }}
+                    >
+                      <Quote className="w-8 h-8 text-primary-500 mb-4" />
+                    </motion.div>
+                    <motion.p 
+                      className="text-gray-700 dark:text-gray-300 mb-6 italic"
+                      initial={{ opacity: 0.7 }}
+                      whileHover={{ opacity: 1 }}
+                    >
+                      "{testimonial.content}"
+                    </motion.p>
+                    <div>
+                      <div className="font-semibold text-gray-900 dark:text-white">
+                        {testimonial.name}
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        {testimonial.role}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </InteractiveCard>
+                </InteractiveCard>
+              </motion.div>
             ))}
           </div>
           
           {/* Additional testimonials */}
           <div className="grid md:grid-cols-2 gap-8">
             {additionalTestimonials.map((testimonial, index) => (
-              <InteractiveCard
+              <motion.div
                 key={testimonial.name}
-                className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700 hover:shadow-2xl transition-all duration-300"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{ scale: 1.02 }}
               >
-                <div className="flex mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-gray-700 dark:text-gray-300 mb-4 italic">
-                  "{testimonial.content}"
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-3">
-                    {testimonial.name.charAt(0)}
+                <InteractiveCard
+                  className="bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm p-5 rounded-2xl shadow-xl border border-primary-100/50 dark:border-gray-700"
+                >
+                  <div className="flex mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                    ))}
                   </div>
-                  <div>
-                    <div className="font-semibold text-gray-900 dark:text-white">
-                      {testimonial.name}
+                  <p className="text-gray-700 dark:text-gray-300 mb-4 italic">
+                    "{testimonial.content}"
+                  </p>
+                  <motion.div 
+                    className="flex items-center"
+                    whileHover={{ x: 5 }}
+                  >
+                    <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                      {testimonial.name.charAt(0)}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {testimonial.role}
+                    <div>
+                      <div className="font-semibold text-gray-900 dark:text-white">
+                        {testimonial.name}
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        {testimonial.role}
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </InteractiveCard>
+                  </motion.div>
+                </InteractiveCard>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Pricing Section */}
-      <section className="px-6 py-20 bg-gradient-to-br from-gray-50/50 to-white/50 dark:from-gray-800 dark:to-gray-900">
-        <div className="max-w-7xl mx-auto">
+      <section className="px-6 py-12 bg-gradient-to-br from-slate-100/30 via-primary-50/40 to-gray-50/50 dark:from-gray-900 dark:via-gray-800/80 dark:to-gray-800 min-h-screen flex items-center">
+        <div className="max-w-7xl mx-auto w-full">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+            className="text-center mb-12"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 dark:text-white">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 dark:text-white">
               Simple, Transparent <span className="text-primary-600">Pricing</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
               Choose the plan that's right for your hydroponic operation
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {pricingPlans.map((plan, index) => (
-              <InteractiveCard
+              <motion.div
                 key={plan.name}
-                className={`relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl border ${
-                  plan.popular 
-                    ? 'border-primary-500 ring-2 ring-primary-500/20 scale-105' 
-                    : 'border-gray-200 dark:border-gray-700'
-                }`}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{ y: -10 }}
+                className="relative"
               >
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
                     <span className="bg-gradient-to-r from-primary-500 to-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium">
                       Most Popular
                     </span>
                   </div>
                 )}
-                <div className={`p-8 ${plan.popular ? 'pt-12' : ''}`}>  {/* Add extra top padding when 'Most Popular' badge is present */}
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4 dark:text-white">
-                    {plan.name}
-                  </h3>
-                  <div className="mb-6">
-                    <span className="text-4xl font-bold text-gray-900 dark:text-white">
-                      {plan.price}
-                    </span>
-                    <span className="text-gray-600 dark:text-gray-400">
-                      {plan.period}
-                    </span>
+                
+                <div className={`relative rounded-2xl shadow-xl border ${
+                  plan.popular
+                    ? 'border-primary-500 bg-gradient-to-br from-white to-primary-50 dark:from-gray-800 dark:to-gray-900 ring-2 ring-primary-500/20'
+                    : 'bg-white/70 dark:bg-gray-800/70 border-primary-200/30 dark:border-gray-700 backdrop-blur-sm'
+                }`}>
+                  <div className="p-6 md:p-8">
+                    <div className="text-center mb-6">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{plan.name}</h3>
+                      <div className="flex items-baseline justify-center">
+                        <span className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">{plan.price}</span>
+                        <span className="text-gray-500 dark:text-gray-400 ml-1">{plan.period}</span>
+                      </div>
+                    </div>
+
+                    <ul className="space-y-3 mb-8">
+                      {plan.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-start text-gray-700 dark:text-gray-300">
+                          <div className="w-6 h-6 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                            <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+                          </div>
+                          <span className="text-sm">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <Link to="/register">
+                      <motion.button 
+                        className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
+                          plan.popular 
+                            ? 'bg-gradient-to-r from-primary-500 to-blue-500 text-white hover:from-primary-600 hover:to-blue-600 shadow-md hover:shadow-lg' 
+                            : 'bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-300 hover:to-gray-400 text-gray-800 dark:from-gray-700 dark:to-gray-600 dark:hover:from-gray-600 dark:hover:to-gray-500 dark:text-white'
+                        }`}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        Get Started
+                      </motion.button>
+                    </Link>
                   </div>
-                  <ul className="space-y-3 mb-8">
-                    {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center">
-                        <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                        <span className="text-gray-700 dark:text-gray-300">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Link to="/register">
-                    <Button 
-                      className={`w-full ${
-                        plan.popular 
-                          ? 'bg-gradient-to-r from-primary-500 to-blue-500 hover:from-primary-600 hover:to-blue-600 dark:from-primary-600 dark:to-blue-600 dark:hover:from-primary-700 dark:hover:to-blue-700' 
-                          : 'bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-300 hover:to-gray-400 dark:from-gray-700 dark:to-gray-600 dark:hover:from-gray-600 dark:hover:to-gray-500'
-                      }`}
-                    >
-                      Get Started
-                    </Button>
-                  </Link>
                 </div>
-              </InteractiveCard>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="px-6 py-20 bg-gradient-to-br from-slate-50/50 to-white/50 dark:from-gray-800 dark:to-gray-900">
-        <div className="max-w-4xl mx-auto">
+      <section className="px-6 py-12 bg-gradient-to-br from-gray-50/50 via-primary-100/40 to-slate-50/50 dark:from-gray-800 dark:via-gray-800/70 dark:to-gray-900 min-h-screen flex items-center">
+        <div className="max-w-4xl mx-auto w-full">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+            className="text-center mb-8"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 dark:text-white">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 dark:text-white">
               Frequently <span className="text-primary-600 dark:text-primary-400">Asked</span> Questions
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
               Everything you need to know about HY.YUME
             </p>
           </motion.div>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             {faqs.map((faq, index) => (
-              <InteractiveCard
+              <motion.div
                 key={index}
-                className="bg-gradient-to-r from-primary-50 to-white dark:from-gray-700 dark:to-gray-800 p-6 rounded-2xl shadow-xl"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
               >
-                <h3 className="text-xl font-semibold text-gray-900 mb-3 dark:text-white">
-                  {faq.question}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  {faq.answer}
-                </p>
-              </InteractiveCard>
+                <InteractiveCard
+                  className="bg-gradient-to-r from-primary-50 to-white dark:from-gray-700 dark:to-gray-800 p-6 rounded-2xl shadow-xl cursor-pointer"
+                >
+                  <div className="flex justify-between items-start">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex-1 pr-4">
+                      {faq.question}
+                    </h3>
+                    <motion.div
+                      whileHover={{ rotate: 90 }}
+                      className="text-primary-500"
+                    >
+                      <ChevronDown className="w-5 h-5" />
+                    </motion.div>
+                  </div>
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden mt-3"
+                  >
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {faq.answer}
+                    </p>
+                  </motion.div>
+                </InteractiveCard>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Final CTA */}
-      <section className="px-6 py-20 bg-gradient-to-r from-primary-500 to-blue-600 dark:from-primary-600 dark:to-blue-700 relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-white/[0.05] bg-[length:20px_20px]"></div>
-        <div className="max-w-4xl mx-auto text-center relative z-10">
+      <section className="px-6 py-12 bg-gradient-to-br from-primary-600 via-blue-600 to-indigo-700 dark:from-primary-800 dark:via-blue-800 dark:to-indigo-900 relative overflow-hidden min-h-screen flex items-center">
+        <div className="absolute inset-0 bg-grid-white/[0.1] bg-[length:40px_40px]"></div>
+        
+        {/* Animated floating elements */}
+        <div className="absolute inset-0 overflow-hidden">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            className="absolute top-1/4 left-1/4 w-20 h-20 bg-white/10 rounded-full blur-xl"
+            animate={{ 
+              y: [-20, 20, -20],
+              x: [-20, 20, -20],
+              scale: [1, 1.2, 1]
+            }}
+            transition={{ 
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div
+            className="absolute top-2/3 right-1/3 w-16 h-16 bg-white/15 rounded-full blur-xl"
+            animate={{ 
+              y: [15, -15, 15],
+              x: [15, -15, 15],
+              scale: [1, 1.3, 1]
+            }}
+            transition={{ 
+              duration: 7,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1
+            }}
+          />
+          <motion.div
+            className="absolute bottom-1/4 left-1/3 w-24 h-24 bg-white/5 rounded-full blur-2xl"
+            animate={{ 
+              y: [-30, 30, -30],
+              x: [-10, 10, -10],
+              scale: [1, 1.4, 1]
+            }}
+            transition={{ 
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2
+            }}
+          />
+        </div>
+        
+        <div className="max-w-5xl mx-auto text-center relative z-10 w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Ready to Transform Your Hydroponic Farm?
-            </h2>
-            <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
-              Join thousands of hydroponic farmers who trust HY.YUME for their monitoring and control needs.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/register">
-                <Button size="lg" className="bg-white text-primary-600 hover:bg-gray-100 px-8 py-3 text-lg">
-                  Start Free Trial
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </Link>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="border-white text-white hover:bg-white/10"
-              >
-                Schedule Demo
-              </Button>
+            <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6 text-white">
+              <Sparkles2 className="w-4 h-4 mr-2" />
+              <span className="text-sm font-medium">Join thousands of successful farmers</span>
             </div>
+            
+            <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+              Ready to Transform Your <span className="text-primary-300">Hydroponic Farm</span>?
+            </h2>
+            
+            <motion.p 
+              className="text-xl text-primary-100 mb-10 max-w-3xl mx-auto leading-relaxed"
+              initial={{ opacity: 0.8 }}
+              whileHover={{ opacity: 1 }}
+            >
+              Join thousands of hydroponic farmers who trust HY.YUME for their monitoring and control needs.
+              Experience the power of smart farming with real-time insights and automated controls.
+            </motion.p>
+            
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
+              <motion.div
+                whileHover={{ scale: 1.05, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full sm:w-auto"
+              >
+                <Link to="/register">
+                  <Button size="lg" className="bg-white text-primary-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold shadow-2xl w-full sm:w-auto">
+                    Start Free Trial
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
+                </Link>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.05, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full sm:w-auto"
+              >
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="border-2 border-white text-white hover:bg-white hover:text-primary-600 px-8 py-4 text-lg font-semibold shadow-2xl w-full sm:w-auto"
+                >
+                  Schedule Demo
+                </Button>
+              </motion.div>
+            </div>
+            
+            {/* Social proof section */}
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ delay: 0.5 }}
+            >
+              <div className="text-center">
+                <div className="text-3xl font-bold text-white mb-2">5,000+</div>
+                <div className="text-primary-100">Active Farmers</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-white mb-2">99.9%</div>
+                <div className="text-primary-100">Uptime</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-white mb-2">24/7</div>
+                <div className="text-primary-100">Support</div>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
