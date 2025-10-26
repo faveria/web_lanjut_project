@@ -1,71 +1,84 @@
 import axios from 'axios';
 
-// Define base URL - in VPS development you can set your own backend, otherwise use production
-// To use your VPS backend, make sure to also run the backend server
-let API_BASE_URL = 'https://api.hyyyume.my.id/api'; // Default to production
+// Production API for authentication
+const PRODUCTION_API_BASE_URL = 'https://api.hyyyume.my.id/api';
 
-// Check if we're using a local backend (you can set this in a .env file)
-if (import.meta.env?.VITE_API_BASE_URL) {
-  API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-} else {
-  // For VPS with domain - assuming backend runs on port 3000
-  // You can change this to your actual backend endpoint
-  const vpsBackend = 'https://hyyyume.my.id:3000/api'; // Use your domain with port 3000
-  API_BASE_URL = vpsBackend;
-}
+// VPS API for data operations (including pump control)
+const VPS_API_BASE_URL = 'https://hyyyume.my.id:3000/api';
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
+// API instance for authentication (always uses production)
+const authApi = axios.create({
+  baseURL: PRODUCTION_API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Interceptor untuk menambahkan token ke setiap request
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
+// API instance for data operations (uses VPS)
+const dataApi = axios.create({
+  baseURL: VPS_API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
   },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+});
 
-// Interceptor untuk handle token expired
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+// Common interceptor for both APIs
+const addAuthHeader = (apiInstance) => {
+  apiInstance.interceptors.request.use(
+    (config) => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
-  }
-);
+  );
+};
+
+// Add auth headers to both APIs
+addAuthHeader(authApi);
+addAuthHeader(dataApi);
+
+// Response interceptor for handling 401 errors
+const handle401Response = (apiInstance) => {
+  apiInstance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response?.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
+      return Promise.reject(error);
+    }
+  );
+};
+
+// Add response interceptors to both APIs
+handle401Response(authApi);
+handle401Response(dataApi);
 
 export const authAPI = {
-  login: (credentials) => api.post('/auth/login', credentials),
-  register: (userData) => api.post('/auth/register', userData),
-  getProfile: () => api.get('/auth/profile'),
+  login: (credentials) => authApi.post('/auth/login', credentials),
+  register: (userData) => authApi.post('/auth/register', userData),
+  getProfile: () => authApi.get('/auth/profile'),
 };
 
 export const dataAPI = {
-  getLatestData: () => api.get('/data/latest'),
-  getHistory: () => api.get('/data/history'),
+  getLatestData: () => dataApi.get('/data/latest'),
+  getHistory: () => dataApi.get('/data/history'),
 };
 
 export const subscriptionAPI = {
-  createInvoice: (planId) => api.post('/subscription/create-invoice', { planId }),
-  getStatus: () => api.get('/subscription/status'),
+  createInvoice: (planId) => authApi.post('/subscription/create-invoice', { planId }),
+  getStatus: () => authApi.get('/subscription/status'),
 };
 
 export const pumpAPI = {
-  controlPump: (status) => api.post('/data/control-pump', { status }),
+  controlPump: (status) => dataApi.post('/data/control-pump', { status }),
 };
 
-export default api;
+export default dataApi; // Default to data API for general use
