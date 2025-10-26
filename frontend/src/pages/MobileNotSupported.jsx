@@ -10,7 +10,7 @@ const MobileNotSupported = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-gray-800 rounded-xl shadow-lg p-8 text-center">
+      <div className="max-w-md w-full bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-700 p-8 text-center">
         <div className="mb-6">
           <div className="mx-auto flex items-center justify-center w-16 h-16 rounded-full bg-red-500/20">
             <svg 

@@ -15,7 +15,7 @@ import EmailVerification from './pages/EmailVerification';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentFailed from './pages/PaymentFailed';
 import MobileNotSupported from './pages/MobileNotSupported';
-import { handleScreenSizeRedirect, setupScreenSizeListener } from './utils/mobileDetection';
+import { handleScreenSizeRedirect, setupMobileDetectionListeners } from './utils/mobileDetection';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -51,7 +51,7 @@ function App() {
     handleScreenSizeRedirect();
     
     // Setup listener for screen size changes
-    const removeListener = setupScreenSizeListener();
+    const removeListener = setupMobileDetectionListeners();
     
     // Cleanup function to remove event listener
     return () => {

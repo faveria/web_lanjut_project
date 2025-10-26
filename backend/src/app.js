@@ -1,15 +1,31 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const mqttClient = require('./config/mqtt'); // ✅ Tetap import MQTT client
+const mobileBlocker = require('./middlewares/mobileBlocker');
 require('dotenv').config();
 
 const app = express();
+
+// Serve static files
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(mobileBlocker); // Mobile blocking middleware
+
+// Routes
+app.get('/', (req, res) => {
+  res.sendFile('index.html', { root: 'src/public' });
+});
+
+// Mobile not supported route
+app.get('/mobile-not-supported', (req, res) => {
+  res.status(403).sendFile('mobile-not-supported.html', { root: 'src/public' });
+});
 
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
