@@ -117,7 +117,7 @@ const InteractiveDashboard = () => {
 const Dashboard = () => {
   const [showAlert, setShowAlert] = useState(true);
   const { sensorData, history, loading, error, refetch, getHourlyData } = useSensorData();
-  const { controlPump: controlPumpAPI, isControlling, error: pumpError } = usePumpControl();
+  const { controlPump: controlPumpAPI, isControlling, error: pumpError, mqttConnected } = usePumpControl();
 
   const sensorTypes = ['suhu_air', 'suhu_udara', 'kelembapan', 'tds', 'ph'];
 
@@ -203,6 +203,7 @@ const Dashboard = () => {
             pumpStatus={sensorData?.pompa}
             onPumpControl={handlePumpControl}
             isControlling={isControlling}
+            mqttConnected={mqttConnected}
           />
         </motion.div>
       </motion.div>
