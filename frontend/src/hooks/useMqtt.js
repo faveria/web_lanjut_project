@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import mqtt from 'mqtt';
 
-const MQTT_BROKER_URL = 'mqtt://148.230.97.142:1883'; // Using the same broker as backend
+const MQTT_BROKER_URL = 'wss://hyyyume.my.id:8084/mqtt';
 
 export const useMqtt = () => {
   const [isConnected, setIsConnected] = useState(false);
