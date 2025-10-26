@@ -1,104 +1,49 @@
 import { useState, useEffect, useRef } from 'react';
 import mqtt from 'mqtt';
 
-// Try WebSocket endpoint that should work in browser
-// If the main endpoint doesn't work, try other common ports
-const MQTT_BROKER_URLS = [
-  'wss://hyyyume.my.id:8084/mqtt',  // Standard WebSockets MQTT
-  'wss://hyyyume.my.id:8884',       // Alternative WebSocket port
-  'ws://148.230.97.142:9001',       // Direct IP WebSocket
-  'ws://148.230.97.142:8084'        // Direct IP WebSocket alternative
-];
-
-let currentBrokerIndex = 0;
-const MQTT_BROKER_URL = MQTT_BROKER_URLS[currentBrokerIndex];
+// Use the same broker that works with mosquitto_pub
+const MQTT_BROKER_URL = 'mqtt://148.230.97.142:1883';
 
 export const useMqtt = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [connectionError, setConnectionError] = useState(null);
   const clientRef = useRef(null);
-  const [reconnectAttempts, setReconnectAttempts] = useState(0);
-  const maxReconnectAttempts = 5;
 
   useEffect(() => {
-    const connect = () => {
-      if (clientRef.current && clientRef.current.connected) {
-        console.log('✅ Already connected, skipping connection attempt');
-        return;
-      }
+    console.log(`🔌 Connecting to MQTT broker: ${MQTT_BROKER_URL}`);
+    
+    const client = mqtt.connect(MQTT_BROKER_URL, {
+      clientId: `hyyume_frontend_${Math.random().toString(16).slice(3)}`,
+      clean: true,
+      connectTimeout: 10000,
+      reconnectPeriod: 1000,
+      // Additional options
+      keepalive: 60,
+      resubscribe: true,
+    });
 
-      const brokerUrl = MQTT_BROKER_URLS[currentBrokerIndex];
-      console.log(`🔌 Connecting to MQTT broker: ${brokerUrl}`);
-      
-      try {
-        const client = mqtt.connect(brokerUrl, {
-          clientId: `hyyume_frontend_${Math.random().toString(16).slice(3)}`,
-          clean: true,
-          connectTimeout: 10000, // Increased timeout
-          reconnectPeriod: 1000,
-          // Additional options that might help
-          keepalive: 60,
-          resubscribe: true,
-          // Add protocol options if needed
-          protocolId: 'MQTT',
-          protocolVersion: 4,
-          // Enable more debugging
-          reconnectPeriod: 3000, // Try reconnection more frequently
-          connectTimeout: 10000,
-        });
+    clientRef.current = client;
 
-        clientRef.current = client;
+    client.on('connect', () => {
+      console.log('✅ MQTT Client connected to broker');
+      setIsConnected(true);
+      setConnectionError(null);
+    });
 
-        client.on('connect', (connack) => {
-          console.log('✅ MQTT Client connected to broker:', brokerUrl, 'Connack:', connack);
-          setIsConnected(true);
-          setConnectionError(null);
-          setReconnectAttempts(0);
-        });
+    client.on('error', (error) => {
+      console.error('❌ MQTT Error:', error);
+      setConnectionError(error.message || 'Connection error');
+    });
 
-        client.on('error', (error) => {
-          console.error('❌ MQTT Error:', error);
-          console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
-          setIsConnected(false);
-          setConnectionError(error.message || 'Connection error');
-        });
+    client.on('close', () => {
+      console.log('🔌 MQTT Connection closed');
+      setIsConnected(false);
+    });
 
-        client.on('close', () => {
-          console.log('🔌 MQTT Connection closed');
-          setIsConnected(false);
-          
-          // Attempt to reconnect to next broker if we haven't exceeded max attempts
-          if (reconnectAttempts < maxReconnectAttempts) {
-            const newAttempts = reconnectAttempts + 1;
-            currentBrokerIndex = (currentBrokerIndex + 1) % MQTT_BROKER_URLS.length;
-            setReconnectAttempts(newAttempts);
-            console.log(`🔄 Attempting to reconnect to next broker... (${newAttempts}/${maxReconnectAttempts})`);
-            setTimeout(connect, 3000); // Shorter delay to try next broker quickly
-          } else {
-            console.error('❌ Max reconnection attempts reached');
-          }
-        });
-
-        client.on('offline', () => {
-          console.log('🔴 MQTT Client offline');
-          setIsConnected(false);
-        });
-        
-        // Additional event for debugging
-        client.on('packetsend', (packet) => {
-          console.log('📤 Packet sent:', packet.cmd);
-        });
-        
-        client.on('packetreceive', (packet) => {
-          console.log('📥 Packet received:', packet.cmd);
-        });
-      } catch (error) {
-        console.error('❌ Failed to create MQTT client:', error);
-        setConnectionError(error.message);
-      }
-    };
-
-    connect();
+    client.on('offline', () => {
+      console.log('🔴 MQTT Client offline');
+      setIsConnected(false);
+    });
 
     // Cleanup on unmount
     return () => {
@@ -107,7 +52,7 @@ export const useMqtt = () => {
         clientRef.current.end(true);
       }
     };
-  }, [reconnectAttempts]);
+  }, []);
 
   const publish = (topic, message) => {
     if (clientRef.current && isConnected) {
