@@ -104,16 +104,17 @@ export const isScreenWidthSmall = () => {
  * Redirects users based on device type
  */
 export const handleScreenSizeRedirect = () => {
-  const isMobile = isMobileDevice();
-  const isOnMobilePage = window.location.pathname.includes('/mobile-not-supported');
-  
-  if (isMobile && !isOnMobilePage) {
-    // If device is mobile and user is not on mobile-not-supported page, redirect there
-    window.location.href = '/mobile-not-supported';
-  } else if (!isMobile && isOnMobilePage) {
-    // If device is not mobile and user is on mobile-not-supported page, redirect to home
-    window.location.href = '/';
-  }
+  // Mobile blocking is temporarily disabled
+  // const isMobile = isMobileDevice();
+  // const isOnMobilePage = window.location.pathname.includes('/mobile-not-supported');
+  // 
+  // if (isMobile && !isOnMobilePage) {
+  //   // If device is mobile and user is not on mobile-not-supported page, redirect there
+  //   window.location.href = '/mobile-not-supported';
+  // } else if (!isMobile && isOnMobilePage) {
+  //   // If device is not mobile and user is on mobile-not-supported page, redirect to home
+  //   window.location.href = '/';
+  // }
 };
 
 /**
