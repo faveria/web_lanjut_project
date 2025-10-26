@@ -23,6 +23,7 @@ export const useMqtt = () => {
   useEffect(() => {
     const connect = () => {
       if (clientRef.current && clientRef.current.connected) {
+        console.log('✅ Already connected, skipping connection attempt');
         return;
       }
 
@@ -33,17 +34,23 @@ export const useMqtt = () => {
         const client = mqtt.connect(brokerUrl, {
           clientId: `hyyume_frontend_${Math.random().toString(16).slice(3)}`,
           clean: true,
-          connectTimeout: 4000,
+          connectTimeout: 10000, // Increased timeout
           reconnectPeriod: 1000,
           // Additional options that might help
           keepalive: 60,
           resubscribe: true,
+          // Add protocol options if needed
+          protocolId: 'MQTT',
+          protocolVersion: 4,
+          // Enable more debugging
+          reconnectPeriod: 3000, // Try reconnection more frequently
+          connectTimeout: 10000,
         });
 
         clientRef.current = client;
 
-        client.on('connect', () => {
-          console.log('✅ MQTT Client connected to broker:', brokerUrl);
+        client.on('connect', (connack) => {
+          console.log('✅ MQTT Client connected to broker:', brokerUrl, 'Connack:', connack);
           setIsConnected(true);
           setConnectionError(null);
           setReconnectAttempts(0);
@@ -51,8 +58,9 @@ export const useMqtt = () => {
 
         client.on('error', (error) => {
           console.error('❌ MQTT Error:', error);
+          console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
           setIsConnected(false);
-          setConnectionError(error.message);
+          setConnectionError(error.message || 'Connection error');
         });
 
         client.on('close', () => {
@@ -75,6 +83,15 @@ export const useMqtt = () => {
           console.log('🔴 MQTT Client offline');
           setIsConnected(false);
         });
+        
+        // Additional event for debugging
+        client.on('packetsend', (packet) => {
+          console.log('📤 Packet sent:', packet.cmd);
+        });
+        
+        client.on('packetreceive', (packet) => {
+          console.log('📥 Packet received:', packet.cmd);
+        });
       } catch (error) {
         console.error('❌ Failed to create MQTT client:', error);
         setConnectionError(error.message);
@@ -86,6 +103,7 @@ export const useMqtt = () => {
     // Cleanup on unmount
     return () => {
       if (clientRef.current) {
+        console.log('🔌 Closing MQTT connection on component unmount');
         clientRef.current.end(true);
       }
     };
@@ -93,6 +111,7 @@ export const useMqtt = () => {
 
   const publish = (topic, message) => {
     if (clientRef.current && isConnected) {
+      console.log(`📤 Publishing message: ${message} to topic: ${topic}`);
       return new Promise((resolve, reject) => {
         clientRef.current.publish(topic, String(message), { qos: 0 }, (err) => {
           if (err) {
@@ -105,6 +124,7 @@ export const useMqtt = () => {
         });
       });
     } else {
+      console.warn('⚠️ MQTT client not connected, cannot publish message');
       return Promise.reject(new Error('MQTT client not connected'));
     }
   };
