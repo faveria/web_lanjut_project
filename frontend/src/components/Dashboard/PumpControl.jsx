@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ToggleLeft, Droplets, Wifi, WifiOff } from 'lucide-react';
+import { ToggleLeft, Droplets } from 'lucide-react';
 
-const PumpControl = ({ pumpStatus, onPumpControl, isControlling, mqttConnected }) => {
+const PumpControl = ({ pumpStatus, onPumpControl, isControlling }) => {
   const isOn = pumpStatus === 'ON';
   
   return (
@@ -20,12 +20,7 @@ const PumpControl = ({ pumpStatus, onPumpControl, isControlling, mqttConnected }
           </div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Pump Control</h3>
         </div>
-        <div className="flex items-center space-x-2">
-          <div className={`w-3 h-3 rounded-full ${mqttConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-          <span className="text-xs text-gray-500 dark:text-gray-400">
-            {mqttConnected ? 'Connected' : 'Disconnected'}
-          </span>
-        </div>
+        <div className={`w-3 h-3 rounded-full ${isOn ? 'bg-green-500' : 'bg-gray-400'}`}></div>
       </div>
       
       {/* Status Display */}

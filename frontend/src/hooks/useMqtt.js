@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import mqtt from 'mqtt';
 
-// Use the same broker that works with mosquitto_pub
-const MQTT_BROKER_URL = 'mqtt://148.230.97.142:1883';
+// Use WebSocket to connect through the backend's MQTT bridge
+// The backend is already configured to handle MQTT connections
+const MQTT_BROKER_URL = 'ws://localhost:3000/mqtt'; // Use backend WebSocket endpoint
 
 export const useMqtt = () => {
   const [isConnected, setIsConnected] = useState(false);
@@ -10,48 +11,53 @@ export const useMqtt = () => {
   const clientRef = useRef(null);
 
   useEffect(() => {
-    console.log(`🔌 Connecting to MQTT broker: ${MQTT_BROKER_URL}`);
+    console.log(`🔌 Connecting to MQTT broker via WebSocket: ${MQTT_BROKER_URL}`);
     
-    const client = mqtt.connect(MQTT_BROKER_URL, {
-      clientId: `hyyume_frontend_${Math.random().toString(16).slice(3)}`,
-      clean: true,
-      connectTimeout: 10000,
-      reconnectPeriod: 1000,
-      // Additional options
-      keepalive: 60,
-      resubscribe: true,
-    });
+    try {
+      const client = mqtt.connect(MQTT_BROKER_URL, {
+        clientId: `hyyume_frontend_${Math.random().toString(16).slice(3)}`,
+        clean: true,
+        connectTimeout: 10000,
+        reconnectPeriod: 1000,
+        // Additional options
+        keepalive: 60,
+        resubscribe: true,
+      });
 
-    clientRef.current = client;
+      clientRef.current = client;
 
-    client.on('connect', () => {
-      console.log('✅ MQTT Client connected to broker');
-      setIsConnected(true);
-      setConnectionError(null);
-    });
+      client.on('connect', () => {
+        console.log('✅ MQTT Client connected via WebSocket');
+        setIsConnected(true);
+        setConnectionError(null);
+      });
 
-    client.on('error', (error) => {
-      console.error('❌ MQTT Error:', error);
-      setConnectionError(error.message || 'Connection error');
-    });
+      client.on('error', (error) => {
+        console.error('❌ MQTT WebSocket Error:', error);
+        setConnectionError(error.message || 'Connection error');
+      });
 
-    client.on('close', () => {
-      console.log('🔌 MQTT Connection closed');
-      setIsConnected(false);
-    });
+      client.on('close', () => {
+        console.log('🔌 MQTT WebSocket Connection closed');
+        setIsConnected(false);
+      });
 
-    client.on('offline', () => {
-      console.log('🔴 MQTT Client offline');
-      setIsConnected(false);
-    });
+      client.on('offline', () => {
+        console.log('🔴 MQTT WebSocket Client offline');
+        setIsConnected(false);
+      });
 
-    // Cleanup on unmount
-    return () => {
-      if (clientRef.current) {
-        console.log('🔌 Closing MQTT connection on component unmount');
-        clientRef.current.end(true);
-      }
-    };
+      // Cleanup on unmount
+      return () => {
+        if (clientRef.current) {
+          console.log('🔌 Closing MQTT WebSocket connection on component unmount');
+          clientRef.current.end(true);
+        }
+      };
+    } catch (error) {
+      console.error('❌ Failed to create MQTT WebSocket client:', error);
+      setConnectionError(error.message);
+    }
   }, []);
 
   const publish = (topic, message) => {
@@ -69,7 +75,7 @@ export const useMqtt = () => {
         });
       });
     } else {
-      console.warn('⚠️ MQTT client not connected, cannot publish message');
+      console.warn('⚠️ MQTT WebSocket client not connected, cannot publish message');
       return Promise.reject(new Error('MQTT client not connected'));
     }
   };
