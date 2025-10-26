@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -14,6 +14,8 @@ import Subscription from './pages/Subscription';
 import EmailVerification from './pages/EmailVerification';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentFailed from './pages/PaymentFailed';
+import MobileNotSupported from './pages/MobileNotSupported';
+import { handleScreenSizeRedirect, setupScreenSizeListener } from './utils/mobileDetection';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -44,6 +46,19 @@ const PublicRoute = ({ children }) => {
 };
 
 function App() {
+  useEffect(() => {
+    // Check screen size and redirect if needed
+    handleScreenSizeRedirect();
+    
+    // Setup listener for screen size changes
+    const removeListener = setupScreenSizeListener();
+    
+    // Cleanup function to remove event listener
+    return () => {
+      removeListener();
+    };
+  }, []);
+
   return (
     <ThemeProvider>
       <AuthProvider>
@@ -151,6 +166,9 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
+
+              {/* Mobile Not Supported Route */}
+              <Route path="/mobile-not-supported" element={<MobileNotSupported />} />
 
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/" />} />
