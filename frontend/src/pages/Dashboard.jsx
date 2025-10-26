@@ -247,7 +247,7 @@ const Dashboard = () => {
               if (filteredData.length > 60) {
                 // Sample evenly spaced data points
                 const step = Math.ceil(filteredData.length / 60);
-                filteredData = filteredData.filter((_, index) => index % step === 0);
+                filteredData = filteredData.filter((_, idx) => idx % step === 0);
               }
             }
             
