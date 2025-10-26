@@ -205,55 +205,37 @@ const InteractiveDashboard = () => {
     pompa: 'ON'
   });
 
-  // Mock historical data for charts
+  // Mock historical data for charts - generate data for the last 10 hours
+  const generateLast10HoursData = (sensorKey, baseValue, variation = 1) => {
+    const now = new Date();
+    return Array.from({ length: 10 }, (_, i) => {
+      const date = new Date(now);
+      date.setHours(date.getHours() - (9 - i)); // Start from 9 hours ago to now
+      
+      // Generate slightly varying values
+      const value = baseValue + (Math.random() - 0.5) * variation * 2;
+      
+      return {
+        created_at: date.toISOString(),
+        [sensorKey]: value
+      };
+    });
+  };
+
   const [historyData, setHistoryData] = useState({
-    suhu_air: [
-      { created_at: '2024-01-01T10:00:00Z', suhu_air: 23.1 },
-      { created_at: '2024-01-01T11:00:00Z', suhu_air: 23.5 },
-      { created_at: '2024-01-01T12:00:00Z', suhu_air: 24.0 },
-      { created_at: '2024-01-01T13:00:00Z', suhu_air: 25.2 },
-      { created_at: '2024-01-01T14:00:00Z', suhu_air: 24.8 },
-      { created_at: '2024-01-01T15:00:00Z', suhu_air: 24.5 },
-    ],
-    suhu_udara: [
-      { created_at: '2024-01-01T10:00:00Z', suhu_udara: 22.1 },
-      { created_at: '2024-01-01T11:00:00Z', suhu_udara: 22.5 },
-      { created_at: '2024-01-01T12:00:00Z', suhu_udara: 23.0 },
-      { created_at: '2024-01-01T13:00:00Z', suhu_udara: 24.2 },
-      { created_at: '2024-01-01T14:00:00Z', suhu_udara: 23.8 },
-      { created_at: '2024-01-01T15:00:00Z', suhu_udara: 23.2 },
-    ],
-    kelembapan: [
-      { created_at: '2024-01-01T10:00:00Z', kelembapan: 62 },
-      { created_at: '2024-01-01T11:00:00Z', kelembapan: 63 },
-      { created_at: '2024-01-01T12:00:00Z', kelembapan: 64 },
-      { created_at: '2024-01-01T13:00:00Z', kelembapan: 66 },
-      { created_at: '2024-01-01T14:00:00Z', kelembapan: 65 },
-      { created_at: '2024-01-01T15:00:00Z', kelembapan: 65 },
-    ],
-    tds: [
-      { created_at: '2024-01-01T10:00:00Z', tds: 540 },
-      { created_at: '2024-01-01T11:00:00Z', tds: 545 },
-      { created_at: '2024-01-01T12:00:00Z', tds: 550 },
-      { created_at: '2024-01-01T13:00:00Z', tds: 565 },
-      { created_at: '2024-01-01T14:00:00Z', tds: 562 },
-      { created_at: '2024-01-01T15:00:00Z', tds: 560 },
-    ],
-    ph: [
-      { created_at: '2024-01-01T10:00:00Z', ph: 6.6 },
-      { created_at: '2024-01-01T11:00:00Z', ph: 6.7 },
-      { created_at: '2024-01-01T12:00:00Z', ph: 6.75 },
-      { created_at: '2024-01-01T13:00:00Z', ph: 6.85 },
-      { created_at: '2024-01-01T14:00:00Z', ph: 6.8 },
-      { created_at: '2024-01-01T15:00:00Z', ph: 6.8 },
-    ]
+    suhu_air: generateLast10HoursData('suhu_air', 24.0, 1.5), // Water temperature
+    suhu_udara: generateLast10HoursData('suhu_udara', 23.0, 2.0), // Air temperature
+    kelembapan: generateLast10HoursData('kelembapan', 65, 5), // Humidity
+    tds: generateLast10HoursData('tds', 560, 20), // TDS
+    ph: generateLast10HoursData('ph', 6.8, 0.3) // pH
   });
 
   const [showAlert, setShowAlert] = useState(true);
 
-  // Simulate real-time sensor updates
+  // Simulate real-time sensor updates and update history data every hour
   useEffect(() => {
-    const interval = setInterval(() => {
+    // Update sensor values every 2 seconds
+    const sensorInterval = setInterval(() => {
       setSensorData(prev => ({
         suhu_air: Math.max(15, Math.min(35, prev.suhu_air + (Math.random() - 0.5) * 0.5)),
         suhu_udara: Math.max(15, Math.min(35, prev.suhu_udara + (Math.random() - 0.5) * 0.5)),
@@ -264,8 +246,44 @@ const InteractiveDashboard = () => {
       }));
     }, 2000);
 
-    return () => clearInterval(interval);
-  }, []);
+    // Update history data every 30 seconds (to simulate hourly updates in a shorter time for demo purposes)
+    const historyInterval = setInterval(() => {
+      setHistoryData(prev => {
+        const now = new Date();
+        const newDataPoint = {
+          created_at: now.toISOString(),
+          suhu_air: sensorData.suhu_air,
+          suhu_udara: sensorData.suhu_udara,
+          kelembapan: sensorData.kelembapan,
+          tds: sensorData.tds,
+          ph: sensorData.ph
+        };
+
+        // Update each sensor's history, keeping only the last 10 data points
+        const updateHistory = (prevHistory, sensorKey) => {
+          const newHistory = [...prevHistory, { 
+            created_at: newDataPoint.created_at, 
+            [sensorKey]: newDataPoint[sensorKey] 
+          }];
+          // Keep only the last 10 data points
+          return newHistory.slice(-10);
+        };
+
+        return {
+          suhu_air: updateHistory(prev.suhu_air, 'suhu_air'),
+          suhu_udara: updateHistory(prev.suhu_udara, 'suhu_udara'),
+          kelembapan: updateHistory(prev.kelembapan, 'kelembapan'),
+          tds: updateHistory(prev.tds, 'tds'),
+          ph: updateHistory(prev.ph, 'ph')
+        };
+      });
+    }, 30000); // Update history every 30 seconds for demo purposes (would be 3600000ms in production)
+
+    return () => {
+      clearInterval(sensorInterval);
+      clearInterval(historyInterval);
+    };
+  }, [sensorData]);
 
   // Mock constants for sensor thresholds
   const SENSOR_THRESHOLDS = {
@@ -632,7 +650,7 @@ const InteractiveDashboard = () => {
         </div>
         
         <div className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-          Showing data from the last 10 hours (6 data points total)
+          Showing data from the last 10 hours ({historyData.suhu_air.length} data points total)
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -772,26 +790,26 @@ const Landing = () => {
   const howItWorksSteps = [
     {
       step: 1,
-      title: 'Connect Your Sensors',
-      description: 'Set up our IoT hardware with your hydroponic system to start collecting data',
+      title: 'Install Smart Sensors',
+      description: 'Connect our advanced IoT sensors to your hydroponic system to monitor water temperature, pH levels, TDS, humidity, and other critical parameters in real-time.',
       icon: Cpu
     },
     {
       step: 2,
-      title: 'Monitor Real-Time',
-      description: 'View live sensor readings on our dashboard with instant updates',
+      title: 'Real-Time Dashboard',
+      description: 'Access live data feeds through our intuitive dashboard that displays all key metrics and system status indicators at a glance.',
       icon: Monitor
     },
     {
       step: 3,
-      title: 'Analyze Data',
-      description: 'Get insights and trends to optimize your growing conditions',
+      title: 'Analyze & Optimize',
+      description: 'Utilize our AI-powered analytics to identify patterns, predict issues, and receive actionable insights to maximize your crop yield.',
       icon: BarChart3
     },
     {
       step: 4,
-      title: 'Take Action',
-      description: 'Control your system remotely and receive alerts when needed',
+      title: 'Remote Control & Alerts',
+      description: 'Control your pumps and equipment remotely while receiving instant notifications when parameters go outside optimal ranges.',
       icon: Zap
     }
   ];
@@ -1413,80 +1431,174 @@ const Landing = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-8"
+            className="text-center mb-12"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 dark:text-white">
               How It <span className="text-primary-600 dark:text-primary-400">Works</span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto dark:text-gray-300">
-              Simple 4-step process to transform your hydroponic operation
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto dark:text-gray-300 mb-8">
+              Transform your hydroponic farming with our 4-step smart solution
             </p>
+            
+            {/* Visual representation of hydroponic system */}
+            <div className="relative max-w-4xl mx-auto h-40 mb-12">
+              <motion.div 
+                className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 to-blue-500 rounded-full"
+                initial={{ width: 0 }}
+                whileInView={{ width: "100%" }}
+                viewport={{ once: true }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+              ></motion.div>
+              
+              <motion.div 
+                className="absolute top-1/2 left-1/4 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center z-10"
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+              >
+                <Sprout className="w-8 h-8 text-white" />
+              </motion.div>
+              
+              <motion.div 
+                className="absolute top-1/2 left-2/4 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center z-10"
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+              >
+                <Monitor className="w-8 h-8 text-white" />
+              </motion.div>
+              
+              <motion.div 
+                className="absolute top-1/2 left-3/4 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center z-10"
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.6 }}
+              >
+                <BarChart3 className="w-8 h-8 text-white" />
+              </motion.div>
+            </div>
           </motion.div>
 
-          <div className="relative">
-            {/* Animated timeline line */}
-            <motion.div 
-              className="absolute left-1/2 transform -translate-x-1/2 w-1 bg-gradient-to-b from-primary-500 to-blue-500 hidden md:block dark:bg-gradient-to-b dark:from-primary-600 dark:to-blue-600"
-              initial={{ height: 0 }}
-              whileInView={{ height: "100%" }}
-              viewport={{ once: true }}
-              transition={{ duration: 1.5, ease: "easeOut" }}
-            ></motion.div>
-            
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Step descriptions */}
+            <div className="space-y-8">
               {howItWorksSteps.map((step, index) => {
                 const Icon = step.icon;
                 return (
                   <motion.div
                     key={step.title}
-                    initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.5, delay: index * 0.15 }}
-                    whileHover={{ y: -15, scale: 1.05 }}
-                    className={`text-center ${index % 2 === 0 ? 'md:pr-10' : 'md:pl-10 md:mt-12'}`}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="flex items-start space-x-6 p-6 rounded-2xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm shadow-lg border border-primary-100/30 dark:border-gray-700"
                   >
-                    <div className="relative mb-6">
-                      <motion.div 
-                        className="w-16 h-16 bg-gradient-to-br from-primary-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 rounded-full flex items-center justify-center mx-auto"
-                        whileHover={{ 
-                          scale: 1.1,
-                          backgroundColor: "rgba(99, 102, 241, 0.1)" 
-                        }}
-                      >
-                        <motion.div 
-                          className="w-12 h-12 bg-gradient-to-r from-primary-500 to-blue-500 rounded-full flex items-center justify-center"
-                          whileHover={{ 
-                            scale: 1.1,
-                            boxShadow: "0 0 20px rgba(99, 102, 241, 0.5)"
-                          }}
-                        >
-                          <Icon className="w-6 h-6 text-white" />
-                        </motion.div>
-                      </motion.div>
-                      <motion.div 
-                        className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-primary-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm"
-                        whileHover={{ scale: 1.2, rotate: 10 }}
-                      >
-                        {step.step}
-                      </motion.div>
+                    <div className="flex-shrink-0">
+                      <div className="w-14 h-14 bg-gradient-to-r from-primary-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
+                        <Icon className="w-7 h-7 text-white" />
+                      </div>
                     </div>
-                    <motion.h3 
-                      className="text-xl font-semibold text-gray-900 mb-3 dark:text-white"
-                      whileHover={{ color: "#4f46e5" }}
-                    >
-                      {step.title}
-                    </motion.h3>
-                    <motion.p 
-                      className="text-gray-600 dark:text-gray-300"
-                      initial={{ opacity: 0.7 }}
-                      whileHover={{ opacity: 1 }}
-                    >
-                      {step.description}
-                    </motion.p>
+                    <div>
+                      <div className="flex items-center mb-2">
+                        <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center mr-3">
+                          <span className="text-white font-bold text-sm">{step.step}</span>
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">{step.title}</h3>
+                      </div>
+                      <p className="text-gray-600 dark:text-gray-300 pl-11">
+                        {step.description}
+                      </p>
+                    </div>
                   </motion.div>
                 );
               })}
+            </div>
+            
+            {/* Visual representation */}
+            <div className="flex justify-center">
+              <InteractiveCard className="w-full max-w-lg bg-gradient-to-br from-green-50/40 to-primary-50/50 dark:from-gray-700 dark:to-gray-800 p-8 rounded-3xl shadow-2xl border border-primary-200/50 dark:border-gray-600">
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-100 to-blue-100 rounded-full text-primary-700 dark:from-green-900/30 dark:to-blue-900/30 dark:text-primary-300 mb-4">
+                    <Droplets className="w-4 h-4 mr-2" />
+                    <span className="text-sm font-medium">Smart Hydroponic System</span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Complete Monitoring Solution</h3>
+                  <p className="text-gray-600 dark:text-gray-300 mt-2">Real-time control and analytics for optimal growth</p>
+                </div>
+                
+                {/* Simplified hydroponic system visualization */}
+                <div className="relative">
+                  {/* Water tank */}
+                  <div className="w-full h-24 bg-gradient-to-b from-blue-900/30 to-blue-700/50 rounded-lg border border-blue-500/50 mb-6 relative overflow-hidden">
+                    <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-b from-blue-400/40 to-blue-500/60"></div>
+                    <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-3/4 h-2 bg-gradient-to-r from-transparent via-blue-300/70 to-transparent flex justify-between px-2">
+                      {[...Array(5)].map((_, i) => (
+                        <div key={i} className="w-1 h-4 bg-blue-300/80 rounded-full"></div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Plant containers */}
+                  <div className="grid grid-cols-3 gap-4 mb-6">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="relative">
+                        <div className="w-full h-16 bg-gradient-to-b from-green-800/40 to-green-700/60 rounded-lg flex items-center justify-center">
+                          <div className="w-8 h-12 bg-gradient-to-b from-green-500 to-emerald-600 rounded-t-full relative">
+                            {/* Leaves */}
+                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-6 h-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full"></div>
+                            <div className="absolute -top-1 -left-2 w-4 h-3 bg-gradient-to-r from-lime-300 to-green-400 rounded-full"></div>
+                            <div className="absolute -top-1 -right-2 w-4 h-3 bg-gradient-to-r from-lime-300 to-green-400 rounded-full"></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Sensors visualization */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-gradient-to-r from-primary-500/20 to-blue-500/20 p-4 rounded-xl border border-primary-300/50">
+                      <div className="flex items-center">
+                        <Thermometer className="w-5 h-5 mr-2 text-primary-500" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Water Temp: 24°C</span>
+                      </div>
+                    </div>
+                    <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 p-4 rounded-xl border border-blue-300/50">
+                      <div className="flex items-center">
+                        <Droplets className="w-5 h-5 mr-2 text-blue-500" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">pH: 6.8</span>
+                      </div>
+                    </div>
+                    <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 p-4 rounded-xl border border-green-300/50">
+                      <div className="flex items-center">
+                        <Gauge className="w-5 h-5 mr-2 text-green-500" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">TDS: 560 ppm</span>
+                      </div>
+                    </div>
+                    <div className="bg-gradient-to-r from-purple-500/20 to-violet-500/20 p-4 rounded-xl border border-purple-300/50">
+                      <div className="flex items-center">
+                        <WindIcon className="w-5 h-5 mr-2 text-purple-500" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Humidity: 65%</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Control panel */}
+                  <div className="mt-6 pt-4 border-t border-gray-300/50 dark:border-gray-600">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Pump: </span>
+                      <div className="flex items-center">
+                        <span className="text-xs mr-2 text-green-600 dark:text-green-400">ON</span>
+                        <div className="w-10 h-6 bg-green-500 rounded-full flex items-center justify-center relative">
+                          <div className="w-4 h-4 bg-white rounded-full"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </InteractiveCard>
             </div>
           </div>
         </div>
