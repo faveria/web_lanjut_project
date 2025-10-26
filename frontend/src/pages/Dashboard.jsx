@@ -242,6 +242,13 @@ const Dashboard = () => {
                 const itemDate = new Date(item.created_at);
                 return itemDate >= tenHoursAgo;
               });
+              
+              // Limit to 60 data points max for better performance and readability
+              if (filteredData.length > 60) {
+                // Sample evenly spaced data points
+                const step = Math.ceil(filteredData.length / 60);
+                filteredData = filteredData.filter((_, index) => index % step === 0);
+              }
             }
             
             return (
