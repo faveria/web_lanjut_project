@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://api.hyyyume.my.id/api';
+// Use local backend in development, production server in production
+const API_BASE_URL = process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:3000/api' 
+  : 'https://api.hyyyume.my.id/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
