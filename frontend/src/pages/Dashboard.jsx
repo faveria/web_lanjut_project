@@ -231,22 +231,42 @@ const Dashboard = () => {
             { title: "TDS Trend", dataKey: "tds", color: "#F59E0B" },
             { title: "pH Level Trend", dataKey: "ph", color: "#EF4444" }
           ].map((chart, index) => {
-            // Filter history to last 10 hours for each chart
+            // Filter history to last 10 hours for each chart with robust date handling
             let filteredData = [];
             if (history && history.length > 0) {
-              const tenHoursAgo = new Date();
-              tenHoursAgo.setHours(tenHoursAgo.getHours() - 10);
+              // More reliable time calculation
+              const tenHoursAgo = new Date(Date.now() - (10 * 60 * 60 * 1000)); // 10 hours ago from now
               
               filteredData = history.filter(item => {
-                const itemDate = new Date(item.created_at);
-                return itemDate >= tenHoursAgo;
+                try {
+                  if (!item?.created_at) return false;
+                  
+                  const itemDate = new Date(item.created_at);
+                  if (isNaN(itemDate.getTime())) return false;
+                  
+                  return itemDate >= tenHoursAgo;
+                } catch (error) {
+                  console.warn('Error parsing date:', error);
+                  return false;
+                }
               });
+              
+              // Sort by time to ensure proper chart display (oldest first)
+              filteredData.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
               
               // Limit to 60 data points max for better performance and readability
               if (filteredData.length > 60) {
                 // Sample evenly spaced data points
                 const step = Math.ceil(filteredData.length / 60);
                 filteredData = filteredData.filter((_, idx) => idx % step === 0);
+              }
+              
+              // Add fallback: if no data in last 10 hours, show last 24 points
+              if (filteredData.length === 0) {
+                filteredData = [...history]
+                  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                  .slice(0, 24)
+                  .reverse();
               }
             }
             
