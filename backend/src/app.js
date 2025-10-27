@@ -6,6 +6,12 @@ const mqttClient = require('./config/mqtt'); // ✅ Tetap import MQTT client
 const mobileBlocker = require('./middlewares/mobileBlocker');
 require('dotenv').config();
 
+// ✅ Import dataController after other imports to avoid circular dependency
+const dataController = require('./controllers/dataController');
+
+// ✅ CONNECT MQTT CLIENT WITH DATA CONTROLLER to break circular dependency
+mqttClient.setMessageHandler(dataController.saveSensorData);
+
 const app = express();
 
 // Serve static files

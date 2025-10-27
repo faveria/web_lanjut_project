@@ -1,6 +1,5 @@
 const mqtt = require('mqtt');
 require('dotenv').config();
-const { saveSensorData } = require('../controllers/dataController'); // ✅ BARU
 
 class MQTTClient {
   constructor() {
@@ -8,6 +7,12 @@ class MQTTClient {
     this.isConnected = false;
     this.reconnectAttempts = 0;           // ✅ BARU
     this.maxReconnectAttempts = 5;        // ✅ BARU
+    this.messageHandler = null;           // Callback storage for breaking circular dependency
+  }
+
+  // ✅ ADD METHOD TO SET CALLBACK LATER to break circular dependency
+  setMessageHandler(callback) {
+    this.messageHandler = callback;
   }
 
   connect() {
@@ -28,16 +33,20 @@ class MQTTClient {
         this.subscribe('hyyume/sensor/data');
       });
 
-      // ✅ BARU: Message handler langsung di sini (tidak perlu onMessage callback)
+      // ✅ Message handler - USE CALLBACK IF AVAILABLE to break circular dependency
       this.client.on('message', async (topic, message) => {
         try {
           console.log(`📨 MQTT Message received on topic: ${topic}`); // ✅ BARU
           const data = JSON.parse(message.toString());
           console.log('📊 Sensor Data:', data); // ✅ BARU
           
-          // Save to database
-          await saveSensorData(data);
-          console.log('💾 Data saved to database successfully'); // ✅ BARU
+          // ✅ USE CALLBACK IF AVAILABLE - breaks circular dependency
+          if (this.messageHandler) {
+            await this.messageHandler(data);
+            console.log('💾 Data saved to database successfully'); // ✅ BARU
+          } else {
+            console.warn('⚠️ No message handler set, data not processed');
+          }
         } catch (error) {
           console.error('❌ Error processing MQTT message:', error);
           console.error('Raw message:', message.toString()); // ✅ BARU
@@ -91,9 +100,6 @@ class MQTTClient {
       console.log('⚠️  MQTT client not connected, cannot subscribe'); // ✅ BARU
     }
   }
-
-  
-  // ❌ DIHAPUS: onMessage callback (karena sudah langsung handle di constructor)
 }
 
 module.exports = new MQTTClient();
