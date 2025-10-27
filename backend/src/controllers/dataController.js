@@ -1,4 +1,4 @@
-const { SensorData } = require('../models');
+const { SensorData, Op } = require('../models');
 const mqttClient = require('../config/mqtt'); // Import MQTT client for pump control
 
 const getLatestData = async (req, res) => {
@@ -81,16 +81,28 @@ const controlPump = async (req, res) => {
   }
 };
 
+const { Op } = require('sequelize'); // Add this at the top with other imports
+
+// ... keep the existing code until getHistory function ...
+
 const getHistory = async (req, res) => {
   try {
+    // Get data from the last 12 hours to ensure we have at least 10 hours of data
+    const tenHoursAgo = new Date(Date.now() - 10 * 60 * 60 * 1000);
+    
     const history = await SensorData.findAll({
-      order: [['created_at', 'DESC']],
-      limit: 50
+      where: {
+        created_at: {
+          [Op.gte]: tenHoursAgo
+        }
+      },
+      order: [['created_at', 'ASC']],  // Oldest first for charts
+      limit: 500  // Reasonable limit to prevent too much data
     });
 
     res.json({
       success: true,
-      data: history.reverse() // Reverse untuk urutan ascending (oldest first)
+      data: history
     });
   } catch (error) {
     console.error('Get history error:', error);
