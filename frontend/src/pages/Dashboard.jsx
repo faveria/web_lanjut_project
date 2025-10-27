@@ -234,10 +234,10 @@ const Dashboard = () => {
             // Filter history to last 10 hours for each chart with robust date handling
             let filteredData = [];
             if (history && history.length > 0) {
-              // More reliable time calculation
-              const tenHoursAgo = new Date(Date.now() - (10 * 60 * 60 * 1000)); // 10 hours ago from now
+              // Use UTC time to match backend data (backend stores in UTC)
+              const tenHoursAgo = new Date(Date.now() - (10 * 60 * 60 * 1000));
               
-              console.log('⏰ Filtering data from:', tenHoursAgo);
+              console.log('⏰ Filtering data from (UTC):', tenHoursAgo.toISOString());
               console.log('📊 Total history points:', history.length);
               console.log('📅 History time range:', history[0]?.created_at, 'to', history[history.length-1]?.created_at);
 
@@ -245,9 +245,11 @@ const Dashboard = () => {
                 try {
                   if (!item?.created_at) return false;
                   
+                  // Parse the date string as UTC (backend stores in UTC)
                   const itemDate = new Date(item.created_at);
                   if (isNaN(itemDate.getTime())) return false;
                   
+                  // Compare in UTC - both times should be in same timezone
                   const isWithinRange = itemDate >= tenHoursAgo;
                   return isWithinRange;
                 } catch (error) {
@@ -261,16 +263,17 @@ const Dashboard = () => {
               // Sort by time to ensure proper chart display (oldest first)
               filteredData.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
               
-              // If we have too many points, sample them for better chart performance
-              if (filteredData.length > 100) {
-                const sampleRate = Math.ceil(filteredData.length / 100);
-                filteredData = filteredData.filter((_, index) => index % sampleRate === 0);
-                console.log('📈 Sampled to:', filteredData.length, 'points');
-              }
-              
-              // Add fallback: if no data in last 10 hours, show last 50 points
-              if (filteredData.length === 0) {
-                filteredData = [...history].slice(-50);
+              // If we have data, use it. Otherwise use fallback.
+              if (filteredData.length > 0) {
+                // Sample if too many points
+                if (filteredData.length > 100) {
+                  const sampleRate = Math.ceil(filteredData.length / 100);
+                  filteredData = filteredData.filter((_, index) => index % sampleRate === 0);
+                  console.log('📈 Sampled to:', filteredData.length, 'points');
+                }
+              } else {
+                // Use more fallback data if no data in 10 hours
+                filteredData = [...history].slice(-100);
                 console.log('🔄 Using fallback data:', filteredData.length, 'points');
               }
             }
