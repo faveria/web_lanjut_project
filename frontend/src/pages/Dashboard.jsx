@@ -237,6 +237,10 @@ const Dashboard = () => {
               // More reliable time calculation
               const tenHoursAgo = new Date(Date.now() - (10 * 60 * 60 * 1000)); // 10 hours ago from now
               
+              console.log('⏰ Filtering data from:', tenHoursAgo);
+              console.log('📊 Total history points:', history.length);
+              console.log('📅 History time range:', history[0]?.created_at, 'to', history[history.length-1]?.created_at);
+
               filteredData = history.filter(item => {
                 try {
                   if (!item?.created_at) return false;
@@ -244,29 +248,30 @@ const Dashboard = () => {
                   const itemDate = new Date(item.created_at);
                   if (isNaN(itemDate.getTime())) return false;
                   
-                  return itemDate >= tenHoursAgo;
+                  const isWithinRange = itemDate >= tenHoursAgo;
+                  return isWithinRange;
                 } catch (error) {
                   console.warn('Error parsing date:', error);
                   return false;
                 }
               });
               
+              console.log('✅ Filtered data points:', filteredData.length);
+              
               // Sort by time to ensure proper chart display (oldest first)
               filteredData.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
               
-              // Limit to 60 data points max for better performance and readability
-              if (filteredData.length > 60) {
-                // Sample evenly spaced data points
-                const step = Math.ceil(filteredData.length / 60);
-                filteredData = filteredData.filter((_, idx) => idx % step === 0);
+              // If we have too many points, sample them for better chart performance
+              if (filteredData.length > 100) {
+                const sampleRate = Math.ceil(filteredData.length / 100);
+                filteredData = filteredData.filter((_, index) => index % sampleRate === 0);
+                console.log('📈 Sampled to:', filteredData.length, 'points');
               }
               
-              // Add fallback: if no data in last 10 hours, show last 24 points
+              // Add fallback: if no data in last 10 hours, show last 50 points
               if (filteredData.length === 0) {
-                filteredData = [...history]
-                  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                  .slice(0, 24)
-                  .reverse();
+                filteredData = [...history].slice(-50);
+                console.log('🔄 Using fallback data:', filteredData.length, 'points');
               }
             }
             

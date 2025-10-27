@@ -87,6 +87,8 @@ const getHistory = async (req, res) => {
     // Get data from the last 24 hours to ensure we have sufficient data for 10-hour charts
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     
+    console.log('🔍 Backend query: looking for data since', twentyFourHoursAgo);
+    
     const history = await SensorData.findAll({
       where: {
         created_at: {
@@ -97,8 +99,10 @@ const getHistory = async (req, res) => {
       limit: 2000  // Increase limit to capture more diverse data
     });
 
-    // Log for debugging - check how much data we're getting
-    console.log(`📊 History data: ${history.length} points from ${history[0]?.created_at} to ${history[history.length-1]?.created_at}`);
+    console.log('📊 Backend found:', history.length, 'records');
+    if (history.length > 0) {
+      console.log('⏰ Time range:', history[0].created_at, 'to', history[history.length-1].created_at);
+    }
     
     res.json({
       success: true,
