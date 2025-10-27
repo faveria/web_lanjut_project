@@ -81,9 +81,8 @@ const controlPump = async (req, res) => {
   }
 };
 
-const { Op } = require('sequelize'); // Add this at the top with other imports
-
-// ... keep the existing code until getHistory function ...
+// ❌❌❌ DELETE THIS DUPLICATE LINE ❌❌❌
+// const { Op } = require('sequelize'); // Add this at the top with other imports
 
 const getHistory = async (req, res) => {
   try {
