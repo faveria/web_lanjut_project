@@ -1,4 +1,5 @@
-const { SensorData, Op } = require('../models');
+const { SensorData } = require('../models');
+const { Op } = require('sequelize'); // Import Op directly from sequelize
 const mqttClient = require('../config/mqtt'); // Import MQTT client for pump control
 
 const getLatestData = async (req, res) => {
