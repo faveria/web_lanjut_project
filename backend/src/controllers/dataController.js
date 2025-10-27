@@ -84,29 +84,22 @@ const controlPump = async (req, res) => {
 
 const getHistory = async (req, res) => {
   try {
-    // Get data from the last 24 hours to ensure we have sufficient data for 10-hour charts
-    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    
-    console.log('🔍 Backend query: looking for data since', twentyFourHoursAgo);
-    
+    // Get the MOST RECENT data regardless of time range (since we have old data)
     const history = await SensorData.findAll({
-      where: {
-        created_at: {
-          [Op.gte]: twentyFourHoursAgo
-        }
-      },
-      order: [['created_at', 'ASC']],  // Oldest first for charts
-      limit: 2000  // Increase limit to capture more diverse data
+      order: [['created_at', 'DESC']],  // Newest first to get most recent data
+      limit: 1000
     });
 
-    console.log('📊 Backend found:', history.length, 'records');
+    console.log('📊 Most recent data:', history.length, 'records');
     if (history.length > 0) {
-      console.log('⏰ Time range:', history[0].created_at, 'to', history[history.length-1].created_at);
+      console.log('⏰ Most recent timestamp:', history[0].created_at);
+      console.log('⏰ Oldest timestamp in result:', history[history.length-1].created_at);
     }
     
+    // Reverse to show oldest first for charts
     res.json({
       success: true,
-      data: history
+      data: history.reverse()
     });
   } catch (error) {
     console.error('Get history error:', error);
