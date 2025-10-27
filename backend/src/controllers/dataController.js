@@ -81,9 +81,6 @@ const controlPump = async (req, res) => {
   }
 };
 
-// ❌❌❌ DELETE THIS DUPLICATE LINE ❌❌❌
-// const { Op } = require('sequelize'); // Add this at the top with other imports
-
 const getHistory = async (req, res) => {
   try {
     // Get data from the last 12 hours to ensure we have at least 10 hours of data
