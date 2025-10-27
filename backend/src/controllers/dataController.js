@@ -39,26 +39,41 @@ const controlPump = async (req, res) => {
       });
     }
 
-    // Publish pump command to MQTT topic
-    if (mqttClient.client && mqttClient.isConnected) {
+    // DEBUG: Log both connection states
+    console.log('🔌 MQTT Status:', {
+      classProperty: mqttClient.isConnected,        // Your class property (might be stale)
+      realTimeState: mqttClient.client?.connected   // MQTT library's real-time state
+    });
+
+    // FIX: Use the REAL-TIME connection state from MQTT library
+    if (mqttClient.client && mqttClient.client.connected) {
       const topic = 'hyyume/sensor/pump';
-      mqttClient.client.publish(topic, status);
       
-      console.log(`Pump command sent: ${status} to topic: ${topic}`);
-      
-      res.json({
-        success: true,
-        message: `Pump command sent: ${status}`
+      // Use callback to properly handle publish errors
+      mqttClient.client.publish(topic, status, (err) => {
+        if (err) {
+          console.error('❌ MQTT Publish failed:', err);
+          return res.status(503).json({
+            success: false,
+            message: 'Failed to send command to pump'
+          });
+        }
+        
+        console.log(`✅ Pump command sent: ${status} to topic: ${topic}`);
+        res.json({
+          success: true,
+          message: `Pump command sent: ${status}`
+        });
       });
     } else {
-      console.error('MQTT client not connected');
+      console.error('❌ MQTT client not connected');
       res.status(503).json({
         success: false,
         message: 'MQTT client not connected'
       });
     }
   } catch (error) {
-    console.error('Control pump error:', error);
+    console.error('💥 Control pump error:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error'
