@@ -150,127 +150,111 @@ const getHourlyData = async (req, res) => {
     
     // Initialize all 24 hours with null values
     for (let hour = 0; hour < 24; hour++) {
-      const hourKey = `${date}T${hour.toString().padStart(2, '0')}:00:00.000Z`;
-      hourlyData[hourKey] = {
-        hour: `${hour.toString().padStart(2, '0')}:00`,
+      const hourStr = `${hour.toString().padStart(2, '0')}:00`;
+      hourlyData[hourStr] = {
+        hour: hourStr,
         suhu_air: null,
         suhu_udara: null,
         kelembapan: null,
         tds: null,
         ph: null,
-        count: 0
+        record_count: 0  // How many records contributed to this hour
       };
     }
     
     // Group the data by hour and calculate averages
     allData.forEach(record => {
       const recordDate = new Date(record.created_at);
-      const hour = recordDate.getUTCHours(); // Use UTC hours
-      const hourKey = `${date}T${hour.toString().padStart(2, '0')}:00:00.000Z`;
+      // Convert to local hour to match the date parameter
+      const localHour = recordDate.getUTCHours();
+      const hourStr = `${localHour.toString().padStart(2, '0')}:00`;
       
-      if (hourlyData[hourKey]) {
-        // Accumulate values for averaging
-        if (record.suhu_air !== null) {
-          hourlyData[hourKey].suhu_air = (hourlyData[hourKey].suhu_air === null ? 0 : hourlyData[hourKey].suhu_air) + record.suhu_air;
-          hourlyData[hourKey].count++;
+      if (hourlyData[hourStr]) {
+        // For each sensor type, accumulate values and count records
+        if (record.suhu_air !== null && record.suhu_air !== undefined) {
+          if (hourlyData[hourStr].suhu_air === null) {
+            hourlyData[hourStr].suhu_air = record.suhu_air;
+            hourlyData[hourStr].suhu_air_count = 1;
+          } else {
+            hourlyData[hourStr].suhu_air = (hourlyData[hourStr].suhu_air + record.suhu_air);
+            hourlyData[hourStr].suhu_air_count++;
+          }
         }
-        if (record.suhu_udara !== null) {
-          hourlyData[hourKey].suhu_udara = (hourlyData[hourKey].suhu_udara === null ? 0 : hourlyData[hourKey].suhu_udara) + record.suhu_udara;
-          hourlyData[hourKey].count++;
+        
+        if (record.suhu_udara !== null && record.suhu_udara !== undefined) {
+          if (hourlyData[hourStr].suhu_udara === null) {
+            hourlyData[hourStr].suhu_udara = record.suhu_udara;
+            hourlyData[hourStr].suhu_udara_count = 1;
+          } else {
+            hourlyData[hourStr].suhu_udara = (hourlyData[hourStr].suhu_udara + record.suhu_udara);
+            hourlyData[hourStr].suhu_udara_count++;
+          }
         }
-        if (record.kelembapan !== null) {
-          hourlyData[hourKey].kelembapan = (hourlyData[hourKey].kelembapan === null ? 0 : hourlyData[hourKey].kelembapan) + record.kelembapan;
-          hourlyData[hourKey].count++;
+        
+        if (record.kelembapan !== null && record.kelembapan !== undefined) {
+          if (hourlyData[hourStr].kelembapan === null) {
+            hourlyData[hourStr].kelembapan = record.kelembapan;
+            hourlyData[hourStr].kelembapan_count = 1;
+          } else {
+            hourlyData[hourStr].kelembapan = (hourlyData[hourStr].kelembapan + record.kelembapan);
+            hourlyData[hourStr].kelembapan_count++;
+          }
         }
-        if (record.tds !== null) {
-          hourlyData[hourKey].tds = (hourlyData[hourKey].tds === null ? 0 : hourlyData[hourKey].tds) + record.tds;
-          hourlyData[hourKey].count++;
+        
+        if (record.tds !== null && record.tds !== undefined) {
+          if (hourlyData[hourStr].tds === null) {
+            hourlyData[hourStr].tds = record.tds;
+            hourlyData[hourStr].tds_count = 1;
+          } else {
+            hourlyData[hourStr].tds = (hourlyData[hourStr].tds + record.tds);
+            hourlyData[hourStr].tds_count++;
+          }
         }
-        if (record.ph !== null) {
-          hourlyData[hourKey].ph = (hourlyData[hourKey].ph === null ? 0 : hourlyData[hourKey].ph) + record.ph;
-          hourlyData[hourKey].count++;
+        
+        if (record.ph !== null && record.ph !== undefined) {
+          if (hourlyData[hourStr].ph === null) {
+            hourlyData[hourStr].ph = record.ph;
+            hourlyData[hourStr].ph_count = 1;
+          } else {
+            hourlyData[hourStr].ph = (hourlyData[hourStr].ph + record.ph);
+            hourlyData[hourStr].ph_count++;
+          }
         }
+        
+        hourlyData[hourStr].record_count++;
       }
     });
     
     // Calculate averages and format the result
     const result = Object.values(hourlyData).map(hourlyRecord => {
-      if (hourlyRecord.count > 0) {
-        // Calculate averages by dividing accumulated values by count
-        // Note: This is a simplified approach - we need to properly track separate counts for each metric
-        const averagedRecord = { ...hourlyRecord };
-        
-        // Calculate average for each field separately
-        const countForSuhuAir = allData.filter(r => 
-          new Date(r.created_at).getUTCHours() === new Date(`${date}T${hourlyRecord.hour.slice(0, 2)}:00:00.000Z`).getUTCHours() && 
-          r.suhu_air !== null
-        ).length;
-        
-        const countForSuhuUdara = allData.filter(r => 
-          new Date(r.created_at).getUTCHours() === new Date(`${date}T${hourlyRecord.hour.slice(0, 2)}:00:00.000Z`).getUTCHours() && 
-          r.suhu_udara !== null
-        ).length;
-        
-        const countForKelembapan = allData.filter(r => 
-          new Date(r.created_at).getUTCHours() === new Date(`${date}T${hourlyRecord.hour.slice(0, 2)}:00:00.000Z`).getUTCHours() && 
-          r.kelembapan !== null
-        ).length;
-        
-        const countForTds = allData.filter(r => 
-          new Date(r.created_at).getUTCHours() === new Date(`${date}T${hourlyRecord.hour.slice(0, 2)}:00:00.000Z`).getUTCHours() && 
-          r.tds !== null
-        ).length;
-        
-        const countForPh = allData.filter(r => 
-          new Date(r.created_at).getUTCHours() === new Date(`${date}T${hourlyRecord.hour.slice(0, 2)}:00:00.000Z`).getUTCHours() && 
-          r.ph !== null
-        ).length;
-        
-        if (countForSuhuAir > 0) {
-          const sum = allData
-            .filter(r => new Date(r.created_at).getUTCHours() === new Date(`${date}T${hourlyRecord.hour.slice(0, 2)}:00:00.000Z`).getUTCHours() && r.suhu_air !== null)
-            .reduce((sum, r) => sum + r.suhu_air, 0);
-          averagedRecord.suhu_air = parseFloat((sum / countForSuhuAir).toFixed(2));
-        }
-        
-        if (countForSuhuUdara > 0) {
-          const sum = allData
-            .filter(r => new Date(r.created_at).getUTCHours() === new Date(`${date}T${hourlyRecord.hour.slice(0, 2)}:00:00.000Z`).getUTCHours() && r.suhu_udara !== null)
-            .reduce((sum, r) => sum + r.suhu_udara, 0);
-          averagedRecord.suhu_udara = parseFloat((sum / countForSuhuUdara).toFixed(2));
-        }
-        
-        if (countForKelembapan > 0) {
-          const sum = allData
-            .filter(r => new Date(r.created_at).getUTCHours() === new Date(`${date}T${hourlyRecord.hour.slice(0, 2)}:00:00.000Z`).getUTCHours() && r.kelembapan !== null)
-            .reduce((sum, r) => sum + r.kelembapan, 0);
-          averagedRecord.kelembapan = parseFloat((sum / countForKelembapan).toFixed(2));
-        }
-        
-        if (countForTds > 0) {
-          const sum = allData
-            .filter(r => new Date(r.created_at).getUTCHours() === new Date(`${date}T${hourlyRecord.hour.slice(0, 2)}:00:00.000Z`).getUTCHours() && r.tds !== null)
-            .reduce((sum, r) => sum + r.tds, 0);
-          averagedRecord.tds = Math.round(sum / countForTds);
-        }
-        
-        if (countForPh > 0) {
-          const sum = allData
-            .filter(r => new Date(r.created_at).getUTCHours() === new Date(`${date}T${hourlyRecord.hour.slice(0, 2)}:00:00.000Z`).getUTCHours() && r.ph !== null)
-            .reduce((sum, r) => sum + r.ph, 0);
-          averagedRecord.ph = parseFloat((sum / countForPh).toFixed(2));
-        }
-        
-        return averagedRecord;
+      // Calculate averages where data exists
+      const finalRecord = { ...hourlyRecord };
+      
+      // Calculate average for each field if there are values to average
+      if (finalRecord.suhu_air_count > 0) {
+        finalRecord.suhu_air = parseFloat((finalRecord.suhu_air / finalRecord.suhu_air_count).toFixed(2));
       }
-      return hourlyRecord;
-    });
-    
-    // Sort by hour
-    result.sort((a, b) => {
-      const hourA = parseInt(a.hour.split(':')[0]);
-      const hourB = parseInt(b.hour.split(':')[0]);
-      return hourA - hourB;
+      if (finalRecord.suhu_udara_count > 0) {
+        finalRecord.suhu_udara = parseFloat((finalRecord.suhu_udara / finalRecord.suhu_udara_count).toFixed(2));
+      }
+      if (finalRecord.kelembapan_count > 0) {
+        finalRecord.kelembapan = parseFloat((finalRecord.kelembapan / finalRecord.kelembapan_count).toFixed(2));
+      }
+      if (finalRecord.tds_count > 0) {
+        finalRecord.tds = Math.round(finalRecord.tds / finalRecord.tds_count);
+      }
+      if (finalRecord.ph_count > 0) {
+        finalRecord.ph = parseFloat((finalRecord.ph / finalRecord.ph_count).toFixed(2));
+      }
+      
+      // Remove the temporary count fields
+      delete finalRecord.suhu_air_count;
+      delete finalRecord.suhu_udara_count;
+      delete finalRecord.kelembapan_count;
+      delete finalRecord.tds_count;
+      delete finalRecord.ph_count;
+      
+      return finalRecord;
     });
     
     res.json({
@@ -283,6 +267,53 @@ const getHourlyData = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Internal server error'
+    });
+  }
+};
+
+// Get daily data summary (for historical page)
+const getDailyData = async (req, res) => {
+  try {
+    const days = parseInt(req.query.days) || 30; // Default 30 days
+    const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    
+    console.log('📊 Getting daily data for last', days, 'days');
+
+    const history = await SensorData.findAll({
+      where: {
+        created_at: {
+          [Op.gte]: startDate
+        }
+      },
+      order: [['created_at', 'ASC']],
+      limit: 5000
+    });
+
+    console.log('📈 Daily data found:', history.length, 'records');
+
+    // Group by day and take one reading per day
+    const dailyData = {};
+    history.forEach(item => {
+      const dayKey = new Date(item.created_at).toISOString().slice(0, 10); // "2025-10-28"
+      if (!dailyData[dayKey]) {
+        dailyData[dayKey] = item;
+      }
+    });
+
+    const result = Object.values(dailyData)
+      .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+    res.json({
+      success: true,
+      data: result,
+      totalRecords: history.length,
+      dailyRecords: result.length
+    });
+  } catch (error) {
+    console.error('Get daily data error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error: ' + error.message
     });
   }
 };
@@ -313,7 +344,8 @@ const saveSensorData = async (sensorData) => {
 module.exports = {
   getLatestData,
   getHistory,
-  getHourlyData, // Add the new function
+  getHourlyData,    // Add hourly data function
+  getDailyData,     // Add daily data function
   saveSensorData,
   controlPump
 };

@@ -121,7 +121,7 @@ const DailyHistory = () => {
     return date.toLocaleDateString('en-US', { weekday: 'long' });
   };
 
-  if (loading || sensorLoading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <motion.div
