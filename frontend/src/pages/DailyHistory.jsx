@@ -36,7 +36,7 @@ const DailyHistory = () => {
     };
 
     fetchDailyData();
-  }, [selectedDate, getHourlyData]);
+  }, [selectedDate]); // Only re-run when selectedDate changes, not when getHourlyData changes
 
   const generateMockDataForDate = (date) => {
     // Generate mock data for the selected date, simulating hourly averages
