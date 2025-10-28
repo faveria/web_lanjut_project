@@ -196,7 +196,7 @@ const DailyHistory = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-primary-500 to-blue-500 dark:from-gray-700 dark:to-gray-800 text-white rounded-2xl p-6 shadow-xl"
+        className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-gray-700 dark:to-gray-800 text-gray-800 dark:text-white rounded-2xl p-6 shadow-xl"
       >
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
@@ -208,11 +208,11 @@ const DailyHistory = () => {
                 day: 'numeric' 
               })}
             </h2>
-            <p className="text-primary-100 dark:text-gray-300 mt-1">
+            <p className="text-gray-600 dark:text-gray-300 mt-1">
               {getDayOfWeek(selectedDate)} • {dailyData.length} data points recorded
             </p>
           </div>
-          <div className="mt-4 md:mt-0 flex items-center text-primary-100 dark:text-gray-300">
+          <div className="mt-4 md:mt-0 flex items-center text-gray-700 dark:text-gray-300">
             <Clock className="w-5 h-5 mr-2" />
             <span>Updated in real-time</span>
           </div>
