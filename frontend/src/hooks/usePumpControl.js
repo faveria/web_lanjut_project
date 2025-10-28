@@ -9,6 +9,7 @@ export const usePumpControl = () => {
     setIsControlling(true);
     setError(null);
     
+    
     try {
       // Use the existing HTTP API that routes to MQTT on the backend
       const response = await pumpAPI.controlPump(status);
