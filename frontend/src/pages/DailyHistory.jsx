@@ -339,8 +339,22 @@ const DailyHistory = () => {
               className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6"
             >
               <div className="flex items-center mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-blue-500 rounded-lg flex items-center justify-center mr-3">
-                  <Icon className="w-5 h-5 text-white" />
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center mr-3 ${
+                  config.dataKey === 'suhu_air' ? 'bg-blue-100 dark:bg-blue-900/50' :
+                  config.dataKey === 'suhu_udara' ? 'bg-red-100 dark:bg-red-900/50' :
+                  config.dataKey === 'kelembapan' ? 'bg-green-100 dark:bg-green-900/50' :
+                  config.dataKey === 'tds' ? 'bg-yellow-100 dark:bg-yellow-900/50' :
+                  config.dataKey === 'ph' ? 'bg-purple-100 dark:bg-purple-900/50' : 
+                  'bg-primary-100 dark:bg-primary-900/50'
+                }`}>
+                  <Icon className={`w-5 h-5 ${
+                    config.dataKey === 'suhu_air' ? 'text-blue-600 dark:text-blue-400' :
+                    config.dataKey === 'suhu_udara' ? 'text-red-600 dark:text-red-400' :
+                    config.dataKey === 'kelembapan' ? 'text-green-600 dark:text-green-400' :
+                    config.dataKey === 'tds' ? 'text-yellow-600 dark:text-yellow-400' :
+                    config.dataKey === 'ph' ? 'text-purple-600 dark:text-purple-400' : 
+                    'text-primary-600 dark:text-primary-400'
+                  }`} />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   {config.title}
