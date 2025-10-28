@@ -45,6 +45,7 @@ export const authAPI = {
 export const dataAPI = {
   getLatestData: () => api.get('/data/latest'),
   getHistory: () => api.get('/data/history'),
+  getHourlyData: (date) => api.get(`/data/hourly?date=${date}`),
 };
 
 export const subscriptionAPI = {

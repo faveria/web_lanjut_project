@@ -73,9 +73,15 @@ export const useSensorData = (pollingInterval = 3000) => {
     }
   };
 
-  // Method to get hourly data
-  const getHourlyData = () => {
-    return hourlyDataRef.current;
+  // Method to get hourly data for a specific date
+  const getHourlyData = async (date) => {
+    try {
+      const response = await dataAPI.getHourlyData(date);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching hourly data:', error);
+      throw error;
+    }
   };
 
   useEffect(() => {
