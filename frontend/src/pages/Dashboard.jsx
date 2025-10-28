@@ -231,52 +231,59 @@ const Dashboard = () => {
             { title: "TDS Trend", dataKey: "tds", color: "#F59E0B" },
             { title: "pH Level Trend", dataKey: "ph", color: "#EF4444" }
           ].map((chart, index) => {
-            // Filter history to show 1 data point per hour for the last 10 hours
+            // Show exactly 1 data point for each of the last 10 hours
             let filteredData = [];
             if (history && history.length > 0) {
               console.log('📊 Total history points:', history.length);
               console.log('📅 History time range:', history[0]?.created_at, 'to', history[history.length-1]?.created_at);
 
-              // Get data from last 10 hours
-              const tenHoursAgo = new Date(Date.now() - (10 * 60 * 60 * 1000));
+              // Create array for the last 10 hours
+              const lastTenHours = [];
+              const now = new Date();
               
-              // Filter to last 10 hours first
-              const lastTenHoursData = history.filter(item => {
-                try {
-                  if (!item?.created_at) return false;
-                  const itemDate = new Date(item.created_at);
-                  return !isNaN(itemDate.getTime()) && itemDate >= tenHoursAgo;
-                } catch (error) {
-                  return false;
-                }
-              });
-
-              console.log('⏰ Data in last 10 hours:', lastTenHoursData.length, 'points');
-
-              // If we have data in the last 10 hours, sample it to 1 point per hour
-              if (lastTenHoursData.length > 0) {
-                // Group data by hour and take the last reading from each hour
-                const hourlyData = {};
+              // Generate the last 10 hour slots
+              for (let i = 0; i < 10; i++) {
+                const hour = new Date(now);
+                hour.setHours(hour.getHours() - i);
+                hour.setMinutes(0, 0, 0); // Set to beginning of hour
                 
-                lastTenHoursData.forEach(item => {
+                const hourKey = hour.toISOString().slice(0, 13); // "2025-10-27T10"
+                lastTenHours.unshift({ hourKey, targetTime: new Date(hour) }); // Oldest first
+              }
+
+              console.log('⏰ Looking for data in hours:', lastTenHours.map(h => h.hourKey));
+
+              // Find the closest data point for each hour
+              filteredData = lastTenHours.map(hourSlot => {
+                // Find all data points in this hour
+                const dataInThisHour = history.filter(item => {
                   const itemDate = new Date(item.created_at);
-                  const hourKey = itemDate.toISOString().slice(0, 13); // "2025-10-27T10"
-                  
-                  if (!hourlyData[hourKey] || new Date(item.created_at) > new Date(hourlyData[hourKey].created_at)) {
-                    hourlyData[hourKey] = item;
-                  }
+                  const itemHourKey = itemDate.toISOString().slice(0, 13);
+                  return itemHourKey === hourSlot.hourKey;
                 });
 
-                // Convert to array and sort by time
-                filteredData = Object.values(hourlyData)
-                  .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                if (dataInThisHour.length > 0) {
+                  // Take the data point closest to the middle of the hour
+                  const targetTime = hourSlot.targetTime.getTime() + (30 * 60 * 1000); // Middle of hour
+                  const closest = dataInThisHour.reduce((closest, current) => {
+                    const currentDiff = Math.abs(new Date(current.created_at).getTime() - targetTime);
+                    const closestDiff = Math.abs(new Date(closest.created_at).getTime() - targetTime);
+                    return currentDiff < closestDiff ? current : closest;
+                  });
+                  return closest;
+                }
                 
-                console.log('📈 Sampled to 1 point per hour:', filteredData.length, 'points');
-              } else {
-                // If no data in last 10 hours, sample all data to max 10 points
-                const sampleRate = Math.ceil(history.length / 10);
-                filteredData = history.filter((_, index) => index % sampleRate === 0).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-                console.log('🔄 Using sampled historical data:', filteredData.length, 'points');
+                // If no data for this hour, return null (will be filtered out)
+                return null;
+              }).filter(item => item !== null); // Remove hours with no data
+
+              console.log('📈 Hourly data points found:', filteredData.length, 'out of 10 hours');
+              
+              // If we have very few points, show what we have
+              if (filteredData.length === 0) {
+                // Fallback: show last 10 data points
+                filteredData = history.slice(-10);
+                console.log('🔄 Using fallback - last 10 data points');
               }
             }
             
