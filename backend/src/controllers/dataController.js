@@ -1,6 +1,7 @@
-const { SensorData } = require('../models');
+const { SensorData, User } = require('../models');
 const { Op } = require('sequelize'); // Import Op directly from sequelize
 const mqttClient = require('../config/mqtt'); // Import MQTT client for pump control
+const { generateAlerts } = require('./alertController'); // Import alert generation function
 
 const getLatestData = async (req, res) => {
   try {
@@ -334,6 +335,23 @@ const saveSensorData = async (sensorData) => {
     });
 
     console.log('✅ Sensor data saved:', newData.id);
+    
+    // Generate alerts for all users based on this sensor data
+    try {
+      // Get all users to generate alerts for
+      const users = await User.findAll({
+        attributes: ['id']
+      });
+      
+      // Generate alerts for each user
+      for (const user of users) {
+        await generateAlerts(newData, user.id);
+      }
+    } catch (alertError) {
+      console.error('❌ Error generating alerts:', alertError);
+      // Don't throw the error as it's not critical to saving the sensor data
+    }
+    
     return newData;
   } catch (error) {
     console.error('❌ Error saving sensor data:', error);

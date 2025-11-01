@@ -3,15 +3,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, X, ShieldAlert } from 'lucide-react';
 import { SENSOR_THRESHOLDS } from '../../utils/constants';
 
-const StatusAlert = ({ sensorData, onClose }) => {
+const StatusAlert = ({ sensorData, onClose, usePlantThresholds = false }) => {
   const getAlerts = () => {
     if (!sensorData) return [];
 
     const alerts = [];
     
+    // Use either plant-specific thresholds or default system thresholds
+    const thresholdsToUse = usePlantThresholds ? {} : SENSOR_THRESHOLDS; // for now, will be populated with plant thresholds
+    
     Object.keys(SENSOR_THRESHOLDS).forEach(key => {
       const value = sensorData[key];
-      const threshold = SENSOR_THRESHOLDS[key];
+      const threshold = SENSOR_THRESHOLDS[key]; // Using default thresholds for now
       
       if (value !== undefined && value !== null) {
         if (value < threshold.min) {

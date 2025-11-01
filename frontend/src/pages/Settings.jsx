@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useSensorData } from '../hooks/useWebSocket';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/button';
-import { RefreshCw, Bell, Moon, Sun, Zap, Shield, Package, Activity } from 'lucide-react';
+import { RefreshCw, Bell, Moon, Sun, Zap, Shield, Package, Activity, Leaf, Plus, X } from 'lucide-react';
+import PlantProfileSelector from '../components/Dashboard/PlantProfileSelector';
+import { plantAPI } from '../utils/api';
 
 const Settings = () => {
   const { updatePollingInterval } = useSensorData();
   const { theme, setTheme } = useTheme();
+  const { user } = useAuth();
   const [pollingInterval, setPollingInterval] = useState(3000);
+  const [userPlants, setUserPlants] = useState([]);
+  const [loadingPlants, setLoadingPlants] = useState(true);
+  const [showPlantSelector, setShowPlantSelector] = useState(false);
 
   const handlePollingIntervalChange = (e) => {
     const value = parseInt(e.target.value);
@@ -24,6 +31,45 @@ const Settings = () => {
     { value: 30000, label: '30 seconds' },
   ];
 
+  useEffect(() => {
+    if (user) {
+      loadUserPlants();
+    }
+  }, [user]);
+
+  const loadUserPlants = async () => {
+    if (!user) return;
+    
+    try {
+      setLoadingPlants(true);
+      const response = await plantAPI.getUserPlantSettings(user.id);
+      setUserPlants(response.data.data);
+    } catch (error) {
+      console.error('Error loading user plants:', error);
+    } finally {
+      setLoadingPlants(false);
+    }
+  };
+
+  const handleAddPlant = async (plant) => {
+    try {
+      await plantAPI.addUserPlant(user.id, { plantProfileId: plant.id });
+      loadUserPlants(); // Refresh the list
+      setShowPlantSelector(false);
+    } catch (error) {
+      console.error('Error adding plant:', error);
+    }
+  };
+
+  const handleRemovePlant = async (plantId) => {
+    try {
+      await plantAPI.removeUserPlant(user.id, plantId);
+      loadUserPlants(); // Refresh the list
+    } catch (error) {
+      console.error('Error removing plant:', error);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <motion.div
@@ -33,6 +79,81 @@ const Settings = () => {
       >
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
         <p className="text-gray-600 mt-1 dark:text-gray-300">Customize your monitoring experience</p>
+      </motion.div>
+
+      {/* Plant Management Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100/30 dark:border-gray-700 p-6"
+      >
+        <div className="flex items-center mb-6">
+          <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mr-3">
+            <Leaf className="w-5 h-5 text-white" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Plant Management</h2>
+        </div>
+        
+        <div className="mb-6">
+          <button
+            onClick={() => setShowPlantSelector(!showPlantSelector)}
+            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-all flex items-center"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            {showPlantSelector ? 'Hide' : 'Add Plants'} to Garden
+          </button>
+        </div>
+
+        {showPlantSelector && (
+          <div className="mb-6">
+            <PlantProfileSelector 
+              userId={user?.id}
+              selectedPlants={userPlants}
+              onPlantSelect={() => {}}
+              onRemovePlant={handleRemovePlant}
+              onAddPlant={handleAddPlant}
+            />
+          </div>
+        )}
+
+        {/* User's Active Plants */}
+        {loadingPlants ? (
+          <div className="flex justify-center items-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+          </div>
+        ) : userPlants.length > 0 ? (
+          <div>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Your Active Garden ({userPlants.length} plants)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {userPlants.map((selectedPlant) => (
+                <div 
+                  key={selectedPlant.id}
+                  className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-700 dark:to-gray-800 p-4 rounded-xl border border-green-200/30 dark:border-gray-600 flex items-center justify-between"
+                >
+                  <div>
+                    <h4 className="font-bold text-gray-900 dark:text-white">{selectedPlant.PlantProfile.name}</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{selectedPlant.PlantProfile.scientificName}</p>
+                    <span className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full mt-1 inline-block">
+                      {selectedPlant.growthPhase}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => handleRemovePlant(selectedPlant.id)}
+                    className="text-red-500 hover:text-red-700 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <Leaf className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-600 dark:text-gray-400">No plants in your garden yet</p>
+            <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Add plants to get personalized recommendations</p>
+          </div>
+        )}
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

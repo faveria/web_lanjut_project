@@ -1,5 +1,6 @@
 const app = require('./app');
 const { syncDatabase } = require('./models');
+const seedPlants = require('./seeders/plantSeeder');
 const mqttClient = require('./config/mqtt');
 require('dotenv').config();
 
@@ -10,6 +11,10 @@ const startServer = async () => {
     // Sync database
     await syncDatabase();
     console.log('✅ Database synchronized'); // ✅ BARU
+    
+    // Seed plant data if needed
+    console.log('🌱 Initializing plant profiles...');
+    await seedPlants();
     
     // Start MQTT client
     console.log('🚀 Starting MQTT client...'); // ✅ BARU

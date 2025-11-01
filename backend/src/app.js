@@ -48,6 +48,9 @@ app.get('/mobile-not-supported', (req, res) => {
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/data', require('./routes/dataRoutes'));
 app.use('/api/subscription', require('./routes/subscriptionRoutes'));
+app.use('/api/plants', require('./routes/plantRoutes'));
+app.use('/api/alerts', require('./routes/alertRoutes'));
+app.use('/api/recommendations', require('./routes/recommendationRoutes'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

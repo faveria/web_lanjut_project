@@ -53,6 +53,26 @@ export const subscriptionAPI = {
   getStatus: () => api.get('/subscription/status'),
 };
 
+export const plantAPI = {
+  getAllPlantProfiles: (params) => api.get('/plants', { params }),
+  getPlantProfileById: (id) => api.get(`/plants/${id}`),
+  getUserPlantSettings: (userId) => api.get(`/plants/user/${userId}/plants`),
+  addUserPlant: (userId, plantData) => api.post(`/plants/user/${userId}/plants`, plantData),
+  updateUserPlant: (userId, userPlantSettingId, plantData) => api.put(`/plants/user/${userId}/plants/${userPlantSettingId}`, plantData),
+  removeUserPlant: (userId, userPlantSettingId) => api.delete(`/plants/user/${userId}/plants/${userPlantSettingId}`),
+  getUserPlantOptimalParameters: (userId) => api.get(`/plants/user/${userId}/optimal-parameters`),
+};
+
+export const alertAPI = {
+  getUserAlerts: (userId, params) => api.get(`/alerts/user/${userId}`, { params }),
+  getActiveAlerts: (userId) => api.get(`/alerts/user/${userId}/active`),
+  resolveAlert: (userId, alertId) => api.put(`/alerts/user/${userId}/${alertId}/resolve`),
+};
+
+export const recommendationAPI = {
+  getGrowthRecommendations: (userId) => api.get(`/recommendations/user/${userId}`),
+};
+
 export const pumpAPI = {
   controlPump: (status) => api.post('/data/control-pump', { status }),
 };
