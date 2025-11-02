@@ -10,25 +10,25 @@ const startServer = async () => {
   try {
     // Sync database
     await syncDatabase();
-    console.log('✅ Database synchronized'); // ✅ BARU
+    console.log('Database synchronized'); 
     
-    // Seed plant data if needed
-    console.log('🌱 Initializing plant profiles...');
+    // Seed plant data
+    console.log('Initializing plant profiles...');
     await seedPlants();
     
     // Start MQTT client
-    console.log('🚀 Starting MQTT client...'); // ✅ BARU
+    console.log('Starting MQTT client...'); 
     mqttClient.connect();
     
     // Start server
     app.listen(PORT, () => {
-      console.log(`🚀 HY.YUME Monitor Server running on port ${PORT}`);
-      console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
-      console.log(`🔗 MQTT Broker: ${process.env.MQTT_BROKER_URL}`);
-      console.log(`📡 Subscribed to: hyyume/sensor/data`); // ✅ BARU
+      console.log(`HY.YUME Monitor Server running on port ${PORT}`);
+      console.log(`Health check: http://localhost:${PORT}/api/health`);
+      console.log(`MQTT Broker: ${process.env.MQTT_BROKER_URL}`);
+      console.log(`Subscribed to: hyyume/sensor/data`); 
     });
   } catch (error) {
-    console.error('❌ Failed to start server:', error);
+    console.error('Failed to start server:', error);
     process.exit(1);
   }
 };
