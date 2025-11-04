@@ -24,7 +24,8 @@ app.use((req, res, next) => {
     'https://www.hyyyume.my.id',
     'http://localhost:3000',
     'http://localhost:3001',
-    'http://localhost:5173'
+    'http://localhost:5173',
+    'http://localhost:8081'
   ];
   
   const origin = req.headers.origin;
