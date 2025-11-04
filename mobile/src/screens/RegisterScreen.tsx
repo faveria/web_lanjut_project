@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Alert, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../context/AuthContext';
+import { theme } from '../theme';
 
 export default function RegisterScreen({ navigation }: any) {
   const { register } = useAuth();
@@ -65,74 +66,96 @@ export default function RegisterScreen({ navigation }: any) {
 
           {error ? (
             <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>⚠️ {error}</Text>
+              <Text style={styles.errorText}>{error}</Text>
             </View>
           ) : null}
 
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Email Address</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your email"
-              placeholderTextColor="#9ca3af"
-              autoCapitalize="none"
-              keyboardType="email-address"
-              value={email}
-              onChangeText={setEmail}
-            />
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your email"
+                placeholderTextColor={theme.colors.text.disabled}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                value={email}
+                onChangeText={setEmail}
+              />
+            </View>
           </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Password</Text>
             <View style={styles.passwordContainer}>
               <TextInput
-                style={styles.passwordInput}
+                style={[styles.input, styles.passwordInput]}
                 placeholder="Create a password"
-                placeholderTextColor="#9ca3af"
+                placeholderTextColor={theme.colors.text.disabled}
                 secureTextEntry={!showPassword}
                 value={password}
                 onChangeText={setPassword}
               />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <Text style={styles.toggleText}>{showPassword ? 'Hide' : 'Show'}</Text>
+              <TouchableOpacity 
+                style={styles.togglePasswordBtn} 
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Text style={styles.togglePasswordText}>
+                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                </Text>
               </TouchableOpacity>
             </View>
             {password.length > 0 && (
-              <Text style={[styles.requirement, password.length >= 6 && styles.requirementMet]}>
-                {password.length >= 6 ? '✓' : '○'} At least 6 characters
+              <Text style={[styles.requirement, password.length >= 6 ? styles.requirementMet : null]}>
+                {password.length >= 6 ? '✅' : '○'} At least 6 characters
               </Text>
             )}
           </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Confirm Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Confirm your password"
-              placeholderTextColor="#9ca3af"
-              secureTextEntry={!showPassword}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-            />
+            <View style={styles.passwordContainer}>
+              <TextInput
+                style={[styles.input, styles.passwordInput]}
+                placeholder="Confirm your password"
+                placeholderTextColor={theme.colors.text.disabled}
+                secureTextEntry
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+              />
+            </View>
+            {password && confirmPassword && (
+              <Text style={[styles.requirement, password === confirmPassword ? styles.requirementMet : null]}>
+                {password === confirmPassword ? '✅' : '○'} Passwords match
+              </Text>
+            )}
           </View>
 
           <TouchableOpacity 
-            style={[styles.button, loading && styles.buttonDisabled]} 
+            style={[styles.registerBtn, loading && styles.registerBtnDisabled]} 
             onPress={onSubmit} 
             disabled={loading}
             activeOpacity={0.8}
           >
-            <LinearGradient colors={['#667eea', '#764ba2']} style={styles.buttonGradient}>
-              {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Create Account</Text>}
-            </LinearGradient>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.registerBtnText}>Create Account</Text>
+            )}
           </TouchableOpacity>
+
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>OR</Text>
+            <View style={styles.dividerLine} />
+          </View>
 
           <TouchableOpacity 
             onPress={() => navigation.navigate('Login')} 
-            style={styles.linkContainer}
-            activeOpacity={0.7}
+            style={styles.loginBtn}
+            activeOpacity={0.8}
           >
-            <Text style={styles.linkText}>Already have an account? <Text style={styles.linkBold}>Sign in here</Text></Text>
+            <Text style={styles.loginBtnText}>Already have an account? <Text style={styles.linkBold}>Sign in here</Text></Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -141,9 +164,18 @@ export default function RegisterScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  scrollContent: { flexGrow: 1, justifyContent: 'center', padding: 24 },
-  logoContainer: { alignItems: 'center', marginBottom: 40 },
+  container: {
+    flex: 1
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: 24
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 40
+  },
   logoCircle: {
     width: 100,
     height: 100,
@@ -158,7 +190,11 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8
   },
-  logo: { width: 80, height: 80, borderRadius: 40 },
+  logo: {
+    width: 80,
+    height: 80,
+    borderRadius: 40
+  },
   title: {
     fontSize: 36,
     fontWeight: '800',
@@ -177,10 +213,10 @@ const styles = StyleSheet.create({
     fontWeight: '500'
   },
   card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 24,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.xl,
     padding: 24,
-    shadowColor: '#000',
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 16,
@@ -189,111 +225,132 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#111827',
+    color: theme.colors.text.primary,
     marginBottom: 8,
     textAlign: 'center'
   },
   cardSubtitle: {
-    fontSize: 14,
-    color: '#6b7280',
+    fontSize: theme.typography.caption.fontSize,
+    color: theme.colors.text.secondary,
     textAlign: 'center',
     marginBottom: 24
   },
-  errorContainer: {
-    backgroundColor: '#fee2e2',
-    borderWidth: 1,
-    borderColor: '#fecaca',
-    borderRadius: 12,
-    padding: 12,
+  inputContainer: {
     marginBottom: 20
   },
-  errorText: {
-    color: '#dc2626',
-    fontSize: 14,
-    textAlign: 'center'
-  },
-  inputContainer: { marginBottom: 20 },
   inputLabel: {
-    fontSize: 14,
+    fontSize: theme.typography.caption.fontSize,
     fontWeight: '600',
-    color: '#374151',
+    color: theme.colors.text.primary,
     marginBottom: 8
   },
-  input: {
-    backgroundColor: '#f9fafb',
+  inputWrapper: {
     borderWidth: 2,
-    borderColor: '#e5e7eb',
-    borderRadius: 12,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.m,
+    backgroundColor: theme.colors.background
+  },
+  input: {
+    backgroundColor: 'transparent',
     paddingHorizontal: 16,
     paddingVertical: 14,
-    fontSize: 16,
-    color: '#111827'
+    fontSize: theme.typography.body.fontSize,
+    color: theme.colors.text.primary
   },
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f9fafb',
     borderWidth: 2,
-    borderColor: '#e5e7eb',
-    borderRadius: 12,
-    paddingRight: 8
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.m,
+    backgroundColor: theme.colors.background
   },
   passwordInput: {
     flex: 1,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    fontSize: 16,
-    color: '#111827'
+    fontSize: theme.typography.body.fontSize,
+    color: theme.colors.text.primary
   },
-  toggleText: {
-    color: '#667eea',
-    fontWeight: '700',
-    paddingHorizontal: 12
+  togglePasswordBtn: {
+    padding: 12,
+    paddingRight: 16
+  },
+  togglePasswordText: {
+    fontSize: 16
   },
   requirement: {
-    fontSize: 12,
-    color: '#6b7280',
+    fontSize: theme.typography.caption.fontSize,
+    color: theme.colors.text.secondary,
     marginTop: 8
   },
   requirementMet: {
-    color: '#059669',
+    color: theme.colors.status.success,
     fontWeight: '600'
   },
-  button: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginTop: 8,
-    shadowColor: '#667eea',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 8
+  errorContainer: {
+    backgroundColor: '#fee2e2',
+    borderWidth: 1,
+    borderColor: '#fecaca',
+    borderRadius: theme.borderRadius.m,
+    padding: 12,
+    marginBottom: 20
   },
-  buttonGradient: {
+  errorText: {
+    color: theme.colors.status.error,
+    fontSize: theme.typography.caption.fontSize,
+    textAlign: 'center'
+  },
+  registerBtn: {
+    backgroundColor: theme.colors.primary,
     paddingVertical: 16,
+    borderRadius: theme.borderRadius.m,
     alignItems: 'center',
-    justifyContent: 'center'
+    marginBottom: 20,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 6
   },
-  buttonDisabled: {
+  registerBtnDisabled: {
     opacity: 0.6
   },
-  buttonText: {
+  registerBtnText: {
     color: '#ffffff',
-    fontWeight: '700',
-    fontSize: 16,
+    fontWeight: '600',
+    fontSize: theme.typography.body.fontSize,
     letterSpacing: 0.5
   },
-  linkContainer: {
-    marginTop: 24,
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: theme.colors.border
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    color: theme.colors.text.secondary,
+    fontWeight: '500'
+  },
+  loginBtn: {
+    backgroundColor: theme.colors.background,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.m,
+    paddingVertical: 16,
     alignItems: 'center'
   },
-  linkText: {
-    color: '#6b7280',
-    fontSize: 14
+  loginBtnText: {
+    color: theme.colors.text.primary,
+    fontSize: theme.typography.caption.fontSize
   },
   linkBold: {
-    color: '#667eea',
+    color: theme.colors.primary,
     fontWeight: '700'
   }
 });
-

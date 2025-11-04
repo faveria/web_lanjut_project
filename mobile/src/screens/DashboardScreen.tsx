@@ -1,16 +1,19 @@
 import React, { useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Dimensions, Switch } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSensorData } from '../hooks/useSensorData';
 import { useAuth } from '../context/AuthContext';
 import { pumpAPI } from '../api/client';
 import Header from '../components/Header';
-import ParameterStatus from '../components/ParameterStatus';
+import { theme } from '../theme';
 import { SENSOR_THRESHOLDS } from '../utils/constants';
+import { ActivityIndicator } from 'react-native';
 
 export default function DashboardScreen() {
   const { sensorData, loading, error, refetch } = useSensorData(1000);
   const { logout, user } = useAuth();
+  const [refreshing, setRefreshing] = React.useState(false);
 
   const onPumpToggle = async (status: 'on' | 'off') => {
     try {
@@ -20,179 +23,366 @@ export default function DashboardScreen() {
     }
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+      return undefined;
+    }, [refetch])
+  );
+
+  // Calculate system status based on sensor values
+  const getSystemStatus = () => {
+    if (!sensorData) return { status: 'Unknown', color: '#9ca3af' };
+    
+    const values = [
+      sensorData.ph,
+      sensorData.tds,
+      sensorData.suhu_air,
+      sensorData.suhu_udara,
+      sensorData.kelembapan
+    ];
+    
+    const thresholds = [
+      SENSOR_THRESHOLDS.ph,
+      SENSOR_THRESHOLDS.tds,
+      SENSOR_THRESHOLDS.suhu_air,
+      SENSOR_THRESHOLDS.suhu_udara,
+      SENSOR_THRESHOLDS.kelembapan
+    ];
+    
+    let outOfRangeCount = 0;
+    for (let i = 0; i < values.length; i++) {
+      if (values[i] !== null && values[i] !== undefined) {
+        const value = values[i];
+        const threshold = thresholds[i];
+        if (value < threshold.min || value > threshold.max) {
+          outOfRangeCount++;
+        }
+      }
+    }
+    
+    if (outOfRangeCount === 0) {
+      return { status: 'System Optimal', color: '#10b981' };
+    } else if (outOfRangeCount <= 2) {
+      return { status: 'Some Issues', color: '#f59e0b' };
+    } else {
+      return { status: 'Critical Issues', color: '#ef4444' };
+    }
+  };
+
+  const systemStatus = getSystemStatus();
+
   return (
     <View style={styles.container}>
-      {useFocusEffect(
-        useCallback(() => {
-          refetch();
-          return undefined;
-        }, [refetch])
-      )}
       <Header subtitle={user?.email || ''} />
 
-      {loading ? <Text style={styles.info}>Loading...</Text> : null}
-      {error ? <Text style={[styles.info, styles.error]}>{error}</Text> : null}
+      <ScrollView 
+        contentContainerStyle={styles.content} 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[theme.colors.primary]}
+            tintColor={theme.colors.primary}
+          />
+        }
+      >
+        {/* Page Header */}
+        <View style={styles.pageHeader}>
+          <Text style={styles.pageTitle}>Dashboard</Text>
+        </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.summaryCard}>
-          <View style={styles.summaryContent}>
+        {/* System Status Card */}
+        <View style={styles.systemStatusCard}>
+          <View style={styles.systemStatusContent}>
             <View>
-              <Text style={styles.summaryTitle}>System Status</Text>
-              <Text style={styles.summarySubtitle}>Real-time monitoring active</Text>
+              <Text style={styles.systemStatusText}>System Status</Text>
+              
+              {sensorData && (
+                <Text style={styles.lastUpdatedText}>
+                  Last updated: {new Date(sensorData.created_at || Date.now()).toLocaleTimeString()}
+                </Text>
+              )}
             </View>
-            <View style={styles.statusIndicator}>
-              <View style={styles.statusDot} />
+            
+            <View style={styles.connectionContainer}>
+              <View style={[styles.connectionIndicator, { backgroundColor: theme.colors.status.success }]} />
+              <Text style={styles.connectionText}>Connected</Text>
             </View>
           </View>
-          <TouchableOpacity onPress={refetch} style={styles.refreshBtn} activeOpacity={0.7}>
-            <Text style={styles.refreshIcon}>🔄</Text>
-            <Text style={styles.refreshText}>Refresh</Text>
-          </TouchableOpacity>
         </View>
 
-        <View style={styles.grid2}>
-          <ParameterStatus label="pH Level" unit="" value={sensorData?.ph as any} optimal={SENSOR_THRESHOLDS.ph as any} />
-          <ParameterStatus label="TDS" unit="ppm" value={sensorData?.tds as any} optimal={SENSOR_THRESHOLDS.tds as any} />
-          <ParameterStatus label="Water Temp" unit="°C" value={sensorData?.suhu_air as any} optimal={{ min: SENSOR_THRESHOLDS.suhu_air.min, max: SENSOR_THRESHOLDS.suhu_air.max }} />
-          <ParameterStatus label="Air Temp" unit="°C" value={sensorData?.suhu_udara as any} optimal={{ min: SENSOR_THRESHOLDS.suhu_udara.min, max: SENSOR_THRESHOLDS.suhu_udara.max }} />
-          <ParameterStatus label="Humidity" unit="%" value={sensorData?.kelembapan as any} optimal={SENSOR_THRESHOLDS.kelembapan as any} />
-        </View>
+        {/* Loading indicator */}
+        {loading && !sensorData && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={theme.colors.primary} />
+            <Text style={styles.loadingText}>Loading sensor data...</Text>
+          </View>
+        )}
+
+        {/* Sensor Data Cards Grid */}
+        {sensorData && (
+          <View style={styles.sensorGrid}>
+            {/* pH Level Card */}
+            <View style={styles.sensorCard}>
+              <View style={styles.sensorCardHeader}>
+                <Text style={styles.sensorTitle}>PH LEVEL</Text>
+                <Icon name="timeline" size={20} color={theme.colors.primary} />
+              </View>
+              <View style={styles.sensorValueContainer}>
+                <Text style={styles.sensorValue}>{sensorData.ph?.toFixed(1) || '--'}</Text>
+                <Text style={styles.sensorUnit}>pH</Text>
+              </View>
+              <View style={styles.gaugeContainer}>
+                <View style={styles.gauge}>
+                  <View style={[styles.gaugeFill, { width: `${((sensorData.ph || 0) - 4) * 10}%` }]} />
+                </View>
+              </View>
+            </View>
+
+            {/* TDS Card */}
+            <View style={styles.sensorCard}>
+              <View style={styles.sensorCardHeader}>
+                <Text style={styles.sensorTitle}>TDS</Text>
+                <Icon name="bubble-chart" size={20} color={theme.colors.primary} />
+              </View>
+              <View style={styles.sensorValueContainer}>
+                <Text style={styles.sensorValue}>{sensorData.tds?.toFixed(0) || '--'}</Text>
+                <Text style={styles.sensorUnit}>PPM</Text>
+              </View>
+              <View style={styles.gaugeContainer}>
+                <View style={styles.gauge}>
+                  <View style={[styles.gaugeFill, { width: `${((sensorData.tds || 0) / 2000) * 100}%` }]} />
+                </View>
+              </View>
+            </View>
+
+            {/* Water Temp Card */}
+            <View style={styles.sensorCard}>
+              <View style={styles.sensorCardHeader}>
+                <Text style={styles.sensorTitle}>WATER TEMP</Text>
+                <Icon name="water" size={20} color={theme.colors.primary} />
+              </View>
+              <View style={styles.sensorValueContainer}>
+                <Text style={styles.sensorValue}>{sensorData.suhu_air?.toFixed(1) || '--'}</Text>
+                <Text style={styles.sensorUnit}>°C</Text>
+              </View>
+              <View style={styles.gaugeContainer}>
+                <View style={styles.gauge}>
+                  <View style={[styles.gaugeFill, { width: `${((sensorData.suhu_air || 0) - 10) * 5}%` }]} />
+                </View>
+              </View>
+            </View>
+
+            {/* Air Temp Card */}
+            <View style={styles.sensorCard}>
+              <View style={styles.sensorCardHeader}>
+                <Text style={styles.sensorTitle}>AIR TEMP</Text>
+                <Icon name="air" size={20} color={theme.colors.primary} />
+              </View>
+              <View style={styles.sensorValueContainer}>
+                <Text style={styles.sensorValue}>{sensorData.suhu_udara?.toFixed(1) || '--'}</Text>
+                <Text style={styles.sensorUnit}>°C</Text>
+              </View>
+              <View style={styles.gaugeContainer}>
+                <View style={styles.gauge}>
+                  <View style={[styles.gaugeFill, { width: `${((sensorData.suhu_udara || 0) - 15) * 4}%` }]} />
+                </View>
+              </View>
+            </View>
+
+            {/* Humidity Card */}
+            <View style={styles.sensorCard}>
+              <View style={styles.sensorCardHeader}>
+                <Text style={styles.sensorTitle}>HUMIDITY</Text>
+                <Icon name="opacity" size={20} color={theme.colors.primary} />
+              </View>
+              <View style={styles.sensorValueContainer}>
+                <Text style={styles.sensorValue}>{sensorData.kelembapan?.toFixed(1) || '--'}</Text>
+                <Text style={styles.sensorUnit}>%</Text>
+              </View>
+              <View style={styles.gaugeContainer}>
+                <View style={styles.gauge}>
+                  <View style={[styles.gaugeFill, { width: `${(sensorData.kelembapan || 0) }%` }]} />
+                </View>
+              </View>
+            </View>
+
+            {/* Pump Control Card */}
+            <View style={styles.sensorCard}>
+              <View style={styles.sensorCardHeader}>
+                <Text style={styles.sensorTitle}>PUMP STATUS</Text>
+                <Icon name="power" size={20} color={sensorData?.pompa === 'ON' ? theme.colors.status.success : theme.colors.status.error} />
+              </View>
+              <View style={styles.sensorValueRow}>
+                <Text style={[styles.sensorValue, { color: sensorData?.pompa === 'ON' ? theme.colors.status.success : theme.colors.status.error }]}>
+                  {sensorData?.pompa || 'OFF'}
+                </Text>
+                <Switch
+                  style={styles.inlineSwitch}
+                  value={sensorData?.pompa === 'ON'}
+                  onValueChange={(value) => onPumpToggle(value ? 'on' : 'off')}
+                  trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+                  thumbColor={sensorData?.pompa === 'ON' ? '#ffffff' : '#f4f4f4'}
+                />
+              </View>
+            </View>
+          </View>
+        )}
+
+
       </ScrollView>
-
-      <View style={styles.actions}>
-        <TouchableOpacity 
-          onPress={() => onPumpToggle('on')} 
-          style={[styles.actionBtn, styles.on]}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.actionIcon}>💧</Text>
-          <Text style={styles.actionText}>Pump ON</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          onPress={() => onPumpToggle('off')} 
-          style={[styles.actionBtn, styles.off]}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.actionIcon}>⏸</Text>
-          <Text style={styles.actionText}>Pump OFF</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
 
+const { width } = Dimensions.get('window');
+const cardWidth = (width - 48) / 2; // 2 columns with margins
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0f4f8' },
-  info: { textAlign: 'center', marginTop: 12, color: '#374151', fontSize: 14 },
-  error: { color: '#b91c1c', backgroundColor: '#fee2e2', padding: 12, borderRadius: 12, marginHorizontal: 16 },
-  content: { padding: 16, gap: 16 },
-  summaryCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    padding: 20,
-    borderWidth: 2,
-    borderColor: '#e0e7ff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 6
+  container: { 
+    flex: 1, 
+    backgroundColor: theme.colors.background 
   },
-  summaryContent: {
+  content: { 
+    padding: theme.spacing.m,
+    paddingBottom: theme.spacing.m
+  },
+  pageHeader: {
+    marginBottom: theme.spacing.m
+  },
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: theme.colors.text.primary
+  },
+  systemStatusCard: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.l,
+    padding: theme.spacing.m,
+    marginBottom: theme.spacing.m,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2
+  },
+  systemStatusContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  systemStatusText: {
+    fontSize: theme.typography.h3.fontSize,
+    fontWeight: '600',
+    color: theme.colors.text.primary,
+    marginBottom: 4
+  },
+  lastUpdatedText: {
+    fontSize: theme.typography.caption.fontSize,
+    color: theme.colors.text.secondary,
+    marginTop: 4
+  },
+  connectionContainer: {
+    alignItems: 'flex-end'
+  },
+  connectionIndicator: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    alignSelf: 'flex-end',
+    marginBottom: 4
+  },
+  connectionText: {
+    fontSize: theme.typography.caption.fontSize,
+    color: theme.colors.text.secondary
+  },
+  sensorGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: theme.spacing.m,
+    marginBottom: theme.spacing.m
+  },
+  sensorCard: {
+    width: cardWidth,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.m,
+    padding: theme.spacing.m,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2
+  },
+  sensorCardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16
+    marginBottom: theme.spacing.s
   },
-  summaryTitle: {
-    fontSize: 20,
+  sensorTitle: {
+    fontSize: theme.typography.caption.fontSize,
+    fontWeight: '600',
+    color: theme.colors.text.primary,
+    textTransform: 'uppercase'
+  },
+  sensorValueContainer: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginBottom: theme.spacing.xs
+  },
+  sensorValue: {
+    fontSize: 24,
     fontWeight: '700',
-    color: '#111827',
-    marginBottom: 4
+    color: theme.colors.text.primary
   },
-  summarySubtitle: {
-    fontSize: 14,
-    color: '#6b7280'
+  sensorUnit: {
+    fontSize: theme.typography.caption.fontSize,
+    color: theme.colors.text.secondary,
+    marginLeft: 4
   },
-  statusIndicator: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#ecfdf5',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#10b981'
+  gaugeContainer: {
+    marginTop: theme.spacing.s
   },
-  statusDot: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#10b981'
+  gauge: {
+    height: 4,
+    backgroundColor: '#e5e7eb',
+    borderRadius: 2,
+    overflow: 'hidden'
   },
-  refreshBtn: {
+  gaugeFill: {
+    height: '100%',
+    backgroundColor: theme.colors.primary,
+    borderRadius: 2
+  },
+  sensorValueRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#eff6ff',
-    borderWidth: 1,
-    borderColor: '#bfdbfe',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12
+    justifyContent: 'space-between'
   },
-  refreshIcon: {
-    fontSize: 18,
-    marginRight: 8
+  inlineSwitch: {
+    transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }]
   },
-  refreshText: { 
-    color: '#1d4ed8', 
-    fontWeight: '700',
-    fontSize: 14
-  },
-  grid2: { gap: 12 },
-  actions: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-around', 
-    padding: 20, 
-    backgroundColor: '#ffffff', 
-    borderTopWidth: 2, 
-    borderTopColor: '#e5e7eb',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8
-  },
-  actionBtn: { 
-    flexDirection: 'row',
+  loadingContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16, 
-    paddingHorizontal: 32, 
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-    minWidth: 140
+    padding: theme.spacing.xl
   },
-  on: { 
-    backgroundColor: '#10b981'
+  loadingText: {
+    marginTop: theme.spacing.s,
+    color: theme.colors.text.secondary
   },
-  off: { 
-    backgroundColor: '#ef4444' 
-  },
-  actionIcon: {
-    fontSize: 20,
-    marginRight: 8
-  },
-  actionText: { 
-    color: '#fff', 
-    fontWeight: '700',
-    fontSize: 16
-  }
+
 });
-
-

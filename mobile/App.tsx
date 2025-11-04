@@ -2,7 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { StatusBar, ActivityIndicator, View } from 'react-native';
+import { StatusBar, View } from 'react-native';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import DrawerContent from './src/components/DrawerContent';
 import LoginScreen from './src/screens/LoginScreen';
@@ -13,6 +13,7 @@ import DailyHistoryScreen from './src/screens/DailyHistoryScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import SubscriptionScreen from './src/screens/SubscriptionScreen';
+import { theme } from './src/theme';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -47,8 +48,8 @@ function RootNavigator() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f3f4f6' }}>
-        <ActivityIndicator size="large" color="#2563eb" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.background }}>
+        <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
       </View>
     );
   }
@@ -67,8 +68,8 @@ function RootNavigator() {
 export default function App() {
   return (
     <AuthProvider>
+      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
       <NavigationContainer>
-        <StatusBar barStyle="dark-content" />
         <RootNavigator />
       </NavigationContainer>
     </AuthProvider>

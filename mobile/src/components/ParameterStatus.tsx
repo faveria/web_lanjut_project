@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { theme } from '../theme';
 
 type Range = { min: number; max: number };
 
@@ -10,6 +11,9 @@ type Props = {
   optimal: Range;
 };
 
+const { width } = Dimensions.get('window');
+const cardWidth = (width - 48) / 2; // 2 columns with margins
+
 export default function ParameterStatus({ label, unit, value, optimal }: Props) {
   const status = (() => {
     if (value === null || value === undefined) return 'nodata';
@@ -19,130 +23,135 @@ export default function ParameterStatus({ label, unit, value, optimal }: Props) 
     return 'optimal';
   })();
 
-  const progress = (() => {
-    if (value === null || value === undefined) return 0;
-    let minRange = 0, maxRange = 100;
-    if (label.toLowerCase().includes('temp')) { minRange = 10; maxRange = 35; }
-    else if (label.toLowerCase().includes('tds')) { minRange = 0; maxRange = 2000; }
-    else if (label.toLowerCase().includes('ph')) { minRange = 4; maxRange = 8; }
-    const pct = ((Number(value) - minRange) / (maxRange - minRange)) * 100;
-    return Math.max(0, Math.min(100, pct));
-  })();
+  // Get status-specific styles
+  const getStatusStyles = () => {
+    switch(status) {
+      case 'optimal':
+        return {
+          container: { borderColor: '#10b981', backgroundColor: '#ecfdf5' },
+          text: { color: '#065f46' },
+          icon: { backgroundColor: '#10b981' },
+          iconText: { color: '#ffffff' },
+          statusText: { color: '#10b981' }
+        };
+      case 'caution':
+        return {
+          container: { borderColor: '#f59e0b', backgroundColor: '#ffedd5' },
+          text: { color: '#9a3412' },
+          icon: { backgroundColor: '#f59e0b' },
+          iconText: { color: '#ffffff' },
+          statusText: { color: '#f59e0b' }
+        };
+      case 'warning':
+        return {
+          container: { borderColor: '#ef4444', backgroundColor: '#fee2e2' },
+          text: { color: '#991b1b' },
+          icon: { backgroundColor: '#ef4444' },
+          iconText: { color: '#ffffff' },
+          statusText: { color: '#ef4444' }
+        };
+      default: // nodata
+        return {
+          container: { borderColor: '#9ca3af', backgroundColor: '#f9fafb' },
+          text: { color: '#6b7280' },
+          icon: { backgroundColor: '#9ca3af' },
+          iconText: { color: '#ffffff' },
+          statusText: { color: '#9ca3af' }
+        };
+    }
+  };
+
+  const statusStyles = getStatusStyles();
+  const statusText = status.charAt(0).toUpperCase() + status.slice(1);
+  const statusIcon = status === 'optimal' ? '●' : status === 'warning' ? '●' : status === 'caution' ? '●' : '●';
 
   return (
-    <View style={[styles.card, stylesByStatus[status].container]}> 
-      <View style={styles.headerRow}>
-        <View style={styles.iconCircle}>
-          <Text style={stylesByStatus[status].icon}>●</Text>
+    <View style={[styles.container, statusStyles.container]}>
+      {/* Header with label and icon */}
+      <View style={styles.header}>
+        <View style={[styles.icon, statusStyles.icon]}>
+          <Text style={styles.iconText}>{statusIcon}</Text>
         </View>
-        <Text style={[styles.label, stylesByStatus[status].text]}>{label}</Text>
+        <Text style={styles.label}>{label}</Text>
       </View>
-      <View style={styles.valueRow}>
-        <View>
-          <Text style={[styles.value, stylesByStatus[status].text]}>
-            {value ?? '-'}<Text style={styles.unit}>{unit}</Text>
-          </Text>
-          <Text style={[styles.range, stylesByStatus[status].text]}>
-            Optimal: {optimal.min}-{optimal.max}{unit}
-          </Text>
-        </View>
+      
+      {/* Value display */}
+      <View style={styles.valueContainer}>
+        <Text style={[styles.value, statusStyles.text]}>
+          {value !== null && value !== undefined ? value : '--'}
+          {unit && <Text style={styles.unit}>{unit}</Text>}
+        </Text>
       </View>
-      <View style={styles.progressBg}>
-        <View style={[styles.progressFill, { width: `${progress}%`, backgroundColor: stylesByStatus[status].bar as string }]} />
-      </View>
+      
+      {/* Status text */}
+      <Text style={[styles.statusText, statusStyles.statusText]}>
+        {statusText}
+      </Text>
+      
+      {/* Optimal range */}
+      <Text style={styles.rangeText}>
+        Optimal: {optimal.min}-{optimal.max}{unit}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { 
-    backgroundColor: '#ffffff', 
-    borderWidth: 2, 
-    borderRadius: 16, 
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
+  container: {
+    width: cardWidth,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.l,
+    padding: theme.spacing.m,
+    borderWidth: 1,
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4
+    shadowRadius: 4,
+    elevation: 2
   },
-  headerRow: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    marginBottom: 12 
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: theme.spacing.s
   },
-  iconCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+  icon: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12
+    marginRight: theme.spacing.s
   },
-  label: { 
-    fontSize: 16, 
-    fontWeight: '700',
+  iconText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#ffffff'
+  },
+  label: {
+    fontSize: theme.typography.caption.fontSize,
+    fontWeight: '600',
+    color: theme.colors.text.primary,
     flex: 1
   },
-  valueRow: {
-    marginBottom: 12
+  valueContainer: {
+    marginBottom: theme.spacing.xs
   },
-  value: { 
-    fontSize: 32, 
-    fontWeight: '800',
-    marginBottom: 4
+  value: {
+    fontSize: 20,
+    fontWeight: '700',
   },
-  unit: { 
-    fontSize: 18, 
-    fontWeight: '500',
-    opacity: 0.7
+  unit: {
+    fontSize: theme.typography.caption.fontSize,
+    color: theme.colors.text.secondary,
+    fontWeight: '400'
   },
-  range: { 
-    fontSize: 12,
-    opacity: 0.8,
-    marginTop: 4
+  statusText: {
+    fontSize: theme.typography.caption.fontSize,
+    fontWeight: '600',
+    marginBottom: theme.spacing.xs
   },
-  progressBg: { 
-    height: 10, 
-    backgroundColor: '#f3f4f6', 
-    borderRadius: 9999, 
-    overflow: 'hidden',
-    marginTop: 8
-  },
-  progressFill: { 
-    height: 10, 
-    borderRadius: 9999 
+  rangeText: {
+    fontSize: theme.typography.caption.fontSize,
+    color: theme.colors.text.secondary
   }
 });
-
-const stylesByStatus: any = {
-  nodata: { 
-    container: { backgroundColor: '#fffbeb', borderColor: '#fde68a' }, 
-    text: { color: '#78350f' }, 
-    icon: { color: '#f59e0b', fontSize: 12 }, 
-    bar: '#f59e0b' 
-  },
-  warning: { 
-    container: { backgroundColor: '#fee2e2', borderColor: '#fca5a5' }, 
-    text: { color: '#991b1b' }, 
-    icon: { color: '#ef4444', fontSize: 12 }, 
-    bar: '#ef4444' 
-  },
-  caution: { 
-    container: { backgroundColor: '#ffedd5', borderColor: '#fdba74' }, 
-    text: { color: '#9a3412' }, 
-    icon: { color: '#f97316', fontSize: 12 }, 
-    bar: '#f97316' 
-  },
-  optimal: { 
-    container: { backgroundColor: '#ecfdf5', borderColor: '#86efac' }, 
-    text: { color: '#065f46' }, 
-    icon: { color: '#10b981', fontSize: 12 }, 
-    bar: '#10b981' 
-  }
-};
-
-
-

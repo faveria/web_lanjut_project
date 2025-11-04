@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
+import { theme } from '../theme';
 
 export default function ProfileScreen() {
   const { user } = useAuth();
@@ -10,6 +11,18 @@ export default function ProfileScreen() {
     <View style={styles.container}>
       <Header subtitle="Account Information" />
       <ScrollView contentContainerStyle={styles.content}>
+        {/* Profile Header */}
+        <View style={styles.profileHeader}>
+          <View style={styles.avatarContainer}>
+            <View style={styles.avatarPlaceholder}>
+              <Text style={styles.avatarText}>U</Text>
+            </View>
+          </View>
+          <Text style={styles.profileName}>{user?.name || user?.email?.split('@')[0] || 'User Profile'}</Text>
+          <Text style={styles.profileEmail}>{user?.email || 'N/A'}</Text>
+        </View>
+
+        {/* Account Information Card */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Account Information</Text>
           
@@ -27,20 +40,52 @@ export default function ProfileScreen() {
             <Text style={styles.label}>Account Type</Text>
             <Text style={styles.value}>Standard User</Text>
           </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Member Since</Text>
+            <Text style={styles.value}>Jan 2024</Text>
+          </View>
         </View>
 
+        {/* System Access Card */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>System Access</Text>
+          
           <View style={styles.statusRow}>
             <Text style={styles.statusLabel}>Dashboard Access</Text>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>Active</Text>
+            <View style={styles.statusBadgeActive}>
+              <Text style={styles.statusBadgeText}>Active</Text>
             </View>
           </View>
+          
           <View style={styles.statusRow}>
             <Text style={styles.statusLabel}>Real-time Data</Text>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>Enabled</Text>
+            <View style={styles.statusBadgeActive}>
+              <Text style={styles.statusBadgeText}>Enabled</Text>
+            </View>
+          </View>
+          
+          <View style={styles.statusRow}>
+            <Text style={styles.statusLabel}>API Access</Text>
+            <View style={styles.statusBadgeActive}>
+              <Text style={styles.statusBadgeText}>Enabled</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Subscription Status Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Subscription Status</Text>
+          
+          <View style={styles.statusRow}>
+            <Text style={styles.statusLabel}>Plan</Text>
+            <Text style={styles.value}>Starter</Text>
+          </View>
+          
+          <View style={styles.statusRow}>
+            <Text style={styles.statusLabel}>Status</Text>
+            <View style={styles.statusBadgeActive}>
+              <Text style={styles.statusBadgeText}>Active</Text>
             </View>
           </View>
         </View>
@@ -50,16 +95,110 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f3f4f6' },
-  content: { padding: 16, gap: 16 },
-  card: { backgroundColor: '#ffffff', borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#e5e7eb' },
-  cardTitle: { fontSize: 18, fontWeight: '700', color: '#111827', marginBottom: 16 },
-  infoRow: { marginBottom: 16 },
-  label: { fontSize: 12, color: '#6b7280', marginBottom: 4 },
-  value: { fontSize: 16, color: '#111827', fontWeight: '500' },
-  statusRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  statusLabel: { fontSize: 14, color: '#374151' },
-  badge: { backgroundColor: '#10b981', paddingVertical: 4, paddingHorizontal: 12, borderRadius: 9999 },
-  badgeText: { color: '#ffffff', fontSize: 12, fontWeight: '600' }
+  container: { 
+    flex: 1, 
+    backgroundColor: theme.colors.background 
+  },
+  content: { 
+    padding: theme.spacing.m,
+    gap: theme.spacing.m
+  },
+  profileHeader: {
+    alignItems: 'center',
+    padding: theme.spacing.l,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.l,
+    marginBottom: theme.spacing.m,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2
+  },
+  avatarContainer: {
+    marginBottom: theme.spacing.m
+  },
+  avatarPlaceholder: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: theme.colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  avatarText: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#ffffff'
+  },
+  profileName: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.xs
+  },
+  profileEmail: {
+    fontSize: theme.typography.caption.fontSize,
+    color: theme.colors.text.secondary
+  },
+  card: { 
+    backgroundColor: theme.colors.surface, 
+    borderRadius: theme.borderRadius.l, 
+    padding: theme.spacing.m, 
+    borderWidth: 1, 
+    borderColor: theme.colors.border,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2
+  },
+  cardTitle: { 
+    fontSize: theme.typography.h3.fontSize, 
+    fontWeight: '600', 
+    color: theme.colors.text.primary, 
+    marginBottom: theme.spacing.m 
+  },
+  infoRow: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center',
+    paddingVertical: theme.spacing.s,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border
+  },
+  label: { 
+    fontSize: theme.typography.caption.fontSize, 
+    color: theme.colors.text.secondary 
+  },
+  value: { 
+    fontSize: theme.typography.body.fontSize, 
+    color: theme.colors.text.primary, 
+    fontWeight: '500' 
+  },
+  statusRow: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    paddingVertical: theme.spacing.s,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border
+  },
+  statusLabel: { 
+    fontSize: theme.typography.body.fontSize, 
+    color: theme.colors.text.primary 
+  },
+  statusBadgeActive: { 
+    backgroundColor: theme.colors.status.success + '20', // 20% opacity
+    paddingHorizontal: 12, 
+    paddingVertical: 4, 
+    borderRadius: 9999 
+  },
+  statusBadgeText: { 
+    color: theme.colors.status.success, 
+    fontSize: theme.typography.caption.fontSize, 
+    fontWeight: '600' 
+  }
 });
-
