@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Image, ScrollView } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Image, Alert } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { theme } from '../theme';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export default function LoginScreen({ navigation }: any) {
   const { login } = useAuth();
@@ -25,172 +25,136 @@ export default function LoginScreen({ navigation }: any) {
   };
 
   return (
-    <LinearGradient colors={['#667eea', '#764ba2', '#f093fb']} style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-        <View style={styles.logoContainer}>
-          <View style={styles.logoCircle}>
-            <Image source={require('../../assets/icon.png')} style={styles.logo} />
+    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+      <View style={styles.logoContainer}>
+        <Image source={require('../../assets/icon.png')} style={styles.logo} />
+        <Text style={styles.title}>Welcome to HY.YUME</Text>
+        <Text style={styles.subtitle}>Sign in to your account</Text>
+      </View>
+
+      {error ? (
+        <View style={styles.errorContainer}>
+          <Icon name="error-outline" size={20} color={theme.colors.status.error} style={styles.errorIcon} />
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      ) : null}
+
+      <View style={styles.formContainer}>
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Email Address</Text>
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your email"
+              placeholderTextColor={theme.colors.text.disabled}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+            />
           </View>
-          <Text style={styles.title}>HY.YUME</Text>
-          <Text style={styles.subtitle}>Smart Hydroponic Monitor</Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Welcome Back</Text>
-          <Text style={styles.cardSubtitle}>Sign in to continue monitoring</Text>
-
-          {error ? (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
-            </View>
-          ) : null}
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Email Address</Text>
-            <View style={styles.inputWrapper}>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter your email"
-                placeholderTextColor={theme.colors.text.disabled}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                value={email}
-                onChangeText={setEmail}
-              />
-            </View>
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Password</Text>
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your password"
+              placeholderTextColor={theme.colors.text.disabled}
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+            />
+            <TouchableOpacity style={styles.passwordVisibilityBtn} onPress={() => setShowPassword(!showPassword)}>
+              <Icon name={showPassword ? "visibility-off" : "visibility"} size={20} color={theme.colors.text.secondary} />
+            </TouchableOpacity>
           </View>
+        </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Password</Text>
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={[styles.input, styles.passwordInput]}
-                placeholder="Enter your password"
-                placeholderTextColor={theme.colors.text.disabled}
-                secureTextEntry={!showPassword}
-                value={password}
-                onChangeText={setPassword}
-              />
-              <TouchableOpacity 
-                style={styles.togglePasswordBtn} 
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Text style={styles.togglePasswordText}>
-                  {showPassword ? '👁️' : '👁️‍🗨️'}
-                </Text>
-              </TouchableOpacity>
+        <TouchableOpacity style={styles.forgotPasswordBtn} onPress={() => Alert.alert('Forgot Password', 'Please contact support or use the reset link sent to your email.')}>
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.signInBtn, loading && styles.signInBtnDisabled]} 
+          onPress={onSubmit} 
+          disabled={loading}
+          activeOpacity={0.8}
+        >
+          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.signInBtnText}>Sign In</Text>}
+        </TouchableOpacity>
+
+        <View style={styles.dividerContainer}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>OR</Text>
+          <View style={styles.dividerLine} />
+        </View>
+
+        <View style={styles.socialButtonsContainer}>
+          <TouchableOpacity style={styles.socialBtn} onPress={() => Alert.alert('Google Login', 'Google login feature coming soon!')}>
+            <View style={styles.googleLogoContainer}>
+              <Text style={styles.googleLetter}>G</Text>
             </View>
-          </View>
-
-          <TouchableOpacity style={styles.forgotBtn} onPress={() => {}}>
-            <Text style={styles.forgotText}>Forgot Password?</Text>
+            <Text style={styles.socialBtnText}>Sign in with Google</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={[styles.loginBtn, loading && styles.loginBtnDisabled]} 
-            onPress={onSubmit} 
-            disabled={loading}
-            activeOpacity={0.8}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.loginBtnText}>Sign In</Text>
-            )}
-          </TouchableOpacity>
-
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>OR</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          <TouchableOpacity 
-            onPress={() => navigation.navigate('Register')} 
-            style={styles.registerBtn}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.registerBtnText}>Create New Account</Text>
+          
+          <TouchableOpacity style={styles.socialBtn} onPress={() => Alert.alert('Apple Login', 'Apple login feature coming soon!')}>
+            <View style={styles.appleLogoContainer}>
+              <Text style={styles.appleLetter}>A</Text>
+            </View>
+            <Text style={styles.socialBtnText}>Sign in with Apple</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
-    </LinearGradient>
+      </View>
+
+      <View style={styles.signUpContainer}>
+        <Text style={styles.signUpText}>Don't have an account? </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+          <Text style={styles.signUpLink}>Sign up</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-  scrollContent: {
+  container: { 
     flexGrow: 1,
-    justifyContent: 'center',
-    padding: 24
+    backgroundColor: '#ffffff',
+    padding: 24,
+    paddingTop: 80,
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 40
-  },
-  logoCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8
+    marginBottom: 24
   },
   logo: {
     width: 80,
     height: 80,
-    borderRadius: 40
+    borderRadius: 40,
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+    marginBottom: 16
   },
   title: {
-    fontSize: 36,
-    fontWeight: '800',
-    color: '#ffffff',
-    textAlign: 'center',
-    marginBottom: 8,
-    letterSpacing: 2,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4
-  },
-  subtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.9)',
-    textAlign: 'center',
-    fontWeight: '500'
-  },
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.xl,
-    padding: 24,
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 12
-  },
-  cardTitle: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
     color: theme.colors.text.primary,
     marginBottom: 8,
     textAlign: 'center'
   },
-  cardSubtitle: {
-    fontSize: theme.typography.caption.fontSize,
+  subtitle: {
+    fontSize: 16,
     color: theme.colors.text.secondary,
-    textAlign: 'center',
-    marginBottom: 24
+    textAlign: 'center'
   },
-  inputContainer: {
+  formContainer: {
+    width: '100%',
+    marginTop: 16,
+    flex: 1
+  },
+  inputGroup: {
     marginBottom: 20
   },
   inputLabel: {
@@ -200,85 +164,50 @@ const styles = StyleSheet.create({
     marginBottom: 8
   },
   inputWrapper: {
-    borderWidth: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
     borderColor: theme.colors.border,
     borderRadius: theme.borderRadius.m,
     backgroundColor: theme.colors.background
   },
   input: {
-    backgroundColor: 'transparent',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: theme.typography.body.fontSize,
-    color: theme.colors.text.primary
-  },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius.m,
-    backgroundColor: theme.colors.background
-  },
-  passwordInput: {
     flex: 1,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: theme.typography.body.fontSize,
     color: theme.colors.text.primary
   },
-  togglePasswordBtn: {
+  passwordVisibilityBtn: {
     padding: 12,
     paddingRight: 16
   },
-  togglePasswordText: {
-    fontSize: 16
-  },
-  errorContainer: {
-    backgroundColor: '#fee2e2',
-    borderWidth: 1,
-    borderColor: '#fecaca',
-    borderRadius: theme.borderRadius.m,
-    padding: 12,
-    marginBottom: 20
-  },
-  errorText: {
-    color: theme.colors.status.error,
-    fontSize: theme.typography.caption.fontSize,
-    textAlign: 'center'
-  },
-  forgotBtn: {
+  forgotPasswordBtn: {
     alignSelf: 'flex-end',
-    marginBottom: 20,
-    padding: 8
+    marginBottom: 24,
+    paddingVertical: 4
   },
-  forgotText: {
+  forgotPasswordText: {
     fontSize: theme.typography.caption.fontSize,
     color: theme.colors.primary,
     fontWeight: '500'
   },
-  loginBtn: {
+  signInBtn: {
     backgroundColor: theme.colors.primary,
     paddingVertical: 16,
     borderRadius: theme.borderRadius.m,
     alignItems: 'center',
-    marginBottom: 20,
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 6
+    marginBottom: 20
   },
-  loginBtnDisabled: {
+  signInBtnDisabled: {
     opacity: 0.6
   },
-  loginBtnText: {
+  signInBtnText: {
     color: '#ffffff',
     fontWeight: '600',
-    fontSize: theme.typography.body.fontSize,
-    letterSpacing: 0.5
+    fontSize: theme.typography.body.fontSize
   },
-  divider: {
+  dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20
@@ -293,17 +222,88 @@ const styles = StyleSheet.create({
     color: theme.colors.text.secondary,
     fontWeight: '500'
   },
-  registerBtn: {
-    backgroundColor: theme.colors.background,
+  socialButtonsContainer: {
+    gap: 12,
+    marginBottom: 20
+  },
+  socialBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: theme.borderRadius.m,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius.m,
-    paddingVertical: 16,
+    backgroundColor: theme.colors.background
+  },
+  googleLogoContainer: {
+    position: 'absolute',
+    left: 16,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#DB4437', // Google red
+    justifyContent: 'center',
     alignItems: 'center'
   },
-  registerBtnText: {
+  googleLetter: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: 'bold'
+  },
+  appleLogoContainer: {
+    position: 'absolute',
+    left: 16,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#000000', // Apple black
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  appleLetter: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: 'bold'
+  },
+  socialBtnText: {
     color: theme.colors.text.primary,
-    fontWeight: '600',
+    fontWeight: '500',
     fontSize: theme.typography.body.fontSize
+  },
+  signUpContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    paddingBottom: 20
+  },
+  signUpText: {
+    fontSize: theme.typography.body.fontSize,
+    color: theme.colors.text.secondary
+  },
+  signUpLink: {
+    fontSize: theme.typography.body.fontSize,
+    color: theme.colors.primary,
+    fontWeight: '600'
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#fee2e2',
+    borderWidth: 1,
+    borderColor: '#fecaca',
+    borderRadius: theme.borderRadius.m,
+    padding: 12,
+    marginBottom: 20,
+    width: '100%',
+    alignItems: 'center'
+  },
+  errorIcon: {
+    marginRight: 8
+  },
+  errorText: {
+    color: theme.colors.status.error,
+    fontSize: theme.typography.body.fontSize,
+    flex: 1
   }
 });

@@ -1,15 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigationState } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import { theme } from '../theme';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const menuItems = [
-  { label: 'Dashboard', route: 'Dashboard', icon: '' },
-  { label: 'Daily History', route: 'DailyHistory', icon: '' },
-  { label: 'Subscription', route: 'Subscription', icon: '' },
-  { label: 'Profile', route: 'Profile', icon: '' },
-  { label: 'Settings', route: 'Settings', icon: '' },
+  { label: 'Dashboard', route: 'Dashboard', icon: 'dashboard' },
+  { label: 'Daily History', route: 'DailyHistory', icon: 'history' },
+  { label: 'Subscription', route: 'Subscription', icon: 'credit-card' },
+  { label: 'Profile', route: 'Profile', icon: 'person' },
+  { label: 'Settings', route: 'Settings', icon: 'settings' },
 ];
 
 export default function DrawerContent({ navigation }: any) {
@@ -19,32 +20,47 @@ export default function DrawerContent({ navigation }: any) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>HY.YUME</Text>
-        <Text style={styles.subtitle}>{user?.email || 'User'}</Text>
-      </View>
-
-      <View style={styles.menu}>
-        {menuItems.map((item) => (
-          <TouchableOpacity
-            key={item.route}
-            style={[styles.menuItem, currentRoute === item.route && styles.menuItemActive]}
-            onPress={() => navigation.navigate(item.route)}
-          >
-            <Text style={[styles.menuText, currentRoute === item.route && styles.menuTextActive]}>
-              {item.label}
+      <View style={styles.headerContainer}>
+        <View style={styles.avatarContainer}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>
+              {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || 'U'}
             </Text>
-          </TouchableOpacity>
-        ))}
+          </View>
+        </View>
+        <Text style={styles.userName}>{user?.name || 'User'}</Text>
+        <Text style={styles.userRole}>Standard User</Text>
       </View>
 
-      <TouchableOpacity style={styles.logoutBtn} onPress={logout} activeOpacity={0.8}>
-        <Text style={styles.logoutText}>Logout</Text>
-      </TouchableOpacity>
+      <ScrollView style={styles.menuContainer}>
+        <View style={styles.mainMenu}>
+          {menuItems.map((item) => (
+            <TouchableOpacity
+              key={item.route}
+              style={[styles.menuItem, currentRoute === item.route && styles.activeMenuItem]}
+              onPress={() => navigation.navigate(item.route)}
+            >
+              <Icon name={item.icon} size={20} color={currentRoute === item.route ? theme.colors.primary : theme.colors.text.secondary} style={styles.menuIcon} />
+              <Text style={[styles.menuText, currentRoute === item.route && styles.activeMenuText]}>
+                {item.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <View style={styles.divider} />
+
+        <View style={styles.accountMenu}>
+          <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+            <Icon name="logout" size={20} color={theme.colors.status.error} style={styles.menuIcon} />
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
 
       <View style={styles.footer}>
-        <Text style={styles.footerText}>System Status</Text>
-        <Text style={styles.footerSubtext}>All sensors operational</Text>
+        <View style={styles.statusIndicator} />
+        <Text style={styles.statusText}>System Status: All sensors operational</Text>
       </View>
     </View>
   );
@@ -55,75 +71,105 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.surface,
     paddingTop: 60,
-    paddingHorizontal: 16
+    paddingBottom: 20,
   },
-  header: {
-    paddingVertical: 24,
+  headerContainer: {
+    padding: 16,
+    alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
-    marginBottom: 16
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: theme.colors.primary,
-    marginBottom: 4
+  avatarContainer: {
+    marginBottom: 12,
   },
-  subtitle: {
-    fontSize: theme.typography.caption.fontSize,
-    color: theme.colors.text.secondary
+  avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: theme.colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  menu: {
+  avatarText: {
+    color: '#ffffff',
+    fontSize: 20,
+    fontWeight: '600',
+  },
+  userName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: theme.colors.text.primary,
+    marginBottom: 4,
+  },
+  userRole: {
+    fontSize: 12,
+    color: theme.colors.text.secondary,
+  },
+  menuContainer: {
     flex: 1,
-    paddingTop: 8
+    paddingTop: 16,
+  },
+  mainMenu: {
+    paddingHorizontal: 16,
+  },
+  accountMenu: {
+    paddingHorizontal: 16,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: theme.colors.border,
+    marginVertical: 16,
   },
   menuItem: {
-    paddingVertical: 16,
-    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
     borderRadius: theme.borderRadius.s,
-    marginBottom: 8
+    marginBottom: 4,
   },
-  menuItemActive: {
+  activeMenuItem: {
     backgroundColor: theme.colors.primary + '20', // 20% opacity
   },
+  menuIcon: {
+    marginRight: 12,
+  },
   menuText: {
-    fontSize: theme.typography.body.fontSize,
-    fontWeight: '500',
-    color: theme.colors.text.primary
+    fontSize: 16,
+    color: theme.colors.text.secondary,
   },
-  menuTextActive: {
+  activeMenuText: {
     color: theme.colors.primary,
-    fontWeight: '700'
+    fontWeight: '600',
   },
-  logoutBtn: {
-    padding: 16,
-    marginBottom: 16,
-    backgroundColor: '#fef2f2',
-    borderRadius: theme.borderRadius.m,
-    borderWidth: 1,
-    borderColor: theme.colors.status.error + '40', // 40% opacity
-    alignItems: 'center'
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: theme.borderRadius.s,
   },
   logoutText: {
-    fontSize: theme.typography.body.fontSize,
-    fontWeight: '600',
-    color: theme.colors.status.error
+    fontSize: 16,
+    color: theme.colors.status.error,
+    marginLeft: 12,
   },
   footer: {
-    paddingVertical: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
     borderTopWidth: 1,
-    borderTopColor: theme.colors.border
+    borderTopColor: theme.colors.border,
   },
-  footerText: {
-    fontSize: theme.typography.caption.fontSize,
-    fontWeight: '600',
+  statusIndicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: theme.colors.status.success,
+    marginRight: 8,
+  },
+  statusText: {
+    fontSize: 12,
     color: theme.colors.text.secondary,
-    marginBottom: 4,
-    textAlign: 'center'
   },
-  footerSubtext: {
-    fontSize: theme.typography.caption.fontSize,
-    color: theme.colors.status.success,
-    textAlign: 'center'
-  }
 });

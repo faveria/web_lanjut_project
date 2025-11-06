@@ -1,25 +1,38 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../context/AuthContext';
 import { theme } from '../theme';
 
 type Props = { subtitle?: string };
 
 export default function Header({ subtitle }: Props) {
   const navigation = useNavigation();
+  const { user } = useAuth();
   
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => (navigation as any).openDrawer()} style={styles.menuBtn}>
-        <Text style={styles.menuIcon}>≡</Text>
+        <Text style={styles.menuIcon}>☰</Text>
       </TouchableOpacity>
       <View style={styles.headerContent}>
         <Image source={require('../../assets/icon.png')} style={styles.logo} />
         <View>
-          <Text style={styles.title}>HY.YUME Monitor</Text>
+          <Text style={styles.title}>HY.YUME</Text>
           {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
         </View>
       </View>
+      <TouchableOpacity 
+        onPress={() => navigation.navigate('Profile' as never)} 
+        style={styles.profileBtn}
+        activeOpacity={0.7}
+      >
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>
+            {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || 'U'}
+          </Text>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -73,5 +86,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: theme.colors.text.secondary,
     marginTop: 4
+  },
+  profileBtn: {
+    marginLeft: 12,
+    padding: 4
+  },
+  avatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: theme.colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  avatarText: {
+    color: '#ffffff',
+    fontWeight: '600',
+    fontSize: 14
   }
 });

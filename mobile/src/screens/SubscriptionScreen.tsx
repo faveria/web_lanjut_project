@@ -3,39 +3,47 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator
 import { subscriptionAPI } from '../api/client';
 import Header from '../components/Header';
 import { theme } from '../theme';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const plans = [
   { 
     id: 'monthly', 
     name: 'Starter', 
-    price: 'Rp 299K', 
+    monthlyPrice: 'Rp 299K', 
+    yearlyPrice: 'Rp 2.999K', 
     period: '/month', 
-    features: ['Full access to all features', 'Real-time monitoring', 'Email support', 'Basic analytics'] 
+    yearlyPeriod: '/year',
+    features: ['Full access to all features', 'Real-time monitoring', 'Email support', 'Basic analytics'],
+    popular: false
   },
   { 
     id: 'quarterly', 
     name: 'Professional', 
-    price: 'Rp 799K', 
+    monthlyPrice: 'Rp 799K', 
+    yearlyPrice: 'Rp 6.999K', 
     period: '/3 months', 
-    features: ['All starter features', 'Priority support', 'Advanced analytics', 'Historical data (30 days)'], 
-    popular: true 
+    yearlyPeriod: '/year',
+    features: ['All starter features', 'Priority support', 'Advanced analytics', 'Historical data (30 days)'],
+    popular: true
   },
   { 
     id: 'annual', 
     name: 'Enterprise', 
-    price: 'Rp 1.499K', 
+    monthlyPrice: 'Rp 1.499K', 
+    yearlyPrice: 'Rp 12.999K', 
     period: '/year', 
-    features: ['All professional features', 'Unlimited devices', '24/7 premium support', 'Custom reports', 'Historical data (unlimited)'] 
+    yearlyPeriod: '/year',
+    features: ['All professional features', 'Unlimited devices', '24/7 support', 'Custom reports', 'Historical data (unlimited)'],
+    popular: false
   },
 ];
 
 export default function SubscriptionScreen() {
-  const [loading, setLoading] = useState(false);
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly'); // Default to monthly
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
 
   const handleSubscribe = async (planId: string) => {
-    setLoading(true);
     setLoadingPlan(planId);
     try {
       const res = await subscriptionAPI.createInvoice(planId);
@@ -46,7 +54,6 @@ export default function SubscriptionScreen() {
     } catch (e: any) {
       console.error('Error creating invoice:', e);
     } finally {
-      setLoading(false);
       setLoadingPlan(null);
     }
   };
@@ -60,49 +67,110 @@ export default function SubscriptionScreen() {
           <Text style={styles.subtitle}>Select the perfect plan for your needs</Text>
         </View>
 
+        {/* Billing Cycle Toggle */}
+        <View style={styles.billingToggleContainer}>
+          <TouchableOpacity 
+            style={[
+              styles.billingToggleOption, 
+              billingCycle === 'monthly' && styles.billingToggleOptionActive
+            ]}
+            onPress={() => setBillingCycle('monthly')}
+          >
+            <Text style={[
+              styles.billingToggleText,
+              billingCycle === 'monthly' && styles.billingToggleTextActive
+            ]}>Monthly</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[
+              styles.billingToggleOption, 
+              billingCycle === 'yearly' && styles.billingToggleOptionActive
+            ]}
+            onPress={() => setBillingCycle('yearly')}
+          >
+            <Text style={[
+              styles.billingToggleText,
+              billingCycle === 'yearly' && styles.billingToggleTextActive
+            ]}>Annual</Text>
+            <View style={styles.saveBadge}>
+              <Text style={styles.saveBadgeText}>Save 20%</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
         {paymentUrl && (
           <View style={styles.successCard}>
             <Text style={styles.successText}>Invoice generated! Payment page opened in browser.</Text>
           </View>
         )}
 
-        {plans.map((plan) => (
-          <View key={plan.id} style={[styles.planCard, plan.popular && styles.popularPlan]}>
-            {plan.popular && (
-              <View style={styles.popularBadge}>
-                <Text style={styles.popularBadgeText}>Most Popular</Text>
-              </View>
-            )}
-            
-            <View style={styles.planHeader}>
-              <Text style={styles.planName}>{plan.name}</Text>
-              <Text style={styles.planPrice}>{plan.price}<Text style={styles.planPeriod}>{plan.period}</Text></Text>
-            </View>
-            
-            <Text style={styles.featureTitle}>Features:</Text>
-            <View style={styles.features}>
-              {plan.features.map((feature, idx) => (
-                <View key={idx} style={styles.featureRow}>
-                  <Text style={styles.featureCheck}>✓</Text>
-                  <Text style={styles.featureText}>{feature}</Text>
+        <View style={styles.plansContainer}>
+          {plans.map((plan) => (
+            <View key={plan.id} style={[
+              styles.planCard, 
+              plan.popular && styles.popularPlanCard
+            ]}>
+              {plan.popular && (
+                <View style={styles.popularBadge}>
+                  <Text style={styles.popularBadgeText}>Most Popular</Text>
                 </View>
-              ))}
-            </View>
-            
-            <TouchableOpacity
-              style={[styles.subscribeBtn, plan.popular && styles.popularSubscribeBtn]}
-              onPress={() => handleSubscribe(plan.id)}
-              disabled={loading}
-            >
-              {loading && loadingPlan === plan.id ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.subscribeText}>Subscribe Now</Text>
               )}
-            </TouchableOpacity>
-          </View>
-        ))}
-        
+              
+              <View style={styles.planHeader}>
+                <Text style={styles.planName}>{plan.name}</Text>
+              </View>
+              
+              <View style={styles.priceContainer}>
+                <Text style={styles.price}>
+                  {billingCycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice}
+                </Text>
+                <Text style={styles.period}>
+                  {billingCycle === 'monthly' ? plan.period : plan.yearlyPeriod}
+                </Text>
+              </View>
+              
+              <View style={styles.features}>
+                {plan.features.map((feature, idx) => (
+                  <View key={idx} style={styles.featureRow}>
+                    <Icon name="check-circle" size={16} color={theme.colors.status.success} style={styles.featureIcon} />
+                    <Text style={styles.featureText}>{feature}</Text>
+                  </View>
+                ))}
+              </View>
+              
+              <View style={styles.ctaContainer}>
+                {plan.popular ? (
+                  <TouchableOpacity
+                    style={styles.primaryCtaButton}
+                    onPress={() => handleSubscribe(plan.id)}
+                    disabled={loadingPlan === plan.id}
+                  >
+                    {loadingPlan === plan.id ? (
+                      <ActivityIndicator color="#fff" />
+                    ) : (
+                      <Text style={styles.primaryCtaText}>Subscribe Now</Text>
+                    )}
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.secondaryCtaButton}
+                    onPress={() => handleSubscribe(plan.id)}
+                    disabled={loadingPlan === plan.id}
+                  >
+                    {loadingPlan === plan.id ? (
+                      <ActivityIndicator color={theme.colors.primary} />
+                    ) : (
+                      <Text style={styles.secondaryCtaText}>
+                        {plan.name === 'Starter' ? 'Choose Starter' : 'Choose Enterprise'}
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          ))}
+        </View>
+
         <View style={styles.securityCard}>
           <Text style={styles.securityTitle}>Payment Security</Text>
           <Text style={styles.securityText}>Your payment is securely processed through Xendit. We do not store your payment details.</Text>
@@ -124,12 +192,11 @@ const styles = StyleSheet.create({
   },
   content: { 
     padding: theme.spacing.m,
-    paddingBottom: theme.spacing.xl,
-    gap: theme.spacing.m
+    paddingBottom: theme.spacing.xl
   },
   headerSection: {
     alignItems: 'center',
-    marginBottom: theme.spacing.l
+    marginBottom: theme.spacing.m
   },
   title: { 
     fontSize: 24, 
@@ -141,7 +208,49 @@ const styles = StyleSheet.create({
   subtitle: { 
     fontSize: theme.typography.body.fontSize, 
     color: theme.colors.text.secondary, 
-    textAlign: 'center' 
+    textAlign: 'center', 
+    marginBottom: theme.spacing.l 
+  },
+  billingToggleContainer: {
+    flexDirection: 'row',
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.l,
+    padding: 4,
+    marginBottom: theme.spacing.l,
+    borderWidth: 1,
+    borderColor: theme.colors.border
+  },
+  billingToggleOption: {
+    flex: 1,
+    padding: theme.spacing.m,
+    alignItems: 'center',
+    borderRadius: theme.borderRadius.m,
+    flexDirection: 'row',
+    justifyContent: 'center'
+  },
+  billingToggleOptionActive: {
+    backgroundColor: theme.colors.primary,
+  },
+  billingToggleText: {
+    fontSize: theme.typography.body.fontSize,
+    color: theme.colors.text.secondary,
+    fontWeight: '500'
+  },
+  billingToggleTextActive: {
+    color: '#ffffff',
+    fontWeight: '600'
+  },
+  saveBadge: {
+    backgroundColor: '#10b981',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 9999,
+    marginLeft: 8
+  },
+  saveBadgeText: {
+    color: '#ffffff',
+    fontSize: 10,
+    fontWeight: '600'
   },
   successCard: { 
     backgroundColor: '#ecfdf5', 
@@ -149,12 +258,18 @@ const styles = StyleSheet.create({
     borderWidth: 1, 
     borderRadius: theme.borderRadius.m, 
     padding: theme.spacing.m,
-    alignItems: 'center'
+    alignItems: 'center',
+    marginBottom: theme.spacing.m
   },
   successText: { 
     color: theme.colors.status.success, 
+    textAlign: 'center', 
     fontSize: theme.typography.body.fontSize,
-    textAlign: 'center'
+    lineHeight: 18
+  },
+  plansContainer: {
+    gap: theme.spacing.m,
+    marginBottom: theme.spacing.m
   },
   planCard: { 
     backgroundColor: theme.colors.surface, 
@@ -169,24 +284,27 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2
   },
-  popularPlan: {
+  popularPlanCard: {
     borderColor: theme.colors.primary,
     borderWidth: 2
   },
-  popularBadge: {
-    position: 'absolute',
-    top: -10,
-    left: '50%',
-    transform: [{ translateX: -50 }],
-    backgroundColor: theme.colors.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-    borderRadius: 9999,
-    zIndex: 1
+  popularBadge: { 
+    position: 'absolute', 
+    top: -10, 
+    left: '50%', 
+    transform: [{ translateX: -50 }], 
+    backgroundColor: theme.colors.primary, 
+    color: '#ffffff', 
+    fontSize: 10, 
+    fontWeight: '700', 
+    paddingHorizontal: 16, 
+    paddingVertical: 4, 
+    borderRadius: 9999, 
+    zIndex: 1 
   },
   popularBadgeText: {
     color: '#ffffff',
-    fontSize: theme.typography.caption.fontSize,
+    fontSize: 10,
     fontWeight: '600'
   },
   planHeader: {
@@ -199,24 +317,22 @@ const styles = StyleSheet.create({
     color: theme.colors.text.primary, 
     marginBottom: theme.spacing.s
   },
-  planPrice: { 
+  priceContainer: {
+    alignItems: 'center',
+    marginBottom: theme.spacing.m
+  },
+  price: { 
     fontSize: 32, 
     fontWeight: '700', 
-    color: theme.colors.text.primary 
+    color: theme.colors.text.primary,
+    marginBottom: 4
   },
-  planPeriod: { 
-    fontSize: theme.typography.body.fontSize, 
-    fontWeight: '400', 
+  period: { 
+    fontSize: theme.typography.caption.fontSize, 
     color: theme.colors.text.secondary 
   },
-  featureTitle: {
-    fontSize: theme.typography.caption.fontSize,
-    fontWeight: '600',
-    color: theme.colors.text.primary,
-    marginBottom: theme.spacing.s
-  },
   features: { 
-    marginBottom: theme.spacing.m,
+    marginBottom: theme.spacing.l,
     gap: theme.spacing.s
   },
   featureRow: { 
@@ -224,10 +340,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start', 
     gap: theme.spacing.s 
   },
-  featureCheck: { 
-    color: theme.colors.status.success, 
-    fontSize: theme.typography.body.fontSize, 
-    fontWeight: '700',
+  featureIcon: {
     marginTop: 2
   },
   featureText: { 
@@ -235,19 +348,35 @@ const styles = StyleSheet.create({
     color: theme.colors.text.primary,
     flex: 1 
   },
-  subscribeBtn: { 
-    backgroundColor: theme.colors.background, 
+  ctaContainer: {
+    alignItems: 'center',
+    marginTop: theme.spacing.s
+  },
+  primaryCtaButton: { 
+    backgroundColor: theme.colors.primary, 
     paddingVertical: 16, 
+    paddingHorizontal: 32,
+    borderRadius: theme.borderRadius.m, 
+    alignItems: 'center',
+    minWidth: '80%'
+  },
+  primaryCtaText: { 
+    color: '#ffffff', 
+    fontWeight: '600', 
+    fontSize: theme.typography.body.fontSize 
+  },
+  secondaryCtaButton: { 
+    backgroundColor: 'transparent', 
+    paddingVertical: 16, 
+    paddingHorizontal: 32,
     borderRadius: theme.borderRadius.m, 
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: theme.colors.border
+    borderColor: theme.colors.primary,
+    minWidth: '80%'
   },
-  popularSubscribeBtn: { 
-    backgroundColor: theme.colors.primary 
-  },
-  subscribeText: { 
-    color: '#ffffff', 
+  secondaryCtaText: { 
+    color: theme.colors.primary, 
     fontWeight: '600', 
     fontSize: theme.typography.body.fontSize 
   },
@@ -257,7 +386,8 @@ const styles = StyleSheet.create({
     padding: theme.spacing.m, 
     borderWidth: 1, 
     borderColor: theme.colors.border,
-    alignItems: 'center'
+    alignItems: 'center',
+    marginBottom: theme.spacing.m
   },
   securityTitle: { 
     fontSize: theme.typography.h3.fontSize, 
