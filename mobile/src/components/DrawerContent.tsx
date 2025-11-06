@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigationState } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
-import { theme } from '../theme';
+import { useDarkMode } from '../theme/DarkModeContext';
+import { useDynamicStyles } from '../hooks/useDynamicStyles';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const menuItems = [
@@ -15,8 +16,10 @@ const menuItems = [
 
 export default function DrawerContent({ navigation }: any) {
   const { logout, user } = useAuth();
+  const { theme } = useDarkMode();
   const route = useNavigationState((state) => state?.routes[state?.index || 0]?.name);
   const currentRoute = route || 'Dashboard';
+  const styles = useDynamicStyles(createStyles);
 
   return (
     <View style={styles.container}>
@@ -66,7 +69,7 @@ export default function DrawerContent({ navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.surface,

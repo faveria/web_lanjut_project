@@ -1,11 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
-import { theme } from '../theme';
+import { useDarkMode } from '../theme/DarkModeContext';
+import { useDynamicStyles } from '../hooks/useDynamicStyles';
 
 export default function ProfileScreen() {
   const { user } = useAuth();
+  const { theme } = useDarkMode();
+  const styles = useDynamicStyles(createStyles);
 
   return (
     <View style={styles.container}>
@@ -94,7 +97,7 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: { 
     flex: 1, 
     backgroundColor: theme.colors.background 

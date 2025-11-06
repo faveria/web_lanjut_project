@@ -2,13 +2,16 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
-import { theme } from '../theme';
+import { useDarkMode } from '../theme/DarkModeContext';
+import { useDynamicStyles } from '../hooks/useDynamicStyles';
 
 type Props = { subtitle?: string };
 
 export default function Header({ subtitle }: Props) {
   const navigation = useNavigation();
   const { user } = useAuth();
+  const { theme } = useDarkMode();
+  const styles = useDynamicStyles(createStyles);
   
   return (
     <View style={styles.container}>
@@ -37,7 +40,7 @@ export default function Header({ subtitle }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     backgroundColor: theme.colors.surface,
     borderBottomWidth: 1,

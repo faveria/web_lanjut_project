@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Linking } from 'react-native';
 import { subscriptionAPI } from '../api/client';
 import Header from '../components/Header';
-import { theme } from '../theme';
+import { useDarkMode } from '../theme/DarkModeContext';
+import { useDynamicStyles } from '../hooks/useDynamicStyles';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const plans = [
@@ -39,9 +40,11 @@ const plans = [
 ];
 
 export default function SubscriptionScreen() {
+  const { theme } = useDarkMode();
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly'); // Default to monthly
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
+  const styles = useDynamicStyles(createStyles);
 
   const handleSubscribe = async (planId: string) => {
     setLoadingPlan(planId);
@@ -185,7 +188,7 @@ export default function SubscriptionScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: { 
     flex: 1, 
     backgroundColor: theme.colors.background 
@@ -241,7 +244,7 @@ const styles = StyleSheet.create({
     fontWeight: '600'
   },
   saveBadge: {
-    backgroundColor: '#10b981',
+    backgroundColor: theme.colors.status.success,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 9999,
@@ -253,7 +256,7 @@ const styles = StyleSheet.create({
     fontWeight: '600'
   },
   successCard: { 
-    backgroundColor: '#ecfdf5', 
+    backgroundColor: `${theme.colors.status.success}20`, 
     borderColor: theme.colors.status.success, 
     borderWidth: 1, 
     borderRadius: theme.borderRadius.m, 

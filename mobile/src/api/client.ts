@@ -56,5 +56,10 @@ export const recommendationAPI = {
   getGrowthRecommendations: (userId: number) => api.get(`/recommendations/user/${userId}`)
 };
 
+export const userPreferencesAPI = {
+  getUserPreferences: (userId: number) => api.get(`/users/${userId}/preferences`),
+  updateUserPreferences: (userId: number, preferences: any) => api.put(`/users/${userId}/preferences`, preferences)
+};
+
 
 

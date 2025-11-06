@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Alert, Image } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { theme } from '../theme';
+import { useDarkMode } from '../theme/DarkModeContext';
+import { useDynamicStyles } from '../hooks/useDynamicStyles';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export default function RegisterScreen({ navigation }: any) {
+  const { theme } = useDarkMode();
   const { register } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,6 +15,7 @@ export default function RegisterScreen({ navigation }: any) {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const styles = useDynamicStyles(createStyles);
 
   const validate = () => {
     if (!email || !password || !confirmPassword) {
@@ -179,10 +182,10 @@ export default function RegisterScreen({ navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: { 
     flexGrow: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.colors.background,
     padding: 24,
     paddingTop: 80,
   },
@@ -230,7 +233,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
     borderRadius: theme.borderRadius.m,
-    backgroundColor: theme.colors.background
+    backgroundColor: theme.colors.surface
   },
   input: {
     flex: 1,
@@ -296,7 +299,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.m,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    backgroundColor: theme.colors.background
+    backgroundColor: theme.colors.surface
   },
   googleLogoContainer: {
     position: 'absolute',
@@ -351,9 +354,9 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     flexDirection: 'row',
-    backgroundColor: '#fee2e2',
+    backgroundColor: `${theme.colors.status.error}20`, // 20% opacity
     borderWidth: 1,
-    borderColor: '#fecaca',
+    borderColor: `${theme.colors.status.error}40`, // 40% opacity
     borderRadius: theme.borderRadius.m,
     padding: 12,
     marginBottom: 20,

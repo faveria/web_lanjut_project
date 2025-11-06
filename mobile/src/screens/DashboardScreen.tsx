@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Dimensions, Switch } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useFocusEffect } from '@react-navigation/native';
@@ -6,13 +6,15 @@ import { useSensorData } from '../hooks/useSensorData';
 import { useAuth } from '../context/AuthContext';
 import { pumpAPI } from '../api/client';
 import Header from '../components/Header';
-import { theme } from '../theme';
+import { useDarkMode } from '../theme/DarkModeContext';
+import { useDynamicStyles } from '../hooks/useDynamicStyles';
 import { SENSOR_THRESHOLDS } from '../utils/constants';
 import { ActivityIndicator } from 'react-native';
 
 export default function DashboardScreen() {
   const { sensorData, loading, error, refetch } = useSensorData(1000);
   const { logout, user } = useAuth();
+  const { theme } = useDarkMode();
   const [refreshing, setRefreshing] = React.useState(false);
 
   const onPumpToggle = async (status: 'on' | 'off') => {
@@ -77,6 +79,8 @@ export default function DashboardScreen() {
   };
 
   const systemStatus = getSystemStatus();
+
+  const styles = useDynamicStyles(createStyles);
 
   return (
     <View style={styles.container}>
@@ -246,7 +250,7 @@ export default function DashboardScreen() {
 const { width } = Dimensions.get('window');
 const cardWidth = (width - 48) / 2; // 2 columns with margins
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: { 
     flex: 1, 
     backgroundColor: theme.colors.background 
@@ -358,7 +362,7 @@ const styles = StyleSheet.create({
   },
   gauge: {
     height: 4,
-    backgroundColor: '#e5e7eb',
+    backgroundColor: theme.colors.border, // Use theme border color instead of hardcoded color
     borderRadius: 2,
     overflow: 'hidden'
   },
