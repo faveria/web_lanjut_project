@@ -1,0 +1,183 @@
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
+import Layout from './components/Layout/Layout';
+import Landing from './pages/Landing';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import DailyHistory from './pages/DailyHistory';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
+import Subscription from './pages/Subscription';
+import EmailVerification from './pages/EmailVerification';
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentFailed from './pages/PaymentFailed';
+import MobileNotSupported from './pages/MobileNotSupported';
+import { handleScreenSizeRedirect, setupMobileDetectionListeners } from './utils/mobileDetection';
+
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+      </div>
+    );
+  }
+  
+  return isAuthenticated ? children : <Navigate to="/login" />;
+};
+
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+      </div>
+    );
+  }
+  
+  return !isAuthenticated ? children : <Navigate to="/dashboard" />;
+};
+
+function App() {
+  useEffect(() => {
+    // Check screen size and redirect if needed
+    handleScreenSizeRedirect();
+    
+    // Setup listener for screen size changes
+    const removeListener = setupMobileDetectionListeners();
+    
+    // Cleanup function to remove event listener
+    return () => {
+      removeListener();
+    };
+  }, []);
+
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <div className="App">
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Landing />} />
+              <Route 
+                path="/login" 
+                element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                } 
+              />
+              <Route 
+                path="/register" 
+                element={
+                  <PublicRoute>
+                    <Register />
+                  </PublicRoute>
+                } 
+              />
+              <Route 
+                path="/verify-email" 
+                element={
+                  <PublicRoute>
+                    <EmailVerification />
+                  </PublicRoute>
+                } 
+              />
+
+              {/* Protected Routes */}
+              <Route 
+                path="/dashboard" 
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Dashboard />
+                    </Layout>
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/profile" 
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Profile />
+                    </Layout>
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/settings" 
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Settings />
+                    </Layout>
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/daily-history" 
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <DailyHistory />
+                    </Layout>
+                  </ProtectedRoute>
+                } 
+              />
+              
+              <Route 
+                path="/subscription" 
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Subscription />
+                    </Layout>
+                  </ProtectedRoute>
+                } 
+              />
+              
+              <Route 
+                path="/payment-success" 
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <PaymentSuccess />
+                    </Layout>
+                  </ProtectedRoute>
+                } 
+              />
+              
+              <Route 
+                path="/payment-failed" 
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <PaymentFailed />
+                    </Layout>
+                  </ProtectedRoute>
+                } 
+              />
+
+              {/* Mobile Not Supported Route */}
+              <Route path="/mobile-not-supported" element={<MobileNotSupported />} />
+
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </div>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
+  );
+}
+
+export default App;

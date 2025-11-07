@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "Hyyume",
+    "slug": "hyyume-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "hyyume",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.faveria.hyyumemobile"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3afd5b37-0a6e-4563-961e-8d626db7816e"
+      }
+    }
+  }
+}
+
