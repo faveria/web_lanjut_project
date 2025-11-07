@@ -2,14 +2,12 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const mqttClient = require('./config/mqtt'); // ✅ Tetap import MQTT client
+const mqttClient = require('./config/mqtt');
 const mobileBlocker = require('./middlewares/mobileBlocker');
 require('dotenv').config();
 
-// ✅ Import dataController after other imports to avoid circular dependency
 const dataController = require('./controllers/dataController');
 
-// ✅ CONNECT MQTT CLIENT WITH DATA CONTROLLER to break circular dependency
 mqttClient.setMessageHandler(dataController.saveSensorData);
 
 const app = express();
@@ -74,11 +72,11 @@ app.get('/api/health', (req, res) => {
     success: true,
     message: 'HY.YUME Monitor API is running',
     timestamp: new Date().toISOString(),
-    mqttStatus: mqttClient.isConnected ? 'connected' : 'disconnected' // ✅ Info status MQTT
+    mqttStatus: mqttClient.isConnected ? 'connected' : 'disconnected'
   });
 });
 
-// ❌ HAPUS BAGIAN INI (sudah dipindah ke mqtt.js):
+
 // mqttClient.onMessage(async (topic, message) => {
 //   try {
 //     if (topic === 'hyyume/sensor/data') {

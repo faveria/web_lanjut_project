@@ -362,8 +362,8 @@ const saveSensorData = async (sensorData) => {
 module.exports = {
   getLatestData,
   getHistory,
-  getHourlyData,    // Add hourly data function
-  getDailyData,     // Add daily data function
+  getHourlyData,
+  getDailyData,
   saveSensorData,
   controlPump
 };

@@ -220,7 +220,7 @@ const DesktopSidebar = ({ isOpen, currentPath, onNavigate }) => {
 
 // Main Layout Component
 const Layout = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(true); // Changed default to true for better UX
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();

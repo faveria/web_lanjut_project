@@ -19,14 +19,14 @@
 #include <Preferences.h> // kept though we won't save credentials
 
 // ======================
-// KONFIGURASI MQTT & TOPIC (tidak diubah)
+// MQTT Configuration
 // ======================
 const char* mqtt_server = "${MQTT_BROKER_HOST}";
 const char* mqtt_topic_data = "hyyume/sensor/data";
 const char* mqtt_topic_pump = "hyyume/sensor/pump";
 
 // ======================
-// PIN SENSOR & RELAY (tidak diubah)
+// Sensor and Relay Pins
 // ======================
 #define TdsSensorPin 33
 #define PH_SENSOR_PIN 34
@@ -41,7 +41,7 @@ const char* mqtt_topic_pump = "hyyume/sensor/pump";
 
 // ======================
 WebServer server(80);
-DNSServer dnsServer;            // untuk captive portal redirect
+DNSServer dnsServer;            // captive portal redirect
 WiFiClient espClient;
 PubSubClient client(espClient);
 
@@ -130,7 +130,7 @@ float readPH() {
 }
 
 // ======================
-// MQTT functions (tidak diubah)
+// MQTT Functions
 // ======================
 void sendPumpStatus() {
   if (wifiConnected) {

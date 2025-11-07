@@ -120,6 +120,6 @@ export const useSensorData = (pollingInterval = 3000) => {
     error,
     refetch: fetchLatestData,
     updatePollingInterval,
-    getHourlyData, // Add method to get hourly data
+    getHourlyData,
   };
 };

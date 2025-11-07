@@ -106,7 +106,7 @@ const getUserPlantSettings = async (req, res) => {
   }
 };
 
-// Add plant to user's settings
+
 const addUserPlant = async (req, res) => {
   try {
     const { userId } = req.params;
